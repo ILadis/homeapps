@@ -6,36 +6,9 @@
     return template.content;
   }
 
-  function labelOf({ ingredient, quantity, unit }) {
-    return `${numberOf(quantity)} ${unit || ''} ${ingredient}`;
-  }
-
-  function numberOf(quantity) {
-    if (!quantity || quantity <= 0.1) {
-      return '';
-    } else if (quantity >= 1) {
-      return Number.isInteger(quantity)
-        ? quantity.toString()
-        : quantity.toFixed(2);
-    }
-
-    let fraction = Number.parseInt(1 / quantity);
-    let codePoints = [
-      0, 5830, 189, 8531, 188, 8533, 8537, 8528, 8539, 8529
-    ];
-
-    return String.fromCodePoint(codePoints[fraction]);
-  }
-
   function importNode(template) {
     let node = document.importNode(template, true);
     return node.firstElementChild;
-  }
-
-  function clearAll(node) {
-    while (node.firstChild) {
-      node.firstChild.remove();
-    }
   }
 
   function Recipe() {
@@ -64,13 +37,11 @@
     span.textContent = `Zutaten für ${quantity} ${unit}`;
   };
 
-  Recipe.prototype.onIncreaseServingsClicked = function() { };
-  Recipe.prototype.onDecreaseServingsClicked = function() { };
-
-  Recipe.prototype.addIngredient =  function(ingredient) {
+  // TODO consider returning view here
+  Recipe.prototype.addIngredient = function({ ingredient, quantity, unit }) {
     let ul = this.node.querySelector('ul');
     let li = document.createElement('li');
-    li.textContent = labelOf(ingredient);
+    li.textContent = `${quantity || ''} ${unit || ''} ${ingredient}`;
     ul.appendChild(li);
   };
 
@@ -97,6 +68,7 @@
   </section>
   `;
 
+  // TODO consider returning view here
   Steps.prototype.addStep = function({ step, ingredients }) {
     let h2 = this.node.querySelector('h2');
     h2.textContent = 'Zubereitung';
@@ -104,19 +76,16 @@
     let template = this.node.querySelector('template');
     let node = document.importNode(template.content, true);
 
-    let h3 = node.querySelector('h3');
     let ul = node.querySelector('ul');
+    let h3 = node.querySelector('h3');
+    h3.textContent = 'Zutaten';
 
     if (!ingredients) {
       h3.remove();
-    }
-    else {
-      h3.textContent = 'Zutaten';
-      for (let ingredient of ingredients) {
-        let li = document.createElement('li');
-        li.textContent = labelOf(ingredient);
-        ul.appendChild(li);
-      }
+    } else for (let { ingredient, quantity, unit } of ingredients) {
+      let li = document.createElement('li');
+      li.textContent = `${quantity || ''} ${unit || ''} ${ingredient}`;
+      ul.appendChild(li);
     }
 
     let span = node.querySelector('span');
@@ -129,6 +98,12 @@
   Steps.prototype.appendTo = function(node) {
     node.appendChild(this.node);
   };
+
+  function clearAll(node) {
+    while (node.firstChild) {
+      node.firstChild.remove();
+    }
+  }
 
   exports.Views = { Recipe, Steps, clearAll };
 

@@ -1,13 +1,5 @@
 (function(exports) {
 
-  function* ingredients(recipe, ingredients) {
-    for (let i = 0; i < ingredients.length; i++) {
-      let ingredient = ingredients[i];
-      let ref = recipe.ingredients[ingredient.ref];
-      yield Object.assign({ }, ref, ingredient);
-    }
-  }
-
   const whiteList = new RegExp('^[a-z\\-]+$');
 
   function Repository() {
@@ -26,13 +18,63 @@
     let recipe = await request.json();
 
     for (let step of recipe.steps) {
-      if (step.ingredients) {
-        let iterator = ingredients.bind(null, recipe, step.ingredients);
-        step.ingredients[Symbol.iterator] = iterator;
+      if ('ingredients' in step) {
+        let iterator = Recipe.ingredients(recipe, step.ingredients);
+        step.ingredients = { [Symbol.iterator]: iterator };
+      }
+    }
+
+    for (let ingredient of recipe.ingredients) {
+      if ('quantity' in ingredient) {
+        let primitive = Recipe.quantity(recipe, ingredient.quantity);
+        ingredient.quantity = { [Symbol.toPrimitive]: primitive };
       }
     }
 
     return recipe;
+  };
+
+  function Recipe() {
+  }
+
+  Recipe.quantity = (recipe, quantity) => {
+    let servings = recipe.servings.quantity;
+    return function() {
+      let q = quantity * (recipe.servings.quantity / servings);
+      if (q <= 0.1) {
+        return '';
+      } else if (q >= 1) {
+        return Number.isInteger(q)
+          ? q.toString()
+          : q.toFixed(2);
+      }
+  
+      let fraction = Number.parseInt(1 / q);
+      let codePoints = [
+        0, 5830, 189, 8531, 188, 8533, 8537, 8528, 8539, 8529
+      ];
+  
+      return String.fromCodePoint(codePoints[fraction]);
+    };
+  };
+
+  Recipe.ingredients = (recipe, ingredients) => {
+    return function*() {
+      let iterator = ingredients.values();
+
+      var result = iterator.next();
+      while (!result.done) {
+        let { ref, quantity } = result.value;
+        let ingredient = recipe.ingredients[ref];
+
+        if (!quantity) {
+          quantity = ingredient.quantity;
+        }
+
+        var result = iterator.next();
+        yield Object.assign({ }, ingredient, { quantity });
+      }
+    };
   };
 
   exports.Repository = Repository;
