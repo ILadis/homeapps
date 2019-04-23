@@ -83,7 +83,7 @@ section > ol {
 header > ul > li {
   padding: 8pt 0;
   border-bottom: solid 1pt #ccc;
-  font-size: 12pt;
+  font: 12pt sans-serif;
   color: #828282;
 }
 
@@ -95,7 +95,7 @@ section > ol > li {
   position: relative;
   padding: 12pt 0 32pt 48pt;
   border-top: solid 2pt #e4e6e7;
-  font-size: 12pt;
+  font: 12pt sans-serif;
   color: #828282;
 }
 
