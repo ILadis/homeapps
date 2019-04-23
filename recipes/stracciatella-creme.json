@@ -1,0 +1,42 @@
+{
+  "name": "Stracciatella-Creme",
+  "servings": {
+    "quantity": 4,
+    "unit": "Portionen"
+  },
+  "ingredients": [{
+    "ingredient": "Orangen",
+    "quantity": 3
+  }, {
+    "ingredient": "OrangeBack",
+    "quantity": 5,
+    "unit": "g"
+  }, {
+    "ingredient": "Schlagsahne",
+    "quantity": 200,
+    "unit": "g"
+  }, {
+    "ingredient": "Naturjoghurt",
+    "quantity": 200,
+    "unit": "g"
+  }, {
+    "ingredient": "Schokoladensplitter",
+    "quantity": 4,
+    "unit": "EL"
+  }, {
+    "ingredient": "Raspelschokolade"
+  }, {
+    "ingredient": "Puderzucker",
+    "quantity": 2,
+    "unit": "EL"
+  }],
+  "steps": [{
+    "step": "Orangen so dick schälen, dass die weiße Haut mit entfernt wird. Filets zwischen den Trennhäuten herausschneiden, Saft auffangen.",
+    "ingredients": [{ "ref": 0 }]
+  }, {
+    "step": "Sahne steif schlagen, mit Joghurt, Schokoladensplittern, Puderzucker und OrangeBack mischen.",
+    "ingredients": [{ "ref": 2 }, { "ref": 3 }, { "ref": 4 }, { "ref": 6 }, { "ref": 1 }]
+  }, {
+    "step": "Creme auf Dessertschalen verteilen, mit Orangenfilets, -saft und ggf. Minze garniert servieren."
+  }]
+}

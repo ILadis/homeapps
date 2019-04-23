@@ -1,0 +1,35 @@
+{
+  "name": "Zwiebelstangen",
+  "servings": {
+    "quantity": 24,
+    "unit": "Stangen"
+  },
+  "ingredients": [{
+    "ingredient": "Blätterteig",
+    "quantity": 1,
+    "unit": "Pck"
+  }, {
+    "ingredient": "Fertigmischung Zwiebelsuppe",
+    "quantity": 1,
+    "unit": "Pck"
+  }, {
+    "ingredient": "Schmand",
+    "quantity": 200,
+    "unit": "g"
+  }, {
+    "ingredient": "Ei",
+    "quantity": 1
+  }],
+  "steps": [{
+    "step": "Schmand mit Zwiebelsuppe und ggf. Chilipulver verrühren.",
+    "ingredients": [{ "ref": 2 }, { "ref": 1 }]
+  }, {
+    "step": "Mischung auf die untere Hälfte des Blätterteigs schmieren und anschließend die obere Hälfte über die Mischung klappen. Den Teig in ca. 1 cm breite Streifen schneiden, spiralförmig eindrehen und auf ein mit Backpapier ausgelegtem Blech legen.",
+    "ingredients": [{ "ref": 0 }]
+  }, {
+    "step": "Ei verquirlen und Stangen damit bestreichen.",
+    "ingredients": [{ "ref": 3 }]
+  }, {
+    "step": "Die Stangen bei 180°C ca. 20 Minuten backen bis sie braun sind."
+  }]
+}

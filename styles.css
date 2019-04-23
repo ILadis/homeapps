@@ -1,0 +1,140 @@
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #fff;
+  counter-reset: steps;
+}
+
+header {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  padding: 8pt 18pt 44pt;
+  box-sizing: border-box;
+  background: #f9f8f5;
+  flex-direction: column;
+  display: flex;
+  z-index: 1;
+}
+
+section {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  max-height: 100%;
+  padding: 8pt;
+  margin-top: -40pt;
+  border-radius: 8pt 8pt 0 0;
+  box-shadow: 0 -1pt 2pt 1pt #bfbfbf;
+  box-sizing: border-box;
+  background: #fff;
+  flex-direction: column;
+  display: flex;
+  z-index: 2;
+}
+
+h1 {
+  padding: 8pt;
+  font: 18pt sans-serif;
+  color: #4a4a4a;
+}
+
+h2 {
+  padding: 8pt;
+  font: 15pt serif;
+  color: #4a4a4a;
+}
+
+h3 {
+  font: 12pt serif;
+  color: #4a4a4a;
+}
+
+header > h2 {
+  text-align: center;
+}
+
+header > h2 * {
+  vertical-align: middle;
+}
+
+header > h2 button {
+  margin: 0 8pt;
+  padding: 0 6pt;
+  line-height: 15pt;
+  border: solid 1pt #ccc;
+  background: #fff;
+  outline: none;
+}
+
+header > ul,
+section > ol {
+  padding: 0 8pt;
+  list-style: none;
+  flex-grow: 1;
+  overflow: scroll;
+  scrollbar-width: none;
+}
+
+header > ul > li {
+  padding: 8pt 0;
+  border-bottom: solid 1pt #ccc;
+  font-size: 12pt;
+  color: #828282;
+}
+
+header > ul > li:last-child {
+  border: none;
+}
+
+section > ol > li {
+  position: relative;
+  padding: 12pt 0 32pt 48pt;
+  border-top: solid 2pt #e4e6e7;
+  font-size: 12pt;
+  color: #828282;
+}
+
+section > ol > li:last-child {
+  padding-bottom: 0;
+}
+
+section > ol > li:before {
+  position: absolute;
+  left: 0; top: 12pt;
+  width: 36pt;
+  height: 36pt;
+  line-height: 36pt;
+  font-size: 18pt;
+  text-align: center;
+  color: #4a4a4a;
+  border-radius: 50%;
+  background: #d7eeee;
+  display: block;
+  counter-increment: steps;
+  content: counter(steps);
+}
+
+h3 + ul {
+  margin-top: -2pt;
+  padding-bottom: 6pt;
+  list-style: none;
+}
+
+h3 + ul > li {
+  font-size: 11pt;
+  display: inline;
+}
+
+h3 + ul > li:first-child:before {
+  display: none;
+}
+
+h3 + ul > li:before {
+  content: '•';
+  padding: 0 2pt;
+}
