@@ -1,36 +1,72 @@
 
 (function(exports) {
 
-  function html(source) {
-    let template = document.createElement('template');
-    template.innerHTML = source[0];
-    return template.content;
+  function Index() {
+    this.node = importNode(Index.template);
+    this.records = new Set();
   }
 
-  function clearAll(node) {
-    while (node.firstChild) {
-      node.firstChild.remove();
-    }
+  Index.template = html`
+  <div class="index">
+    <header>
+      <h1><!-- title --></h1>
+      <input type="search">
+    </header>
+    <section>
+      <ol><!-- records --></ol>
+    </section>
+  </div>
+  `;
+
+  Index.prototype.setQuery = function(query) {
+    let h1 = this.node.querySelector('header h1');
+    h1.textContent = 'Kochbuch';
+
+    let input = this.node.querySelector('header input');
+    input.placeholder = 'Suchbegriff...';
+    input.value = `${query || ''}`;
+  };
+
+  Index.prototype.addRecord = function() {
+    let ol = this.node.querySelector('section ol');
+
+    let view = new Record();
+    view.appendTo(ol);
+
+    this.records.add(view);
+    return view;
+  };
+
+  Index.prototype.appendTo = function(node) {
+    node.appendChild(this.node);
+  };
+
+  function Record() {
+    this.node = importNode(Record.template);
   }
 
-  function trimTextNodes(node) {
-    let childs = node.childNodes;
-    for (let i = 0; i < childs.length; i++) {
-      let child = childs[i];
+  Record.template = html`
+  <li>
+    <span><!-- name --></span>
+  </li>
+  `;
 
-      if (child.nodeType == 3) {
-        child.textContent = child.textContent.trim();
-      } else {
-        trimTextNodes(child);
-      }
-    }
-    return node;
-  }
+  Record.prototype.setName = function({ name }) {
+    let span = this.node.querySelector('span');
+    span.textContent = name;
 
-  function importNode(template) {
-    let node = document.importNode(template, true);
-    return trimTextNodes(node.firstElementChild);
-  }
+    let li = this.node;
+    li.onclick = () => this.onRecordClicked();
+
+    return this;
+  };
+
+  Record.prototype.onRecordClicked = function() {
+  };
+
+  Record.prototype.appendTo = function(node) {
+    node.appendChild(this.node);
+  };
 
   function Recipe() {
     this.node = importNode(Recipe.template);
@@ -98,7 +134,6 @@
     this.steps.add(view);
     return view;
   };
-
 
   Recipe.prototype.appendTo = function(node) {
     node.appendChild(this.node);
@@ -175,7 +210,38 @@
     node.appendChild(this.node);
   };
 
-  exports.Views = { Recipe, clearAll };
+  exports.Views = { Index, Recipe, clearAll };
+
+  function html(source) {
+    let template = document.createElement('template');
+    template.innerHTML = source[0];
+    return template.content;
+  }
+
+  function clearAll(node) {
+    while (node.firstChild) {
+      node.firstChild.remove();
+    }
+  }
+
+  function trimTextNodes(node) {
+    let childs = node.childNodes;
+    for (let i = 0; i < childs.length; i++) {
+      let child = childs[i];
+
+      if (child.nodeType == 3) {
+        child.textContent = child.textContent.trim();
+      } else {
+        trimTextNodes(child);
+      }
+    }
+    return node;
+  }
+
+  function importNode(template) {
+    let node = document.importNode(template, true);
+    return trimTextNodes(node.firstElementChild);
+  }
 
 })(this);
 

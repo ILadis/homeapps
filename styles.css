@@ -29,32 +29,78 @@ h3 {
   color: #4a4a4a;
 }
 
+span + span:before {
+  content: ' ';
+}
+
+.index {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  display: flex;
+}
+
+.index > header {
+  width: 100%;
+  padding: 8pt 18pt 12pt;
+  border-bottom: solid 1pt #ccc;
+  box-shadow: 0 -1pt 2pt 1pt #bfbfbf;
+  box-sizing: border-box;
+  background: #f9f8f5;
+}
+
+.index > header > h1 {
+  padding-bottom: 16pt;
+}
+
+.index > header > h1 + input {
+  margin: 0 auto;
+  padding: 4pt 8pt;
+  width: 190pt;
+  font-size: 12pt;
+  border: solid 1pt #ccc;
+  border-radius: 8pt;
+  background: #fff;
+  display: block;
+}
+
+.index > section {
+  padding: 12pt 8pt 0;
+  flex-grow: 1;
+  overflow: scroll;
+  scrollbar-width: none;
+}
+
+.index > section > ol {
+  list-style: none;
+}
+
+.index > section > ol > li {
+  padding: 8pt 0;
+  border-bottom: solid 1pt #ccc;
+}
+
+.index > section > ol > li:last-child {
+  border: none;
+}
+
+.recipe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
 .recipe > header {
   position: fixed;
   width: 100%;
   height: 100%;
-  padding: 8pt 18pt 44pt;
+  padding: 8pt 18pt 32pt;
   box-sizing: border-box;
   background: #f9f8f5;
   flex-direction: column;
   display: flex;
   z-index: 1;
-}
-
-.recipe > section {
-  position: absolute;
-  top: 100%;
-  width: 100%;
-  max-height: 100%;
-  padding: 8pt;
-  margin-top: -40pt;
-  border-radius: 8pt 8pt 0 0;
-  box-shadow: 0 -1pt 2pt 1pt #bfbfbf;
-  box-sizing: border-box;
-  background: #fff;
-  flex-direction: column;
-  display: flex;
-  z-index: 2;
 }
 
 .recipe > header > h2 {
@@ -86,18 +132,36 @@ h3 {
 .recipe > header > ul > li {
   padding: 8pt 0;
   border-bottom: solid 1pt #ccc;
-  color: #828282;
 }
 
 .recipe > header > ul > li:last-child {
   border: none;
 }
 
+.recipe > section {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  max-height: 100%;
+  padding: 8pt;
+  margin-top: -32pt;
+  border-radius: 8pt 8pt 0 0;
+  box-shadow: 0 -1pt 2pt 1pt #bfbfbf;
+  box-sizing: border-box;
+  background: #fff;
+  flex-direction: column;
+  display: flex;
+  z-index: 2;
+}
+
+.recipe > section > h2 {
+  padding-top: 0;
+}
+
 .recipe > section > ol > li {
   position: relative;
   padding: 12pt 0 32pt 48pt;
   border-top: solid 2pt #e4e6e7;
-  color: #828282;
 }
 
 .recipe > section > ol > li:last-child {

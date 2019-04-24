@@ -6,6 +6,17 @@
   function Repository() {
   }
 
+  Repository.fetchIndex = async function() {
+    let request = await fetch(`recipes/index.json`);
+    if (!request.ok) {
+      throw new Error(`request for index failed`);
+    }
+
+    let index = await request.json();
+
+    return index;
+  };
+
   Repository.fetchRecipe = async function(id) {
     if (id == 'index' || !whiteList.test(id)) {
       throw new Error('invalid id given');
@@ -13,7 +24,7 @@
 
     let request = await fetch(`recipes/${id}.json`);
     if (!request.ok) {
-      throw new Error(`request for ${id} failed`);
+      throw new Error(`request for recipe '${id}' failed`);
     }
 
     let recipe = await request.json();

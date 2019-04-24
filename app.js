@@ -1,6 +1,18 @@
 
 (function(exports) {
 
+  function showIndex(view, index) {
+    view.setQuery();
+
+    for (let record of index) {
+      let v = view.addRecord();
+      v.setName(record);
+      v.onRecordClicked = () => {
+        location.hash = `#${record.id}`;
+      };
+    }
+  }
+
   function showRecipe(view, recipe) {
     view.setName(recipe.name);
     view.setServings(recipe.servings);
@@ -39,6 +51,15 @@
   }
 
   exports.App = {
+    loadIndex: async function() {
+      Views.clearAll(document.body);
+
+      let view = new Views.Index();
+      let index = await Repository.fetchIndex();
+
+      showIndex(view, index);
+      view.appendTo(document.body);
+    },
     loadRecipe: async function(id) {
       Views.clearAll(document.body);
 
@@ -53,8 +74,12 @@
 })(this);
 
 window.onhashchange =
-window.onload = async function() {
-  let id = document.location.hash.substr(1);
-  App.loadRecipe(id);
+window.onload = function() {
+  let id = location.hash.substr(1);
+  if (!id) {
+    App.loadIndex();
+  } else {
+    App.loadRecipe(id);
+  }
 };
 
