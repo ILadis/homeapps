@@ -7,7 +7,7 @@
   }
 
   Repository.fetchRecipe = async function(id) {
-    if (!whiteList.test(id)) {
+    if (id == 'index' || !whiteList.test(id)) {
       throw new Error('invalid id given');
     }
 
@@ -49,12 +49,12 @@
           ? q.toString()
           : q.toFixed(0);
       }
-  
+
       let fraction = Number.parseInt(1 / q);
       let codePoints = [
         0, 49, 189, 8531, 188, 8533, 8537, 8528, 8539, 8529, 8530
       ];
-  
+
       return String.fromCodePoint(codePoints[fraction]);
     };
   };
