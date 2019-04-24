@@ -140,10 +140,7 @@
   Step.prototype.setText = function({ step, ingredients }) {
     let h3 = this.node.querySelector('h3');
     h3.textContent = 'Zutaten';
-
-    if (!ingredients) {
-      h3.remove();
-    }
+    h3.hidden = Boolean(!ingredients);
 
     let span = this.node.querySelector('span');
     span.textContent = step;
