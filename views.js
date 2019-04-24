@@ -13,9 +13,23 @@
     }
   }
 
+  function trimTextNodes(node) {
+    let childs = node.childNodes;
+    for (let i = 0; i < childs.length; i++) {
+      let child = childs[i];
+
+      if (child.nodeType == 3) {
+        child.textContent = child.textContent.trim();
+      } else {
+        trimTextNodes(child);
+      }
+    }
+    return node;
+  }
+
   function importNode(template) {
     let node = document.importNode(template, true);
-    return node.firstElementChild;
+    return trimTextNodes(node.firstElementChild);
   }
 
   function Recipe() {
