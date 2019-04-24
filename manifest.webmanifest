@@ -1,5 +1,6 @@
 {
   "name": "Kochbuch",
+  "start_url": "index.html",
   "display": "standalone",
   "theme_color": "#fff",
   "background_color": "#f9f8f5"
