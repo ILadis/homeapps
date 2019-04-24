@@ -2,39 +2,14 @@
 * {
   margin: 0;
   padding: 0;
+  outline: none;
 }
 
 body {
+  font: 12pt sans-serif;
+  color: #828282;
   background: #fff;
   counter-reset: steps;
-}
-
-header {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  padding: 8pt 18pt 44pt;
-  box-sizing: border-box;
-  background: #f9f8f5;
-  flex-direction: column;
-  display: flex;
-  z-index: 1;
-}
-
-section {
-  position: absolute;
-  top: 100%;
-  width: 100%;
-  max-height: 100%;
-  padding: 8pt;
-  margin-top: -40pt;
-  border-radius: 8pt 8pt 0 0;
-  box-shadow: 0 -1pt 2pt 1pt #bfbfbf;
-  box-sizing: border-box;
-  background: #fff;
-  flex-direction: column;
-  display: flex;
-  z-index: 2;
 }
 
 h1 {
@@ -54,25 +29,53 @@ h3 {
   color: #4a4a4a;
 }
 
-header > h2 {
+.recipe > header {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  padding: 8pt 18pt 44pt;
+  box-sizing: border-box;
+  background: #f9f8f5;
+  flex-direction: column;
+  display: flex;
+  z-index: 1;
+}
+
+.recipe > section {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  max-height: 100%;
+  padding: 8pt;
+  margin-top: -40pt;
+  border-radius: 8pt 8pt 0 0;
+  box-shadow: 0 -1pt 2pt 1pt #bfbfbf;
+  box-sizing: border-box;
+  background: #fff;
+  flex-direction: column;
+  display: flex;
+  z-index: 2;
+}
+
+.recipe > header > h2 {
   text-align: center;
 }
 
-header > h2 * {
+.recipe > header > h2 > span {
   vertical-align: middle;
 }
 
-header > h2 button {
+.recipe > header > h2 > button {
   margin: 0 8pt;
   padding: 0 6pt;
   line-height: 15pt;
+  vertical-align: middle;
   border: solid 1pt #ccc;
   background: #fff;
-  outline: none;
 }
 
-header > ul,
-section > ol {
+.recipe > header > ul,
+.recipe > section > ol {
   padding: 0 8pt;
   list-style: none;
   flex-grow: 1;
@@ -80,30 +83,28 @@ section > ol {
   scrollbar-width: none;
 }
 
-header > ul > li {
+.recipe > header > ul > li {
   padding: 8pt 0;
   border-bottom: solid 1pt #ccc;
-  font: 12pt sans-serif;
   color: #828282;
 }
 
-header > ul > li:last-child {
+.recipe > header > ul > li:last-child {
   border: none;
 }
 
-section > ol > li {
+.recipe > section > ol > li {
   position: relative;
   padding: 12pt 0 32pt 48pt;
   border-top: solid 2pt #e4e6e7;
-  font: 12pt sans-serif;
   color: #828282;
 }
 
-section > ol > li:last-child {
+.recipe > section > ol > li:last-child {
   padding-bottom: 0;
 }
 
-section > ol > li:before {
+.recipe > section > ol > li:before {
   position: absolute;
   left: 0; top: 12pt;
   width: 36pt;
@@ -119,22 +120,22 @@ section > ol > li:before {
   content: counter(steps);
 }
 
-h3 + ul {
+.recipe > section h3 + ul {
   margin-top: -2pt;
   padding-bottom: 6pt;
   list-style: none;
 }
 
-h3 + ul > li {
+.recipe > section h3 + ul > li {
   font-size: 11pt;
   display: inline;
 }
 
-h3 + ul > li:first-child:before {
+.recipe > section h3 + ul > li:first-child:before {
   display: none;
 }
 
-h3 + ul > li:before {
-  content: '•';
+.recipe > section h3 + ul > li:before {
   padding: 0 2pt;
+  content: '•';
 }

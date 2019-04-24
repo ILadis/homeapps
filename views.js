@@ -25,7 +25,7 @@
   }
 
   Recipe.template = html`
-  <div>
+  <div class="recipe">
     <header>
       <h1><!-- name --></h1>
       <h2>
