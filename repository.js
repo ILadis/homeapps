@@ -14,6 +14,13 @@
 
     let index = await request.json();
 
+    for (let record of index) {
+      let getter = Index.score(index, record);
+      Object.defineProperty(record, 'score', {
+        get: getter
+      });
+    }
+
     return index;
   };
 
@@ -32,18 +39,41 @@
     for (let step of recipe.steps) {
       if ('ingredients' in step) {
         let iterator = Recipe.ingredients(recipe, step);
-        step.ingredients = { [Symbol.iterator]: iterator };
+        Object.defineProperty(step, 'ingredients', {
+          value: { [Symbol.iterator]: iterator }
+        });
       }
     }
 
     for (let ingredient of recipe.ingredients) {
       if ('quantity' in ingredient) {
-        let primitive = Recipe.quantity(recipe, ingredient);
-        ingredient.quantity = { [Symbol.toPrimitive]: primitive };
+        let getter = Recipe.quantity(recipe, ingredient);
+        Object.defineProperty(ingredient, 'quantity', {
+          get: getter
+        });
       }
     }
 
     return recipe;
+  };
+
+  function Index() {
+  }
+
+  Index.score = (index, record) => {
+    return function() {
+      let query = index.query;
+      if (!query) {
+        return true;
+      }
+
+      let match = record.name.includes(query);
+      if (match) {
+        return query.length / record.name.length;
+      }
+
+      return false;
+    };
   };
 
   function Recipe() {
@@ -74,16 +104,12 @@
     return function*() {
       let iterator = ingredients.values();
 
-      var result = iterator.next();
-      while (!result.done) {
-        let { ref, quantity } = result.value;
+      for (let { ref, quantity } of iterator) {
         let ingredient = recipe.ingredients[ref];
-
         if (!quantity) {
           quantity = ingredient.quantity;
         }
 
-        var result = iterator.next();
         yield Object.assign({ }, ingredient, { quantity });
       }
     };

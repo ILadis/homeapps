@@ -25,16 +25,26 @@
     let input = this.node.querySelector('header input');
     input.placeholder = 'Suchbegriff...';
     input.value = `${query || ''}`;
+    input.onchange = () => this.onQueryChanged(input.value);
+  };
+
+  Index.prototype.onQueryChanged = function(query) {
   };
 
   Index.prototype.addRecord = function() {
     let ol = this.node.querySelector('section ol');
 
     let view = new Record();
-    view.appendTo(ol);
+    ol.appendChild(view.node);
 
     this.records.add(view);
     return view;
+  };
+
+  Index.prototype.removeRecord = function(view) {
+    let ol = this.node.querySelector('section ol');
+    ol.removeChild(view.node);
+    this.records.delete(view);
   };
 
   Index.prototype.appendTo = function(node) {
@@ -62,10 +72,6 @@
   };
 
   Record.prototype.onRecordClicked = function() {
-  };
-
-  Record.prototype.appendTo = function(node) {
-    node.appendChild(this.node);
   };
 
   function Recipe() {
@@ -116,7 +122,7 @@
     let ul = this.node.querySelector('header ul');
 
     let view = new Ingredient();
-    view.appendTo(ul);
+    ul.appendChild(view.node);
 
     this.ingredients.add(view);
     return view;
@@ -129,7 +135,7 @@
     let ol = this.node.querySelector('section ol');
 
     let view = new Step();
-    view.appendTo(ol);
+    ol.appendChild(view.node);
 
     this.steps.add(view);
     return view;
@@ -169,10 +175,6 @@
     return this;
   };
 
-  Ingredient.prototype.appendTo = function(node) {
-    node.appendChild(this.node);
-  };
-
   function Step() {
     this.node = importNode(Step.template);
     this.ingredients = new Set();
@@ -200,14 +202,10 @@
     let ul = this.node.querySelector('ul');
 
     let view = new Ingredient();
-    view.appendTo(ul);
+    ul.appendChild(view.node);
 
     this.ingredients.add(view);
     return view;
-  };
-
-  Step.prototype.appendTo = function(node) {
-    node.appendChild(this.node);
   };
 
   exports.Views = { Index, Recipe, clearAll };

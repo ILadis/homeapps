@@ -3,13 +3,26 @@
 
   function showIndex(view, index) {
     view.setQuery();
+    view.onQueryChanged = (query) => {
+      index.query = query;
+      showRecords(view, index);
+    };
+    showRecords(view, index);
+  }
 
-    for (let record of index) {
-      let v = view.addRecord();
+  function showRecords(view, index) {
+    let records = index.filter(r => r.score).sort((r1, r2) => r2.score - r1.score);
+    let views = view.records.values();
+    for (let record of records) {
+      let v = views.next().value || view.addRecord();
       v.setName(record);
       v.onRecordClicked = () => {
         location.hash = `#${record.id}`;
       };
+    }
+
+    for (let v of views) {
+      view.removeRecord(v);
     }
   }
 
