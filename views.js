@@ -25,7 +25,7 @@
     let input = this.node.querySelector('header input');
     input.placeholder = 'Suchbegriff...';
     input.value = `${query || ''}`;
-    input.onchange = () => this.onQueryChanged(input.value);
+    input.oninput = () => this.onQueryChanged(input.value);
   };
 
   Index.prototype.onQueryChanged = function(query) {
