@@ -1,17 +1,59 @@
 
 (function(exports) {
 
-  function showIndex(view, index) {
+  function App() {
+  }
+
+  App.loadIndex = async function() {
+    Views.clearAll(document.body);
+
+    let view = new Views.Index();
+    let index = await Repository.fetchIndex();
+
+    Presenter.showIndex(view, index);
+    view.appendTo(document.body);
+  };
+
+  App.loadRecipe = async function(id) {
+    Views.clearAll(document.body);
+
+    let view = new Views.Recipe();
+    let recipe = await Repository.fetchRecipe(id);
+
+    Presenter.showRecipe(view, recipe);
+    view.appendTo(document.body);
+  };
+
+  document.onselectstart = () => false;
+
+  window.onhashchange =
+  window.onload = () => {
+    let id = location.hash.substr(1);
+    if (!id) {
+      App.loadIndex();
+    } else {
+      App.loadRecipe(id);
+    }
+  };
+
+  function Presenter() {
+  }
+
+  Presenter.showIndex = function(view, index) {
     view.setQuery();
     view.onQueryChanged = (query) => {
       index.query = query;
-      showRecords(view, index);
+      Presenter.showRecords(view, index);
     };
-    showRecords(view, index);
-  }
+    Presenter.showRecords(view, index);
+  };
 
-  function showRecords(view, index) {
-    let records = index.filter(r => r.score).sort((r1, r2) => r2.score - r1.score);
+   Presenter.showRecords = function(view, index) {
+    let hasScore = (r) => r.score;
+    let byScore = (r1, r2) => r2.score - r1.score;
+
+    let records = index.filter(hasScore).sort(byScore);
+
     let views = view.records.values();
     for (let record of records) {
       let v = views.next().value || view.addRecord();
@@ -24,22 +66,22 @@
     for (let v of views) {
       view.removeRecord(v);
     }
-  }
+  };
 
-  function showRecipe(view, recipe) {
+  Presenter.showRecipe = function(view, recipe) {
     view.setName(recipe.name);
     view.setServings(recipe.servings);
 
     view.onServingsClicked = (change) => {
       recipe.servings.quantity += change;
-      showRecipe(view, recipe);
+      Presenter.showRecipe(view, recipe);
     };
 
-    showIngredients(view, recipe);
-    showSteps(view, recipe);
-  }
+    Presenter.showIngredients(view, recipe);
+    Presenter.showSteps(view, recipe);
+  };
 
-  function showIngredients(view, { ingredients }) {
+  Presenter.showIngredients = function(view, { ingredients }) {
     let views = view.ingredients.values();
     for (let ingredient of ingredients) {
       let v = views.next().value || view.addIngredient();
@@ -47,9 +89,9 @@
       v.setUnit(ingredient);
       v.setLabel(ingredient);
     }
-  }
+  };
 
-  function showSteps(view, { steps }) {
+  Presenter.showSteps = function(view, { steps }) {
     let views = view.steps.values();
     for (let step of steps) {
       let v = views.next().value || view.addStep();
@@ -59,40 +101,9 @@
         continue;
       }
 
-      showIngredients(v, step);
-    }
-  }
-
-  exports.App = {
-    loadIndex: async function() {
-      Views.clearAll(document.body);
-
-      let view = new Views.Index();
-      let index = await Repository.fetchIndex();
-
-      showIndex(view, index);
-      view.appendTo(document.body);
-    },
-    loadRecipe: async function(id) {
-      Views.clearAll(document.body);
-
-      let view = new Views.Recipe();
-      let recipe = await Repository.fetchRecipe(id);
-
-      showRecipe(view, recipe);
-      view.appendTo(document.body);
+      Presenter.showIngredients(v, step);
     }
   };
 
 })(this);
-
-window.onhashchange =
-window.onload = function() {
-  let id = location.hash.substr(1);
-  if (!id) {
-    App.loadIndex();
-  } else {
-    App.loadRecipe(id);
-  }
-};
 
