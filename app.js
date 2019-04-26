@@ -1,59 +1,40 @@
 
-(function(exports) {
+import Repository from './repository.js';
+import Views from './views.js';
 
-  function App() {
-  }
-
-  App.loadIndex = async function() {
+const App = {
+  loadIndex: async () => {
     Views.clearAll(document.body);
 
     let view = new Views.Index();
     let index = await Repository.fetchIndex();
 
-    Presenter.showIndex(view, index);
     view.appendTo(document.body);
-  };
+    Presenter.showIndex(view, index);
+  },
 
-  App.loadRecipe = async function(id) {
+  loadRecipe: async (id) => {
     Views.clearAll(document.body);
 
     let view = new Views.Recipe();
     let recipe = await Repository.fetchRecipe(id);
 
-    Presenter.showRecipe(view, recipe);
     view.appendTo(document.body);
-  };
-
-  document.onselectstart = () => false;
-
-  window.onhashchange =
-  window.onload = () => {
-    let id = location.hash.substr(1);
-    if (!id) {
-      App.loadIndex();
-    } else {
-      App.loadRecipe(id);
-    }
-  };
-
-  function Presenter() {
+    Presenter.showRecipe(view, recipe);
   }
+};
 
-  Presenter.showIndex = function(view, index) {
+const Presenter = {
+  showIndex: function(view, index) {
     view.setQuery();
     view.onQueryChanged = (query) => {
       index.query = query;
-      Presenter.showRecords(view, index);
+      this.showRecords(view, index);
     };
-    Presenter.showRecords(view, index);
-  };
+    this.showRecords(view, index);
+  },
 
-   Presenter.showRecords = function(view, index) {
-    let hasScore = (r) => r.score;
-    let byScore = (r1, r2) => r2.score - r1.score;
-
-    let records = index.filter(hasScore).sort(byScore);
-
+  showRecords: function(view, { records }) {
     let views = view.records.values();
     for (let record of records) {
       let v = views.next().value || view.addRecord();
@@ -66,22 +47,22 @@
     for (let v of views) {
       view.removeRecord(v);
     }
-  };
+  },
 
-  Presenter.showRecipe = function(view, recipe) {
+  showRecipe: function(view, recipe) {
     view.setName(recipe.name);
     view.setServings(recipe.servings);
 
     view.onServingsClicked = (change) => {
       recipe.servings.quantity += change;
-      Presenter.showRecipe(view, recipe);
+      this.showRecipe(view, recipe);
     };
 
-    Presenter.showIngredients(view, recipe);
-    Presenter.showSteps(view, recipe);
-  };
+    this.showIngredients(view, recipe);
+    this.showSteps(view, recipe);
+  },
 
-  Presenter.showIngredients = function(view, { ingredients }) {
+  showIngredients: function(view, { ingredients }) {
     let views = view.ingredients.values();
     for (let ingredient of ingredients) {
       let v = views.next().value || view.addIngredient();
@@ -89,9 +70,9 @@
       v.setUnit(ingredient);
       v.setLabel(ingredient);
     }
-  };
+  },
 
-  Presenter.showSteps = function(view, { steps }) {
+  showSteps: function(view, { steps }) {
     let views = view.steps.values();
     for (let step of steps) {
       let v = views.next().value || view.addStep();
@@ -101,9 +82,10 @@
         continue;
       }
 
-      Presenter.showIngredients(v, step);
+      this.showIngredients(v, step);
     }
-  };
+  }
+};
 
-})(this);
+export default App;
 
