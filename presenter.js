@@ -7,7 +7,7 @@ export function Presenter() {
 
 Presenter.showIndex = async function() {
   let repository = await Repository.create();
-  let iterator = repository.fetchAll();
+  let iterator = repository.iterateAll();
   let recipes = new Set();
   let view = new Views.Index();
 

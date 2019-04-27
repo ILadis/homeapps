@@ -6,7 +6,6 @@ export function Repository(db) {
 Repository.create = async function() {
   let schema = (db) => {
     db.createStore('recipes', { keyPath: 'id', autoIncrement: true });
-    db.createIndex('name', { unique: false });
   };
   schema.version = 1;
 
@@ -19,14 +18,14 @@ Repository.prototype.save = function(data) {
   return this.db.storeData(data);
 };
 
-Repository.prototype.fetchById = function(id) {
-  this.db.beginTx('recipes', 'readonly');
-  return this.db.fetchData(id, Recipe);
-};
-
-Repository.prototype.fetchAll = function() {
+Repository.prototype.iterateAll = function() {
   this.db.beginTx('recipes', 'readonly');
   return this.db.iterateData(Recipe);
+};
+
+Repository.prototype.purgeAll = function() {
+  this.db.beginTx('recipes', 'readwrite');
+  return this.db.clearData();
 };
 
 export function Recipe() {
@@ -161,12 +160,17 @@ Database.prototype.beginTx = function(name, mode) {
 };
 
 Database.prototype.storeData = function(data) {
-  let request = this.store.add(data);
+  let keyPath = this.store.keyPath;
+  if (keyPath in data) {
+    var request = this.store.put(data);
+  } else {
+    var request = this.store.add(data);
+  }
   return Database.promisify(request);
 };
 
-Database.prototype.fetchData = async function(key, decorator) {
-  let request = this.store.get(key);
+Database.prototype.fetchData = async function(index, value, decorator) {
+  let request = this.store.index(index).get(value);
   let data = await Database.promisify(request);
   return decorator.call(data);
 };
@@ -184,5 +188,10 @@ Database.prototype.iterateData = async function*(decorator) {
 
     cursor.continue();
   } while (true);
+};
+
+Database.prototype.clearData = function() {
+  let request = this.store.clear();
+  return Database.promisify(request);
 };
 
