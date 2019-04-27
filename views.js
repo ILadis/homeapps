@@ -96,7 +96,7 @@ Recipe.template = html`
 </div>
 `;
 
-Recipe.prototype.setName = function(name) {
+Recipe.prototype.setName = function({ name }) {
   let h1 = this.node.querySelector('header h1');
   h1.textContent = name;
   return this;
@@ -212,10 +212,9 @@ function html(source) {
   return template.content;
 }
 
-function clearAll(node) {
-  while (node.firstChild) {
-    node.firstChild.remove();
-  }
+function importNode(template) {
+  let node = document.importNode(template, true);
+  return trimTextNodes(node.firstElementChild);
 }
 
 function trimTextNodes(node) {
@@ -231,10 +230,11 @@ function trimTextNodes(node) {
   return node;
 }
 
-function importNode(template) {
-  let node = document.importNode(template, true);
-  return trimTextNodes(node.firstElementChild);
+function clearAll(node) {
+  while (node.firstChild) {
+    node.firstChild.remove();
+  }
 }
 
-export default { Index, Recipe, clearAll };
+export const Views = { Index, Recipe, clearAll };
 

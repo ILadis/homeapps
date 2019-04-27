@@ -7,18 +7,8 @@
   <link href="styles.css" rel="stylesheet">
   <link href="manifest.webmanifest" rel="manifest">
   <script type="module">
-    import App from './app.js';
-
-    window.onhashchange =
-    window.onload = () => {
-      let id = location.hash.substr(1);
-      if (id.length) {
-        return App.loadRecipe(id);
-      }
-
-      return App.loadIndex();
-    };
-
+    import { Presenter } from './presenter.js';
+    window.onload = () => Presenter.showIndex();
     document.onselectstart = () => false;
   </script>
 </head>

@@ -1,115 +1,76 @@
 
-const whiteList = new RegExp('^[a-z\\-]+$');
-
-const Repository = {
-  fetchIndex: async () => {
-    let request = await fetch(`recipes/index.json`);
-    if (!request.ok) {
-      throw new Error(`request for index failed`);
-    }
-
-    let json = await request.json();
-    return Index(json);
-  },
-
-  fetchRecipe: async (id) => {
-    if (id == 'index' || !whiteList.test(id)) {
-      throw new Error('invalid id given');
-    }
-
-    let request = await fetch(`recipes/${id}.json`);
-    if (!request.ok) {
-      throw new Error(`request for recipe '${id}' failed`);
-    }
-
-    let json = await request.json();
-    return Recipe(json);
-  }
-};
-
-function Index(index) {
-  for (let record of index.records) {
-    let getter = Index.score(index, record);
-    Object.defineProperty(record, 'score', {
-      get: getter
-    });
-  }
-
-  let iterator = Index.records(index);
-  Object.defineProperty(index, 'records', {
-    value: { [Symbol.iterator]: iterator }
-  });
-
-  return index;
+export function Repository(db) {
+  this.db = db;
 }
 
-Index.score = (index, record) => {
-  return function() {
-    let query = index.query;
-    if (!query) {
-      return true;
-    }
-
-    let match = record.name.includes(query);
-    if (match) {
-      return query.length / record.name.length;
-    }
-
-    return false;
+Repository.create = async function() {
+  let schema = (db) => {
+    db.createStore('recipes', { keyPath: 'id', autoIncrement: true });
+    db.createIndex('name', { unique: false });
   };
+  schema.version = 1;
+
+  let db = await Database.create('cookbook', schema);
+  return new Repository(db);
 };
 
-Index.records = (index) => {
-  let records = index.records;
-  return function*() {
-    let hasScore = (r) => r.score;
-    let byScore = (r1, r2) => r2.score - r1.score;
-
-    let iterator = records.filter(hasScore)
-      .sort(byScore)
-      .values();
-
-    for (let record of iterator) {
-      yield record;
-    }
-  };
+Repository.prototype.save = function(data) {
+  this.db.beginTx('recipes', 'readwrite');
+  return this.db.storeData(data);
 };
 
-function Recipe(recipe) {
-  for (let step of recipe.steps) {
+Repository.prototype.fetchById = function(id) {
+  this.db.beginTx('recipes', 'readonly');
+  return this.db.fetchData(id, Recipe);
+};
+
+Repository.prototype.fetchAll = function() {
+  this.db.beginTx('recipes', 'readonly');
+  return this.db.iterateData(Recipe);
+};
+
+export function Recipe() {
+  for (let step of this.steps) {
     if ('ingredients' in step) {
-      let iterator = Recipe.ingredients(recipe, step);
+      let ingredients = Recipe.ingredients(this, step);
       Object.defineProperty(step, 'ingredients', {
-        value: { [Symbol.iterator]: iterator }
+        value: { [Symbol.iterator]: ingredients }
       });
     }
   }
 
-  for (let ingredient of recipe.ingredients) {
+  for (let ingredient of this.ingredients) {
     if ('quantity' in ingredient) {
-      let getter = Recipe.quantity(recipe, ingredient);
+      let quantity = Recipe.quantity(this, ingredient);
       Object.defineProperty(ingredient, 'quantity', {
-        get: getter
+        get: quantity
       });
     }
   }
 
-  return recipe;
+  let score = Recipe.score(this);
+  Object.defineProperty(this, 'score', {
+    value: score
+  });
+
+  return this;
 }
 
 Recipe.quantity = (recipe, { quantity }) => {
   let servings = recipe.servings.quantity;
   return function() {
-    let q = quantity * (recipe.servings.quantity / servings);
-    if (q <= 0.1) {
+    let factor = recipe.servings.quantity / servings;
+    let value = quantity * factor;
+
+    if (value <= 0.1) {
       return '';
-    } else if (q >= 1) {
-      return Number.isInteger(q)
-        ? q.toString()
-        : q.toFixed(0);
+    } else if (value >= 1) {
+      return Number.isInteger(value)
+        ? value.toString()
+        : value.toFixed(0);
     }
 
-    let fraction = Number.parseInt(1 / q);
+    let fraction = Number.parseInt(1 / value);
     let codePoints = [
       0, 49, 189, 8531, 188, 8533, 8537, 8528, 8539, 8529, 8530
     ];
@@ -133,5 +94,95 @@ Recipe.ingredients = (recipe, { ingredients }) => {
   };
 };
 
-export default Repository;
+Recipe.score = (recipe) => {
+  return function(query) {
+    if (!query) {
+      return true;
+    }
+
+    let name = recipe.name;
+    let match = name.includes(query);
+
+    if (match) {
+      return query.length / name.length;
+    }
+
+    return false;
+  };
+};
+
+export function Database(db) {
+  this.db = db;
+}
+
+Database.create = function(name, schema) {
+  let request = indexedDB.open(name, schema.version);
+
+  return new Promise((resolve, reject) => {
+    request.onupgradeneeded = () => {
+      let db = new Database(request.result);
+      schema(db);
+    };
+
+    request.onsuccess = () => {
+      let db = new Database(request.result);
+      resolve(db);
+    };
+
+    request.onerror = () => {
+      let error = request.error;
+      reject(error);
+    };
+  });
+};
+
+Database.promisify = function(request) {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+Database.prototype.createStore = function(name, options) {
+  let store = this.db.createObjectStore(name, options);
+  this.store = store;
+  return this;
+};
+
+Database.prototype.createIndex = function(name, options) {
+  this.store.createIndex(name, name, options);
+  return this;
+};
+
+Database.prototype.beginTx = function(name, mode) {
+  let store = this.db.transaction(name, mode).objectStore(name);
+  this.store = store;
+  return this;
+};
+
+Database.prototype.storeData = function(data) {
+  let request = this.store.add(data);
+  return Database.promisify(request);
+};
+
+Database.prototype.fetchData = async function(key, decorator) {
+  let request = this.store.get(key);
+  let data = await Database.promisify(request);
+  return decorator.call(data);
+};
+
+Database.prototype.iterateData = async function*(decorator) {
+  let request = this.store.openCursor();
+
+  do {
+    let cursor = await Database.promisify(request);
+    if (!cursor) {
+      return;
+    }
+
+    yield decorator.call(cursor.value);
+
+    cursor.continue();
+  } while (true);
+};
 
