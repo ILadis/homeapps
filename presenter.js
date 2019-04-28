@@ -6,10 +6,10 @@ export function Presenter() {
 }
 
 Presenter.showIndex = async function() {
-  let repository = await Repository.create();
-  let iterator = repository.iterateAll();
   let recipes = new Set();
   let view = new Views.Index();
+  let repository = new Repository();
+  let iterator = repository.fetchAll();
 
   Views.clearAll(document.body);
   view.appendTo(document.body);

@@ -223,9 +223,8 @@ function trimTextNodes(node) {
     let text = child.textContent;
     if (child.nodeType == 3) {
       child.textContent = text.trim();
-    } else {
-      trimTextNodes(child);
     }
+    trimTextNodes(child);
   }
   return node;
 }

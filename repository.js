@@ -1,34 +1,48 @@
 
-export function Repository(db) {
-  this.db = db;
+const whiteList = new RegExp('^([a-z\\-]+)\\.json$');
+
+export function Repository() {
 }
 
-Repository.create = async function() {
-  let schema = (db) => {
-    db.createStore('recipes', { keyPath: 'id', autoIncrement: true });
-  };
-  schema.version = 1;
+Repository.prototype.fetchAll = async function*() {
+  let request = new Request('./recipes', {
+    method: 'GET'
+  });
 
-  let db = await Database.create('cookbook', schema);
-  return new Repository(db);
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to fetch index');
+  }
+
+  let index = await response.json();
+  for (let { name } of index) {
+    let matches = name.match(whiteList);
+    if (!matches) {
+      continue;
+    }
+
+    let alias = matches[1];
+    yield this.fetchByAlias(alias);
+  }
 };
 
-Repository.prototype.save = function(data) {
-  this.db.beginTx('recipes', 'readwrite');
-  return this.db.storeData(data);
-};
+Repository.prototype.fetchByAlias = async function(alias) {
+  let request = new Request(`./recipes/${alias}.json`, {
+    method: 'GET'
+  });
 
-Repository.prototype.iterateAll = function() {
-  this.db.beginTx('recipes', 'readonly');
-  return this.db.iterateData(Recipe);
-};
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error(`failed to fetch recipe '${alias}'`);
+  }
 
-Repository.prototype.purgeAll = function() {
-  this.db.beginTx('recipes', 'readwrite');
-  return this.db.clearData();
+  let json = await response.json();
+  return new Recipe(json);
 };
 
 export function Recipe() {
+  Object.assign(this, ...arguments);
+
   for (let step of this.steps) {
     if ('ingredients' in step) {
       let ingredients = Recipe.ingredients(this, step);
@@ -108,90 +122,5 @@ Recipe.score = (recipe) => {
 
     return false;
   };
-};
-
-export function Database(db) {
-  this.db = db;
-}
-
-Database.create = function(name, schema) {
-  let request = indexedDB.open(name, schema.version);
-
-  return new Promise((resolve, reject) => {
-    request.onupgradeneeded = () => {
-      let db = new Database(request.result);
-      schema(db);
-    };
-
-    request.onsuccess = () => {
-      let db = new Database(request.result);
-      resolve(db);
-    };
-
-    request.onerror = () => {
-      let error = request.error;
-      reject(error);
-    };
-  });
-};
-
-Database.promisify = function(request) {
-  return new Promise((resolve, reject) => {
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-Database.prototype.createStore = function(name, options) {
-  let store = this.db.createObjectStore(name, options);
-  this.store = store;
-  return this;
-};
-
-Database.prototype.createIndex = function(name, options) {
-  this.store.createIndex(name, name, options);
-  return this;
-};
-
-Database.prototype.beginTx = function(name, mode) {
-  let store = this.db.transaction(name, mode).objectStore(name);
-  this.store = store;
-  return this;
-};
-
-Database.prototype.storeData = function(data) {
-  let keyPath = this.store.keyPath;
-  if (keyPath in data) {
-    var request = this.store.put(data);
-  } else {
-    var request = this.store.add(data);
-  }
-  return Database.promisify(request);
-};
-
-Database.prototype.fetchData = async function(index, value, decorator) {
-  let request = this.store.index(index).get(value);
-  let data = await Database.promisify(request);
-  return decorator.call(data);
-};
-
-Database.prototype.iterateData = async function*(decorator) {
-  let request = this.store.openCursor();
-
-  do {
-    let cursor = await Database.promisify(request);
-    if (!cursor) {
-      return;
-    }
-
-    yield decorator.call(cursor.value);
-
-    cursor.continue();
-  } while (true);
-};
-
-Database.prototype.clearData = function() {
-  let request = this.store.clear();
-  return Database.promisify(request);
 };
 
