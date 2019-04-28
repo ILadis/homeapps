@@ -8,7 +8,7 @@
   <link href="manifest.webmanifest" rel="manifest">
   <script type="module">
     import { Presenter } from './presenter.js';
-    window.onload = () => Presenter.showIndex();
+    window.onload = () => new Presenter().showIndex();
     document.onselectstart = () => false;
   </script>
 </head>

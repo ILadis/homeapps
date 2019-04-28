@@ -1,5 +1,23 @@
 
-function Index() {
+export function Shell() {
+  this.node = document.body;
+  this.content = null;
+}
+
+Shell.prototype.setTitle = function(title) {
+  document.title = title;
+};
+
+Shell.prototype.setContent = function(content) {
+  if (this.content) {
+    this.node.removeChild(this.content.node);
+  }
+
+  this.node.appendChild(content.node);
+  this.content = content;
+};
+
+export function Index() {
   this.node = importNode(Index.template);
   this.records = new Set();
 }
@@ -45,11 +63,7 @@ Index.prototype.removeRecord = function(view) {
   this.records.delete(view);
 };
 
-Index.prototype.appendTo = function(node) {
-  node.appendChild(this.node);
-};
-
-function Record() {
+export function Record() {
   this.node = importNode(Record.template);
 }
 
@@ -72,7 +86,7 @@ Record.prototype.setName = function({ name }) {
 Record.prototype.onRecordClicked = function() {
 };
 
-function Recipe() {
+export function Recipe() {
   this.node = importNode(Recipe.template);
   this.ingredients = new Set();
   this.steps = new Set();
@@ -139,11 +153,7 @@ Recipe.prototype.addStep = function() {
   return view;
 };
 
-Recipe.prototype.appendTo = function(node) {
-  node.appendChild(this.node);
-};
-
-function Ingredient() {
+export function Ingredient() {
   this.node = importNode(Ingredient.template);
 }
 
@@ -173,7 +183,7 @@ Ingredient.prototype.setLabel = function({ ingredient }) {
   return this;
 };
 
-function Step() {
+export function Step() {
   this.node = importNode(Step.template);
   this.ingredients = new Set();
 }
@@ -228,12 +238,4 @@ function trimTextNodes(node) {
   }
   return node;
 }
-
-function clearAll(node) {
-  while (node.firstChild) {
-    node.firstChild.remove();
-  }
-}
-
-export const Views = { Index, Recipe, clearAll };
 
