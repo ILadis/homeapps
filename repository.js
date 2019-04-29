@@ -37,6 +37,8 @@ Repository.prototype.fetchByAlias = async function(alias) {
   }
 
   let json = await response.json();
+  json.alias = alias;
+
   return new Recipe(json);
 };
 

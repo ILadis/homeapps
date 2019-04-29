@@ -24,17 +24,17 @@ Presenter.prototype.showIndex = async function() {
       .sort(byScore)
       .values();
 
-    showRecipes(iterator);
+    showRecipes(view, iterator);
   };
 
-  let showRecipes = async (iterator) => {
+  let showRecipes = async (view, iterator) => {
     let views = view.records.values();
     for await (let recipe of iterator) {
       recipes.add(recipe);
 
       let v = views.next().value || view.addRecord();
       v.setName(recipe);
-      v.onRecordClicked = () => this.showRecipe(recipe);
+      v.onRecordClicked = () => this.showRecipe(recipe.alias);
     }
 
     for (let v of views) {
@@ -43,10 +43,16 @@ Presenter.prototype.showIndex = async function() {
   };
 
   let iterator = this.repository.fetchAll();
-  showRecipes(iterator);
+  showRecipes(view, iterator);
+
+  this.onIndexShown();
 };
 
-Presenter.prototype.showRecipe = function(recipe) {
+Presenter.prototype.onIndexShown = function() {
+};
+
+Presenter.prototype.showRecipe = async function(alias) {
+  let recipe = await this.repository.fetchByAlias(alias);
   let view = new Views.Recipe();
 
   this.shell.setTitle(recipe.name);
@@ -58,11 +64,11 @@ Presenter.prototype.showRecipe = function(recipe) {
     recipe.servings.quantity += change;
     view.setServings(recipe.servings);
 
-    showIngredients(view, recipe.ingredients);
-    showSteps(recipe.steps);
+    showIngredients(view, recipe);
+    showSteps(view, recipe);
   };
 
-  let showIngredients = (view, ingredients) => {
+  let showIngredients = (view, { ingredients }) => {
     let views = view.ingredients.values();
     for (let ingredient of ingredients) {
       let v = views.next().value || view.addIngredient();
@@ -72,19 +78,24 @@ Presenter.prototype.showRecipe = function(recipe) {
     }
   };
 
-  let showSteps = (steps) => {
+  let showSteps = (view, { steps }) => {
     let views = view.steps.values();
     for (let step of steps) {
       let v = views.next().value || view.addStep();
       v.setText(step);
 
       if ('ingredients' in step) {
-        showIngredients(v, step.ingredients);
+        showIngredients(v, step);
       }
     }
   };
 
-  showIngredients(view, recipe.ingredients);
-  showSteps(recipe.steps);
+  showIngredients(view, recipe);
+  showSteps(view, recipe);
+
+  this.onRecipeShown(recipe);
+};
+
+Presenter.prototype.onRecipeShown = function(recipe) {
 };
 

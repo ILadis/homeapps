@@ -9,7 +9,22 @@
   <link href="manifest.webmanifest" rel="manifest">
   <script type="module">
     import { Presenter } from './presenter.js';
-    window.onload = () => new Presenter().showIndex();
+    const presenter = new Presenter();
+
+    presenter.onIndexShown =
+    presenter.onRecipeShown = (recipe = {}) => {
+      location.hash = `${recipe.alias || ''}`;
+    };
+
+    window.onhashchange =
+    window.onload = () => {
+      let alias = location.hash.substr(1);
+      if (alias) {
+        return presenter.showRecipe(alias);
+      }
+      presenter.showIndex();
+    };
+
     document.onselectstart = () => false;
   </script>
 </head>
