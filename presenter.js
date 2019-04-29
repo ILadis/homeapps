@@ -19,7 +19,11 @@ Presenter.prototype.showIndex = async function() {
     let hasScore = (r) => r.score(query) > 0;
     let byScore = (r1, r2) => r2.score(query) - r1.score(query);
 
-    let iterator = [...recipes].filter(hasScore).sort(byScore).values();
+    let iterator = [...recipes]
+      .filter(hasScore)
+      .sort(byScore)
+      .values();
+
     showRecipes(iterator);
   };
 
