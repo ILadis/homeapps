@@ -25,6 +25,7 @@ export function Index() {
 Index.template = html`
 <div class="index">
   <header>
+    <button></button>
     <h1><!-- title --></h1>
     <input type="search">
   </header>
@@ -42,9 +43,15 @@ Index.prototype.setQuery = function(query) {
   input.placeholder = 'Suchbegriff...';
   input.value = `${query || ''}`;
   input.oninput = () => this.onQueryChanged(input.value);
+
+  let button = this.node.querySelector('header button');
+  button.onclick = () => this.onRefreshClicked();
 };
 
 Index.prototype.onQueryChanged = function(query) {
+};
+
+Index.prototype.onRefreshClicked = function() {
 };
 
 Index.prototype.addRecord = function() {

@@ -4,10 +4,11 @@ const whiteList = new RegExp('^([a-z\\-]+)\\.json$');
 export function Repository() {
 }
 
-Repository.prototype.fetchAll = async function*() {
-  let request = new Request('./recipes', {
-    method: 'GET'
-  });
+Repository.prototype.fetchAll = async function*(fresh = false) {
+  let request = new Request('./recipes');
+  if (fresh) {
+    request.headers.set('cache-control', 'no-cache');
+  }
 
   let response = await fetch(request);
   if (!response.ok) {
@@ -22,14 +23,15 @@ Repository.prototype.fetchAll = async function*() {
     }
 
     let alias = matches[1];
-    yield this.fetchByAlias(alias);
+    yield this.fetchByAlias(alias, fresh);
   }
 };
 
-Repository.prototype.fetchByAlias = async function(alias) {
-  let request = new Request(`./recipes/${alias}.json`, {
-    method: 'GET'
-  });
+Repository.prototype.fetchByAlias = async function(alias, fresh = false) {
+  let request = new Request(`./recipes/${alias}.json`);
+  if (fresh) {
+    request.headers.set('cache-control', 'no-cache');
+  }
 
   let response = await fetch(request);
   if (!response.ok) {

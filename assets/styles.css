@@ -50,6 +50,17 @@ span + span:before {
   background: #f9f8f5;
 }
 
+.index > header > button {
+  margin: 4pt 0;
+  width: 26pt;
+  height: 26pt;
+  border: none;
+  background: url(./refresh.svg);
+  background-size: contain;
+  float: right;
+  display: block;
+}
+
 .index > header > h1 {
   padding-bottom: 16pt;
 }
@@ -104,15 +115,16 @@ span + span:before {
 }
 
 .recipe > header > h2 {
+  padding: 0;
   text-align: center;
 }
 
 .recipe > header > h2 > span {
+  margin: 0 8pt;
   vertical-align: middle;
 }
 
 .recipe > header > h2 > button {
-  margin: 0 8pt;
   padding: 0 6pt;
   line-height: 15pt;
   vertical-align: middle;

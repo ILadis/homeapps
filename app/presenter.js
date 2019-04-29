@@ -8,13 +8,15 @@ export function Presenter() {
 }
 
 Presenter.prototype.showIndex = async function() {
+  let iterator = this.repository.fetchAll();
   let recipes = new Set();
+
   let view = new Views.Index();
+  view.setQuery();
 
   this.shell.setTitle('Kochbuch');
   this.shell.setContent(view);
 
-  view.setQuery();
   view.onQueryChanged = (query) => {
     let hasScore = (r) => r.score(query) > 0;
     let byScore = (r1, r2) => r2.score(query) - r1.score(query);
@@ -24,6 +26,16 @@ Presenter.prototype.showIndex = async function() {
       .sort(byScore)
       .values();
 
+    showRecipes(view, iterator);
+  };
+
+  view.onRefreshClicked = () => {
+    let views = view.records.values();
+    for (let v of views) {
+      view.removeRecord(v);
+    }
+
+    let iterator = this.repository.fetchAll(true);
     showRecipes(view, iterator);
   };
 
@@ -42,9 +54,7 @@ Presenter.prototype.showIndex = async function() {
     }
   };
 
-  let iterator = this.repository.fetchAll();
   showRecipes(view, iterator);
-
   this.onIndexShown();
 };
 
@@ -53,13 +63,14 @@ Presenter.prototype.onIndexShown = function() {
 
 Presenter.prototype.showRecipe = async function(alias) {
   let recipe = await this.repository.fetchByAlias(alias);
+
   let view = new Views.Recipe();
+  view.setName(recipe);
+  view.setServings(recipe.servings);
 
   this.shell.setTitle(recipe.name);
   this.shell.setContent(view);
 
-  view.setName(recipe);
-  view.setServings(recipe.servings);
   view.onServingsClicked = (change) => {
     recipe.servings.quantity += change;
     view.setServings(recipe.servings);
@@ -92,7 +103,6 @@ Presenter.prototype.showRecipe = async function(alias) {
 
   showIngredients(view, recipe);
   showSteps(view, recipe);
-
   this.onRecipeShown(recipe);
 };
 
