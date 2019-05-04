@@ -11,6 +11,7 @@ async function refreshAssets() {
     './assets/manifest.webmanifest',
     './app/presenter.js',
     './app/repository.js',
+    './app/recipe.js',
     './app/views.js'
   ];
 
