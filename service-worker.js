@@ -10,6 +10,7 @@ async function refreshAssets() {
     './assets/refresh.svg',
     './assets/manifest.webmanifest',
     './app/presenter.js',
+    './app/search.js',
     './app/repository.js',
     './app/recipe.js',
     './app/views.js'
@@ -17,6 +18,8 @@ async function refreshAssets() {
 
   for (let url of resources) {
     let request = new Request(url);
+    request.headers.set('cache-control', 'no-cache');
+
     let response = await fetch(request);
     await cache.put(request, response);
   }

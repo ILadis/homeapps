@@ -20,11 +20,6 @@ export function Recipe() {
     }
   }
 
-  let score = Recipe.score(this);
-  Object.defineProperty(this, 'score', {
-    value: score
-  });
-
   return this;
 }
 
@@ -63,23 +58,6 @@ Recipe.ingredients = (recipe, { ingredients }) => {
 
       yield Object.assign({ }, ingredient, { quantity });
     }
-  };
-};
-
-Recipe.score = (recipe) => {
-  return function(query) {
-    if (!query) {
-      return true;
-    }
-
-    let name = recipe.name;
-    let match = name.includes(query);
-
-    if (match) {
-      return query.length / name.length;
-    }
-
-    return false;
   };
 };
 

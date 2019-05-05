@@ -1,5 +1,6 @@
 
 import { Repository } from './repository.js';
+import { Search } from './search.js';
 import * as Views from './views.js';
 
 export function Presenter() {
@@ -18,14 +19,23 @@ Presenter.prototype.showIndex = async function() {
   this.shell.setContent(view);
 
   view.onQueryChanged = (query) => {
-    let hasScore = (r) => r.score(query) > 0;
-    let byScore = (r1, r2) => r2.score(query) - r1.score(query);
+    if (!query) {
+      let iterator = recipes.values();
+      return showRecipes(view, iterator);
+    }
 
-    let iterator = [...recipes]
-      .filter(hasScore)
-      .sort(byScore)
-      .values();
+    let search = new Search(recipes);
+    search.execute(query, function*(recipe) {
+      yield recipe.name;
+      for (let { ingredient } of recipe.ingredients) {
+        yield ingredient;
+      }
+      for (let { step } of recipe.steps) {
+        yield step;
+      }
+    });
 
+    let iterator = search.values();
     showRecipes(view, iterator);
   };
 
