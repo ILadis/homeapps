@@ -34,7 +34,6 @@
     window.onhashchange =
     window.onload = () => {
       let alias = location.hash.substr(1);
-      alert('invoking presenter with '+alias);
       if (alias) {
         return presenter.showRecipe(alias);
       }
