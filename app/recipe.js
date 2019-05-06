@@ -52,6 +52,10 @@ Recipe.ingredients = (recipe, { ingredients }) => {
 
     for (let { ref, quantity } of iterator) {
       let ingredient = recipe.ingredients[ref];
+      if (!ingredient) {
+        continue;
+      }
+
       if (!quantity) {
         quantity = ingredient.quantity;
       }
