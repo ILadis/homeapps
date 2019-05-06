@@ -46,6 +46,8 @@ Presenter.prototype.showIndex = async function() {
     }
 
     let iterator = this.repository.fetchAll(true);
+    recipes.clear();
+
     showRecipes(view, iterator);
   };
 

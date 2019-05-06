@@ -12,23 +12,34 @@
     import { Presenter } from './app/presenter.js';
     const presenter = new Presenter();
 
-    presenter.onIndexShown =
-    presenter.onRecipeShown = (recipe = {}) => {
-      location.hash = `${recipe.alias || ''}`;
+    presenter.onIndexShown = () => {
+      if (history.state != null) {
+        let uri = location.pathname;
+        history.pushState(null, '', uri);
+      }
     };
 
-    window.onhashchange =
-    window.onload = () => {
-      let alias = location.hash.substr(1);
-      if (alias) {
-        return presenter.showRecipe(alias);
+    presenter.onRecipeShown = (recipe) => {
+      let alias = recipe.alias;
+      if (history.state != alias) {
+        let uri = location.pathname + '#' + alias;
+        history.pushState(alias, '', uri);
       }
-      presenter.showIndex();
     };
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js');
     }
+
+    window.onhashchange =
+    window.onload = () => {
+      let alias = location.hash.substr(1);
+      alert('invoking presenter with '+alias);
+      if (alias) {
+        return presenter.showRecipe(alias);
+      }
+      presenter.showIndex();
+    };
 
     document.onselectstart = () => false;
   </script>
@@ -36,3 +47,4 @@
 <body>
 </body>
 </html>
+
