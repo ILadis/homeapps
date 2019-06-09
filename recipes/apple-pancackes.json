@@ -1,0 +1,44 @@
+{
+  "name": "Apfelpancakes",
+  "servings": {
+    "quantity": 10,
+    "unit": "Stück"
+  },
+  "ingredients": [{
+    "ingredient": "Mehl",
+    "quantity": 130,
+    "unit": "g"
+  }, {
+    "ingredient": "Backpulver",
+    "quantity": 1,
+    "unit": "TL"
+  }, {
+    "ingredient": "Ei",
+    "quantity": 1
+  }, {
+    "ingredient": "Milch",
+    "quantity": 180,
+    "unit": "ml"
+  }, {
+    "ingredient": "Butter",
+    "quantity": 30,
+    "unit": "g"
+  }, {
+    "ingredient": "Apfel",
+    "quantity": 1
+  }, {
+    "ingredient": "Salz"
+  }],
+  "steps": [{
+    "step": "Die Butter schmelzen und das Ei schlagen bis es fluffig ist. Milch und Butter unter Rühren dem Ei hinzugeben.",
+    "ingredients": [{ "ref": 4 }, { "ref": 2 }, { "ref": 3 }]
+  }, {
+    "step": "Das Mehl mit dem Salz und Backpulver vermengen. Die Mischung unter ständigem Rühren hinzugeben, bis ein sämig-dicker Teig entsteht.",
+    "ingredients": [{ "ref": 0 }, { "ref": 6 }, { "ref": 1 }]
+  }, {
+    "step": "Apfel in kleine Stücke schneiden und der Mischung hinzufügen.",
+    "ingredients": [{ "ref": 5 }]
+  }, {
+    "step": "Die Pfanne mit etwas Butter erhitzen. Anschließend einen Klecks Teig hineingeben und die Pancakes beidseitig auf Stufe 4 goldbraun backen."
+  }]
+}
