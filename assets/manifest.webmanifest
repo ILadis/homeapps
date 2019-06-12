@@ -4,6 +4,12 @@
   "short_name": "Kochbuch",
   "start_url": "../index.html",
   "display": "standalone",
-  "theme_color": "#ffffff",
-  "background_color": "#f9f8f5"
+  "theme_color": "#f9f8f5",
+  "background_color": "#f9f8f5",
+  "icons": [{
+    "src": "./icon.png",
+    "sizes": "512x512",
+    "purpose": "maskable",
+    "type": "image/png"
+  }]
 }
