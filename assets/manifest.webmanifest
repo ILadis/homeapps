@@ -8,8 +8,7 @@
   "background_color": "#f9f8f5",
   "icons": [{
     "src": "./icon.png",
-    "sizes": "512x512",
-    "purpose": "maskable",
+    "sizes": "any",
     "type": "image/png"
   }]
 }
