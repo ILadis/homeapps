@@ -231,17 +231,24 @@ function html(source) {
 
 function importNode(template) {
   let node = document.importNode(template, true);
-  return trimTextNodes(node.firstElementChild);
+  return normalizeNodes(node.firstElementChild);
 }
 
-function trimTextNodes(node) {
+function normalizeNodes(node) {
   let childs = node.childNodes;
   for (let child of childs) {
     let text = child.textContent;
-    if (child.nodeType == 3) {
+    let type = child.nodeType;
+
+    switch (type) {
+    case Node.TEXT_NODE:
       child.textContent = text.trim();
+      break;
+    case Node.COMMENT_NODE:
+      child.remove();
+      break;
     }
-    trimTextNodes(child);
+    normalizeNodes(child);
   }
   return node;
 }
