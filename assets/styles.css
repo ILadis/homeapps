@@ -9,7 +9,6 @@ body {
   font: 12pt sans-serif;
   color: #828282;
   background: #fff;
-  counter-reset: steps;
 }
 
 h1 {
@@ -55,6 +54,7 @@ span + span:before {
   width: 26pt;
   height: 26pt;
   border: none;
+  outline: none;
   background: url(./refresh.svg);
   background-size: contain;
   float: right;
@@ -96,10 +96,26 @@ span + span:before {
   border: none;
 }
 
+.index > section > button {
+  position: fixed;
+  right: 30pt;
+  bottom: 20pt;
+  width: 44pt;
+  height: 44pt;
+  border: none;
+  border-radius: 50%;
+  outline: none;
+  background: #7f7f7f url('./create.svg') no-repeat center;
+  background-size: 32pt;
+  box-shadow: 0 4pt 6pt 1pt #bfbfbf;
+  display: block;
+}
+
 .recipe {
   position: absolute;
   width: 100%;
   height: 100%;
+  counter-reset: steps;
 }
 
 .recipe > header {

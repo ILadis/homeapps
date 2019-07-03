@@ -31,6 +31,7 @@ Index.template = html`
   </header>
   <section>
     <ol><!-- records --></ol>
+    <button></button>
   </section>
 </div>
 `;

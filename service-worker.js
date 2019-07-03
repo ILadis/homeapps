@@ -1,4 +1,4 @@
-
+//v1
 self.oninstall = (event) => event.waitUntil(refreshAssets());
 async function refreshAssets() {
   let cache = await caches.open('cookbook');
@@ -8,6 +8,7 @@ async function refreshAssets() {
     './assets/favicon.ico',
     './assets/styles.css',
     './assets/refresh.svg',
+    './assets/create.svg',
     './assets/manifest.webmanifest',
     './app/presenter.js',
     './app/search.js',
