@@ -172,9 +172,9 @@ span + span:before {
   width: 100%;
   max-height: 100%;
   padding: 8pt;
-  margin-top: -32pt;
+  margin-top: -37pt;
   border-radius: 8pt 8pt 0 0;
-  box-shadow: 0 -1pt 2pt 1pt #bfbfbf;
+  box-shadow: 0 -1pt 3pt -2pt #bfbfbf;
   box-sizing: border-box;
   background: #fff;
   flex-direction: column;
