@@ -1,0 +1,45 @@
+{
+  "name": "Sour Cream",
+  "servings": {
+    "quantity": 500,
+    "unit": "ml"
+  },
+  "ingredients": [{
+    "ingredient": "Magerquark",
+    "quantity": 250,
+    "unit": "g"
+  }, {
+    "ingredient": "Schmand",
+    "quantity": 100,
+    "unit": "g"
+  }, {
+    "ingredient": "Kräuter",
+    "quantity": 1,
+    "unit": "TL"
+  }, {
+    "ingredient": "Knoblauch",
+    "quantity": 1,
+    "unit": "Zehe"
+  }, {
+    "ingredient": "Zwiebel",
+    "quantity": 0.25
+  }, {
+    "ingredient": "Essig",
+    "quantity": 1,
+    "unit": "EL"
+  }, {
+    "ingredient": "Salz"
+  }, {
+    "ingredient": "Pfeffer"
+  }],
+  "steps": [{
+    "step": "Den Magerquark, Schmand und Essig gut verrühren.",
+    "ingredients": [{ "ref": 0 }, { "ref": 1 }, { "ref": 5 }]
+  }, {
+    "step": "Salz, Pfeffer und Kräuter hinzugeben.",
+    "ingredients": [{ "ref": 2 }, { "ref": 6 }, { "ref": 7 }]
+  }, {
+    "step": "Zwiebel und Knoblauch fein hacken und hinzugeben.",
+    "ingredients": [{ "ref": 3 }, { "ref": 4 }]
+  }]
+}
