@@ -1,4 +1,4 @@
-//v1
+
 self.oninstall = (event) => event.waitUntil(refreshAssets());
 async function refreshAssets() {
   let cache = await caches.open('cookbook');
