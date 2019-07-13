@@ -2,7 +2,8 @@
   "name": "Guacamole",
   "servings": {
     "quantity": 500,
-    "unit": "ml"
+    "unit": "ml",
+    "increment": 50
   },
   "ingredients": [{
     "ingredient": "Avocado",

@@ -84,6 +84,7 @@ Presenter.prototype.showRecipe = async function(alias) {
   this.shell.setContent(view);
 
   view.onServingsClicked = (change) => {
+    change *= recipe.servings.increment || 1;
     recipe.servings.quantity += change;
     view.setServings(recipe.servings);
 
