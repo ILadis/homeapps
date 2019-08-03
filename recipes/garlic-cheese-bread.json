@@ -1,0 +1,61 @@
+{
+  "name": "Knoblauch-Käse-Brot",
+  "servings": {
+    "quantity": 500,
+    "unit": "g",
+    "increment": 50
+  },
+  "ingredients": [{
+    "ingredient": "warmes Wasser",
+    "quantity": 250,
+    "unit": "ml"
+  }, {
+    "ingredient": "Trockenhefe",
+    "quantity": 1,
+    "unit": "TL"
+  }, {
+    "ingredient": "Salz",
+    "quantity": 2,
+    "unit": "TL"
+  }, {
+    "ingredient": "Olivenöl",
+    "quantity": 1,
+    "unit": "EL"
+  }, {
+    "ingredient": "Sonnenblumenöl",
+    "quantity": 50,
+    "unit": "ml"
+  }, {
+    "ingredient": "Mehl",
+    "quantity": 370,
+    "unit": "g"
+  }, {
+    "ingredient": "Knoblauch",
+    "quantity": 6,
+    "unit": "Zehen"
+  }, {
+    "ingredient": "Petersilie"
+  }, {
+    "ingredient": "Thymian"
+  }, {
+    "ingredient": "geriebener Käse",
+    "quantity": 90,
+    "unit": "g"
+  }, {
+    "ingredient": "Pfeffer"
+  }],
+  "steps": [{
+    "step": "Warmes Wasser mit der Trockenhefe und 2 EL Mehl verrühren.",
+    "ingredients": [{ "ref": 0 }, { "ref": 1 }]
+  }, {
+    "step": "Mehl und Salz mischen. Die Hefemischung und 1 EL ÖL dazu geben. Zu einem glatten Teig verkneten.",
+    "ingredients": [{ "ref": 5 }, { "ref": 2 }]
+  }, {
+    "step": "Knoblauch, Petersilie, Thymian, Pfeffer und geriebenen Käse mit dem Sonnenblumenöl mischen.",
+    "ingredients": [{ "ref": 6 }, { "ref": 7 }, { "ref": 8 }, { "ref": 10 }, { "ref": 9 }, { "ref": 4 }]
+    }, {
+    "step": "Den Teig mit der Käsemischung verkneten. Einzelne Stücke abzupfen und in eine Backform geben."
+  }, {
+    "step": "Im Ofen bei 190 Grad etwa 35 Minuten goldbraun backen."
+  }]
+}
