@@ -231,3 +231,13 @@ span + span:before {
   padding: 0 2pt;
   content: '•';
 }
+
+.form > header {
+  width: 100%;
+  padding: 8pt 18pt 12pt;
+  border-bottom: solid 1pt #ccc;
+  box-shadow: 0 -1pt 2pt 1pt #bfbfbf;
+  box-sizing: border-box;
+  background: #f9f8f5;
+}
+

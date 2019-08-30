@@ -44,15 +44,27 @@ Index.prototype.setQuery = function(query) {
   input.placeholder = 'Suchbegriff...';
   input.value = `${query || ''}`;
   input.oninput = () => this.onQueryChanged(input.value);
-
-  let button = this.node.querySelector('header button');
-  button.onclick = () => this.onRefreshClicked();
 };
 
 Index.prototype.onQueryChanged = function(query) {
 };
 
+Index.prototype.setRefreshable = function(enabled) {
+  let button = this.node.querySelector('header button');
+  button.hidden = !enabled;
+  button.onclick = () => this.onRefreshClicked();
+};
+
 Index.prototype.onRefreshClicked = function() {
+};
+
+Index.prototype.setCreatable = function(enabled) {
+  let button = this.node.querySelector('section button');
+  button.hidden = !enabled;
+  button.onclick = () => this.onCreateClicked();
+};
+
+Index.prototype.onCreateClicked = function() {
 };
 
 Index.prototype.addRecord = function() {
@@ -223,6 +235,20 @@ Step.prototype.addIngredient = function() {
   this.ingredients.add(view);
   return view;
 };
+
+export function Form() {
+  this.node = importNode(Form.template);
+}
+
+Form.template = html`
+<div class="form">
+  <header>
+    <h1><!-- title --></h1>
+    <!-- name + servings -->
+  </header>
+  <!-- steps + ingredients -->
+</div>
+`;
 
 function html(source) {
   let template = document.createElement('template');

@@ -14,6 +14,8 @@ Presenter.prototype.showIndex = async function() {
 
   let view = new Views.Index();
   view.setQuery();
+  view.setRefreshable(true);
+  view.setCreatable(true);
 
   this.shell.setTitle('Kochbuch');
   this.shell.setContent(view);
@@ -49,6 +51,10 @@ Presenter.prototype.showIndex = async function() {
     recipes.clear();
 
     showRecipes(view, iterator);
+  };
+
+  view.onCreateClicked = () => {
+    this.showForm();
   };
 
   let showRecipes = async (view, iterator) => {
@@ -120,5 +126,17 @@ Presenter.prototype.showRecipe = async function(alias) {
 };
 
 Presenter.prototype.onRecipeShown = function(recipe) {
+};
+
+Presenter.prototype.showForm = function() {
+  let view = new Views.Form();
+
+  this.shell.setTitle('Neues Rezept');
+  this.shell.setContent(view);
+
+  this.onFormShown();
+};
+
+Presenter.prototype.onFormShown = function() {
 };
 

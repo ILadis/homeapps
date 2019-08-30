@@ -9,6 +9,7 @@
   <link href="./assets/styles.css" rel="stylesheet">
   <link href="./assets/manifest.webmanifest" rel="manifest">
   <script type="module">
+    // TODO move this into router.js
     import { Presenter } from './app/presenter.js';
     const presenter = new Presenter();
 
@@ -27,14 +28,26 @@
       }
     };
 
+    presenter.onFormShown = () => {
+      let alias = 'new';
+      if (history.state != alias) {
+        let uri = location.pathname + '#' + alias;
+        history.pushState(alias, '', uri);
+      }
+    };
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js');
     }
 
     window.onhashchange =
-    window.onload = () => {
+    window.onload = (e) => {
+      // TODO use query parameters instead
       let alias = location.hash.substr(1);
-      if (alias) {
+      if (alias == 'new') {
+        return presenter.showForm();
+      }
+      else if (alias) {
         return presenter.showRecipe(alias);
       }
       presenter.showIndex();
