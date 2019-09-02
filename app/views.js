@@ -43,28 +43,28 @@ Index.prototype.setQuery = function(query) {
   let input = this.node.querySelector('header input');
   input.placeholder = 'Suchbegriff...';
   input.value = `${query || ''}`;
-  input.oninput = () => this.onQueryChanged(input.value);
+  input.oninput = () => this.queryChanged(input.value);
 };
 
-Index.prototype.onQueryChanged = function(query) {
+Index.prototype.queryChanged = function(query) {
 };
 
 Index.prototype.setRefreshable = function(enabled) {
   let button = this.node.querySelector('header button');
   button.hidden = !enabled;
-  button.onclick = () => this.onRefreshClicked();
+  button.onclick = () => this.refreshClicked();
 };
 
-Index.prototype.onRefreshClicked = function() {
+Index.prototype.refreshClicked = function() {
 };
 
 Index.prototype.setCreatable = function(enabled) {
   let button = this.node.querySelector('section button');
   button.hidden = !enabled;
-  button.onclick = () => this.onCreateClicked();
+  button.onclick = () => this.createClicked();
 };
 
-Index.prototype.onCreateClicked = function() {
+Index.prototype.createClicked = function() {
 };
 
 Index.prototype.addRecord = function() {
@@ -98,12 +98,12 @@ Record.prototype.setName = function({ name }) {
   span.textContent = name;
 
   let li = this.node;
-  li.onclick = () => this.onRecordClicked();
+  li.onclick = () => this.recordClicked();
 
   return this;
 };
 
-Record.prototype.onRecordClicked = function() {
+Record.prototype.recordClicked = function() {
 };
 
 export function Recipe() {
@@ -141,13 +141,13 @@ Recipe.prototype.setServings = function({ quantity, unit }) {
   span.textContent = `Zutaten für ${quantity} ${unit}`;
 
   let buttons = this.node.querySelectorAll('button');
-  buttons[0].onclick = () => this.onServingsClicked(-1);
-  buttons[1].onclick = () => this.onServingsClicked(+1);
+  buttons[0].onclick = () => this.servingsClicked(-1);
+  buttons[1].onclick = () => this.servingsClicked(+1);
 
   return this;
 };
 
-Recipe.prototype.onServingsClicked = function(change) {
+Recipe.prototype.servingsClicked = function(change) {
 };
 
 Recipe.prototype.addIngredient = function() {

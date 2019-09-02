@@ -20,7 +20,7 @@ Presenter.prototype.showIndex = async function() {
   this.shell.setTitle('Kochbuch');
   this.shell.setContent(view);
 
-  view.onQueryChanged = (query) => {
+  view.queryChanged = (query) => {
     if (!query) {
       let iterator = recipes.values();
       return showRecipes(view, iterator);
@@ -41,7 +41,7 @@ Presenter.prototype.showIndex = async function() {
     showRecipes(view, iterator);
   };
 
-  view.onRefreshClicked = () => {
+  view.refreshClicked = () => {
     let views = view.records.values();
     for (let v of views) {
       view.removeRecord(v);
@@ -53,7 +53,7 @@ Presenter.prototype.showIndex = async function() {
     showRecipes(view, iterator);
   };
 
-  view.onCreateClicked = () => {
+  view.createClicked = () => {
     this.showForm();
   };
 
@@ -64,7 +64,7 @@ Presenter.prototype.showIndex = async function() {
 
       let v = views.next().value || view.addRecord();
       v.setName(recipe);
-      v.onRecordClicked = () => this.showRecipe(recipe.alias);
+      v.recordClicked = () => this.showRecipe(recipe.alias);
     }
 
     for (let v of views) {
@@ -73,10 +73,10 @@ Presenter.prototype.showIndex = async function() {
   };
 
   showRecipes(view, iterator);
-  this.onIndexShown();
+  this.indexShown();
 };
 
-Presenter.prototype.onIndexShown = function() {
+Presenter.prototype.indexShown = function() {
 };
 
 Presenter.prototype.showRecipe = async function(alias) {
@@ -89,7 +89,7 @@ Presenter.prototype.showRecipe = async function(alias) {
   this.shell.setTitle(recipe.name);
   this.shell.setContent(view);
 
-  view.onServingsClicked = (change) => {
+  view.servingsClicked = (change) => {
     change *= recipe.servings.increment || 1;
     recipe.servings.quantity += change;
     view.setServings(recipe.servings);
@@ -122,10 +122,10 @@ Presenter.prototype.showRecipe = async function(alias) {
 
   showIngredients(view, recipe);
   showSteps(view, recipe);
-  this.onRecipeShown(recipe);
+  this.recipeShown(recipe);
 };
 
-Presenter.prototype.onRecipeShown = function(recipe) {
+Presenter.prototype.recipeShown = function(recipe) {
 };
 
 Presenter.prototype.showForm = function() {
@@ -134,9 +134,9 @@ Presenter.prototype.showForm = function() {
   this.shell.setTitle('Neues Rezept');
   this.shell.setContent(view);
 
-  this.onFormShown();
+  this.formShown();
 };
 
-Presenter.prototype.onFormShown = function() {
+Presenter.prototype.formShown = function() {
 };
 

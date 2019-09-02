@@ -10,6 +10,7 @@ async function refreshAssets() {
     './assets/refresh.svg',
     './assets/create.svg',
     './assets/manifest.webmanifest',
+    './app/router.js',
     './app/presenter.js',
     './app/search.js',
     './app/repository.js',

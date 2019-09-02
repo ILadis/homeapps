@@ -30,7 +30,13 @@ Repository.prototype.fetchAll = async function*(fresh = false) {
 };
 
 Repository.prototype.fetchByAlias = async function(alias, fresh) {
-  let request = new Request(`./recipes/${alias}.json`);
+  let name = `${alias}.json`;
+  let matches = name.match(whiteList);
+  if (!matches) {
+    throw new Error(`failed to fetch recipe '${alias}'`);
+  }
+
+  let request = new Request(`./recipes/${name}`);
   if (fresh) {
     request.headers.set('cache-control', 'no-cache');
   }
