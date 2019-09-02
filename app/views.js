@@ -243,9 +243,19 @@ export function Form() {
 Form.template = html`
 <div class="form">
   <header>
-    <h1><!-- title --></h1>
+    <h1><!-- title -->Neues Rezept</h1>
     <!-- name + servings -->
+    <fieldset name="label">
+      <legend>Bezeichnung</legend>
+      <input type="text">
+    </fieldset>
+    <fieldset name="servings">
+      <legend>Mengenangabe</legend>
+      <input type="text">
+      <span>Stück</span>
+    </fieldset>
   </header>
+  <section></section>
   <!-- steps + ingredients -->
 </div>
 `;
