@@ -1,6 +1,5 @@
 
 export function Router() {
-  this.active = false;
   this.routes = new Map();
 }
 
@@ -10,20 +9,16 @@ Router.prototype.register = function(segment, params, action) {
   return route;
 };
 
-Router.prototype.apply = function(url) {
+Router.prototype.apply = function(hash) {
   let iterator = this.routes.entries();
-  this.active = null;
 
   for (let [route, action] of iterator) {
-    let params = route.matches(url.hash);
+    let params = route.matches(hash);
     if (params !== false) {
-      this.active = route;
       action(params);
-      break;
+      return route;
     }
   }
-
-  return this.active;
 };
 
 export function Route(segment, params) {
@@ -67,5 +62,21 @@ Route.prototype.compute = function(values) {
   }
 
   return hash;
+};
+
+Route.prototype.equals = function(hash, values) {
+  let match = this.matches(hash);
+  if (!match) {
+    return false;
+  }
+
+  let iterator = this.params.values();
+  for (let name of iterator) {
+    if(values[name] != match[name]) {
+      return false;
+    }
+  }
+
+  return true;
 };
 

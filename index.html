@@ -34,7 +34,7 @@
     router.navigateTo(recipe, { alias });
 
   router.navigateTo = function(route, values) {
-    if (this.active != route) {
+    if (!route.equals(location.hash, values)) {
       let hash = route.compute(values);
       let uri = location.pathname + hash;
       history.pushState(null, '', uri);
@@ -42,12 +42,12 @@
   };
 
   if ('serviceWorker' in navigator) {
-    //navigator.serviceWorker.register('./service-worker.js');
+    navigator.serviceWorker.register('./service-worker.js');
   }
 
   window.onhashchange =
   window.onload = () => {
-    let route = router.apply(location);
+    let route = router.apply(location.hash);
 
     if (!route) {
       presenter.showIndex();
