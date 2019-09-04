@@ -28,10 +28,6 @@ h3 {
   color: #4a4a4a;
 }
 
-span + span:before {
-  content: ' ';
-}
-
 .index {
   position: absolute;
   width: 100%;
@@ -228,10 +224,11 @@ span + span:before {
   content: ' ';
   position: absolute;
   left: 50%;
-  margin: 21pt -50pt 0;
-  width: 100pt;
+  margin-top: 21pt;
+  width: 50%;
   height: 1pt;
   background: #e4e6e7;
+  transform: translateX(-50%);
   display: block;
 }
 

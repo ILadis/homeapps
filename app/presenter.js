@@ -102,8 +102,6 @@ Presenter.prototype.showRecipe = async function(alias) {
     let views = view.ingredients.values();
     for (let ingredient of ingredients) {
       let v = views.next().value || view.addIngredient();
-      v.setQuantity(ingredient);
-      v.setUnit(ingredient);
       v.setLabel(ingredient);
     }
   };

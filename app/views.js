@@ -179,28 +179,24 @@ export function Ingredient() {
 
 Ingredient.template = html`
 <li>
-  <span><!-- quantity --></span>
-  <span><!-- unit --></span>
-  <span><!-- ingredient --></span>
+  <span><!-- (quantity unit) ingredient --></span>
 </li>
 `;
 
-Ingredient.prototype.setQuantity = function({ quantity }) {
-  let span = this.node.querySelectorAll('span')[0];
-  span.textContent = `${quantity || ''}`;
-  return this;
-};
+Ingredient.prototype.setLabel = function({ quantity, unit, ingredient }) {
+  let label = append(ingredient, append(unit, append(quantity)));
+  let span = this.node.querySelector('span');
+  span.textContent = label;
 
-Ingredient.prototype.setUnit = function({ unit }) {
-  let span = this.node.querySelectorAll('span')[1];
-  span.textContent = `${unit || ''}`;
   return this;
-};
 
-Ingredient.prototype.setLabel = function({ ingredient }) {
-  let span = this.node.querySelectorAll('span')[2];
-  span.textContent = `${ingredient || ''}`;
-  return this;
+  function append(value, label = '') {
+    if (value) {
+      label += label ? ' ' : '';
+      label += value;
+    }
+    return label;
+  }
 };
 
 export function Step() {
@@ -211,7 +207,7 @@ export function Step() {
 Step.template = html`
 <li>
   <h3><!-- ingredients --></h3>
-  <ul><!-- (quantity unit) ingredient--></ul>
+  <ul><!-- (quantity unit) ingredient --></ul>
   <span><!-- step --></span>
 </li>
 `;
