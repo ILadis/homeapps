@@ -251,7 +251,15 @@ Form.template = html`
       <span>Stück</span>
     </fieldset>
   </header>
-  <section></section>
+  <section>
+    <ul>
+      <li>
+        <span>200 g Frischkäse</span><span>1 Ei</span>
+        <input type="text" placeholder="Zutaten hinzufügen">
+        <textarea placeholder="Arbeitsschritte beschreiben"></textarea>
+      </li>
+    </ul>
+  </section>
   <!-- steps + ingredients -->
 </div>
 `;

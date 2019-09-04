@@ -50,7 +50,6 @@ h3 {
   width: 26pt;
   height: 26pt;
   border: none;
-  outline: none;
   background: url(./refresh.svg);
   background-size: contain;
   float: right;
@@ -101,7 +100,6 @@ h3 {
   height: 44pt;
   border: none;
   border-radius: 50%;
-  outline: none;
   background: #7f7f7f url('./create.svg') no-repeat center;
   background-size: 32pt;
   box-shadow: 0 4pt 6pt 1pt #bfbfbf;
@@ -302,7 +300,6 @@ h3 {
   font-size: 12pt;
   color: #4a4a4a;
   border: none;
-  outline: none;
   background: transparent;
   flex-grow: 1;
 }
@@ -319,5 +316,43 @@ h3 {
   flex-grow: 1;
   overflow: scroll;
   scrollbar-width: none;
+}
+
+.form > section span {
+  margin: 2pt 3pt;
+  padding: 0 10pt;
+  height: 20pt;
+  line-height: 20pt;
+  font-size: 11pt;
+  color: #4a4a4a;
+  border: none;
+  border-radius: 9pt;
+  background: #ebebeb;
+  display: inline-block;
+}
+
+.form > section > ul {
+  list-style: none;
+}
+
+.form > section > ul > li input {
+  padding: 12pt 13pt 4pt;
+  width: 100%;
+  font-size: 11pt;
+  color: #4a4a4a;
+  border: none;
+  border-bottom: solid 1pt #ebebeb;
+  box-sizing: border-box;
+}
+
+.form > section > ul > li textarea {
+  padding: 4pt 13pt 12pt;
+  width: 100%;
+  font: 11pt sans-serif;
+  color: #4a4a4a;
+  border: none;
+  resize: none;
+  box-sizing: border-box;
+  overflow: auto;
 }
 
