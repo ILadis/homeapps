@@ -1,0 +1,38 @@
+{
+  "name": "Avocado-Pesto",
+  "servings": {
+    "quantity": 2,
+    "unit": "Personen"
+  },
+  "ingredients": [{
+    "ingredient": "Knoblauch",
+    "quantity": 1,
+    "unit": "Zehe"
+  }, {
+    "ingredient": "Basilikum",
+    "quantity": 3,
+    "unit": "Stiele"
+  }, {
+    "ingredient": "Avocado",
+    "quantity": 0.5
+  }, {
+    "ingredient": "Parmesan",
+    "quantity": 25,
+    "unit": "g"
+  }, {
+    "ingredient": "Olivenöl",
+    "quantity": 3,
+    "unit": "EL"
+  }, {
+    "ingredient": "Tomaten",
+    "quantity": 60,
+    "unit": "g"
+  }, {
+    "ingredient": "Salz"
+  }, {
+    "ingredient": "Pfeffer"
+  }],
+  "steps": [{
+    "step": "Alle Zutaten in einen Mixer geben und fein pürieren. Ggf. noch etwas Schärfe hinzugeben."
+  }]
+}
