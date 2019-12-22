@@ -17,9 +17,9 @@ Shell.prototype.setContent = function(content) {
   this.content = content;
 };
 
-export function Index() {
+export const Index = function() {
   this.node = importNode(Index.template);
-  this.records = new Set();
+  this.recipes = new Set();
 }
 
 Index.template = html`
@@ -30,7 +30,7 @@ Index.template = html`
     <input type="search">
   </header>
   <section>
-    <ol><!-- records --></ol>
+    <ol><!-- recipes --></ol>
     <button></button>
   </section>
 </div>
@@ -43,70 +43,70 @@ Index.prototype.setQuery = function(query) {
   let input = this.node.querySelector('header input');
   input.placeholder = 'Suchbegriff...';
   input.value = `${query || ''}`;
-  input.oninput = () => this.queryChanged(input.value);
+  input.oninput = () => this.onQueryChanged(input.value);
 };
 
-Index.prototype.queryChanged = function(query) {
+Index.prototype.onQueryChanged = function(query) {
 };
 
 Index.prototype.setRefreshable = function(enabled) {
   let button = this.node.querySelector('header button');
   button.hidden = !enabled;
-  button.onclick = () => this.refreshClicked();
+  button.onclick = () => this.onRefreshClicked();
 };
 
-Index.prototype.refreshClicked = function() {
+Index.prototype.onRefreshClicked = function() {
 };
 
 Index.prototype.setCreatable = function(enabled) {
   let button = this.node.querySelector('section button');
   button.hidden = !enabled;
-  button.onclick = () => this.createClicked();
+  button.onclick = () => this.onCreateClicked();
 };
 
-Index.prototype.createClicked = function() {
+Index.prototype.onCreateClicked = function() {
 };
 
-Index.prototype.addRecord = function() {
+Index.prototype.addRecipe = function() {
   let ol = this.node.querySelector('section ol');
 
-  let view = new Record();
+  let view = new Index.Recipe();
   ol.appendChild(view.node);
 
-  this.records.add(view);
+  this.recipes.add(view);
   return view;
 };
 
-Index.prototype.removeRecord = function(view) {
+Index.prototype.removeRecipe = function(view) {
   let ol = this.node.querySelector('section ol');
   ol.removeChild(view.node);
-  this.records.delete(view);
+  this.recipes.delete(view);
 };
 
-export function Record() {
-  this.node = importNode(Record.template);
+Index.Recipe = function() {
+  this.node = importNode(Index.Recipe.template);
 }
 
-Record.template = html`
+Index.Recipe.template = html`
 <li>
   <span><!-- name --></span>
 </li>
 `;
 
-Record.prototype.setName = function({ name }) {
+Index.Recipe.prototype.setName = function({ name }) {
   let span = this.node.querySelector('span');
   span.textContent = name;
 
   let li = this.node;
-  li.onclick = () => this.recordClicked();
+  li.onclick = () => this.onClicked();
 
   return this;
 };
 
-Record.prototype.recordClicked = function() {
+Index.Recipe.prototype.onClicked = function() {
 };
 
-export function Recipe() {
+export const Recipe = function() {
   this.node = importNode(Recipe.template);
   this.ingredients = new Set();
   this.steps = new Set();
@@ -141,19 +141,19 @@ Recipe.prototype.setServings = function({ quantity, unit }) {
   span.textContent = `Zutaten für ${quantity} ${unit}`;
 
   let buttons = this.node.querySelectorAll('button');
-  buttons[0].onclick = () => this.servingsClicked(-1);
-  buttons[1].onclick = () => this.servingsClicked(+1);
+  buttons[0].onclick = () => this.onServingsClicked(-1);
+  buttons[1].onclick = () => this.onServingsClicked(+1);
 
   return this;
 };
 
-Recipe.prototype.servingsClicked = function(change) {
+Recipe.prototype.onServingsClicked = function(change) {
 };
 
 Recipe.prototype.addIngredient = function() {
   let ul = this.node.querySelector('header ul');
 
-  let view = new Ingredient();
+  let view = new Recipe.Ingredient();
   ul.appendChild(view.node);
 
   this.ingredients.add(view);
@@ -166,24 +166,24 @@ Recipe.prototype.addStep = function() {
 
   let ol = this.node.querySelector('section ol');
 
-  let view = new Step();
+  let view = new Recipe.Step();
   ol.appendChild(view.node);
 
   this.steps.add(view);
   return view;
 };
 
-export function Ingredient() {
-  this.node = importNode(Ingredient.template);
+Recipe.Ingredient = function() {
+  this.node = importNode(Recipe.Ingredient.template);
 }
 
-Ingredient.template = html`
+Recipe.Ingredient.template = html`
 <li>
   <span><!-- (quantity unit) ingredient --></span>
 </li>
 `;
 
-Ingredient.prototype.setLabel = function({ quantity, unit, ingredient }) {
+Recipe.Ingredient.prototype.setLabel = function({ quantity, unit, ingredient }) {
   let label = append(ingredient, append(unit, append(quantity)));
   let span = this.node.querySelector('span');
   span.textContent = label;
@@ -199,12 +199,12 @@ Ingredient.prototype.setLabel = function({ quantity, unit, ingredient }) {
   }
 };
 
-export function Step() {
-  this.node = importNode(Step.template);
+Recipe.Step = function() {
+  this.node = importNode(Recipe.Step.template);
   this.ingredients = new Set();
 }
 
-Step.template = html`
+Recipe.Step.template = html`
 <li>
   <h3><!-- ingredients --></h3>
   <ul><!-- (quantity unit) ingredient --></ul>
@@ -212,7 +212,7 @@ Step.template = html`
 </li>
 `;
 
-Step.prototype.setText = function({ step, ingredients }) {
+Recipe.Step.prototype.setText = function({ step, ingredients }) {
   let h3 = this.node.querySelector('h3');
   h3.textContent = 'Zutaten';
   h3.hidden = Boolean(!ingredients);
@@ -222,10 +222,10 @@ Step.prototype.setText = function({ step, ingredients }) {
   return this;
 };
 
-Step.prototype.addIngredient = function() {
+Recipe.Step.prototype.addIngredient = function() {
   let ul = this.node.querySelector('ul');
 
-  let view = new Ingredient();
+  let view = new Recipe.Ingredient();
   ul.appendChild(view.node);
 
   this.ingredients.add(view);

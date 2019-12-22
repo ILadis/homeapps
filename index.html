@@ -18,19 +18,19 @@
   let index = router.register('list', [], () =>
     presenter.showIndex());
 
-  presenter.indexShown = () =>
+  presenter.onIndexShown = () =>
     router.navigateTo(index);
 
   let create = router.register('new', [], () =>
     presenter.showForm());
 
-  presenter.formShown = () =>
+  presenter.onFormShown = () =>
     router.navigateTo(create);
 
   let recipe = router.register('recipe', ['alias'], ({ alias }) =>
     presenter.showRecipe(alias));
 
-  presenter.recipeShown = ({ alias }) =>
+  presenter.onRecipeShown = ({ alias }) =>
     router.navigateTo(recipe, { alias });
 
   router.navigateTo = function(route, values) {
