@@ -18,8 +18,14 @@ Shell.prototype.setContent = function(content) {
 };
 
 export const Index = function() {
-  this.node = importNode(Index.template);
+  let node = importNode(Index.template);
+
+  let input = node.querySelector('header input');
+  input.oninput = () => this.onQueryChanged(input.value);
+
+  this.node = node;
   this.recipes = new Set();
+  this.setTitle('Kochbuch');
 }
 
 Index.template = html`
@@ -27,7 +33,7 @@ Index.template = html`
   <header>
     <button></button>
     <h1><!-- title --></h1>
-    <input type="search">
+    <input type="search" placeholder="Suchbegriff...">
   </header>
   <section>
     <ol><!-- recipes --></ol>
@@ -36,14 +42,9 @@ Index.template = html`
 </div>
 `;
 
-Index.prototype.setQuery = function(query) {
+Index.prototype.setTitle = function(title) {
   let h1 = this.node.querySelector('header h1');
-  h1.textContent = 'Kochbuch';
-
-  let input = this.node.querySelector('header input');
-  input.placeholder = 'Suchbegriff...';
-  input.value = `${query || ''}`;
-  input.oninput = () => this.onQueryChanged(input.value);
+  h1.textContent = title;
 };
 
 Index.prototype.onQueryChanged = function(query) {
@@ -84,7 +85,10 @@ Index.prototype.removeRecipe = function(view) {
 };
 
 Index.Recipe = function() {
-  this.node = importNode(Index.Recipe.template);
+  let node = importNode(Index.Recipe.template);
+  node.onclick = () => this.onClicked();
+
+  this.node = node;
 }
 
 Index.Recipe.template = html`
@@ -96,10 +100,6 @@ Index.Recipe.template = html`
 Index.Recipe.prototype.setName = function({ name }) {
   let span = this.node.querySelector('span');
   span.textContent = name;
-
-  let li = this.node;
-  li.onclick = () => this.onClicked();
-
   return this;
 };
 
@@ -107,7 +107,13 @@ Index.Recipe.prototype.onClicked = function() {
 };
 
 export const Recipe = function() {
-  this.node = importNode(Recipe.template);
+  let node = importNode(Recipe.template);
+
+  let buttons = node.querySelectorAll('button');
+  buttons[0].onclick = () => this.onServingsClicked(-1);
+  buttons[1].onclick = () => this.onServingsClicked(+1);
+
+  this.node = node;
   this.ingredients = new Set();
   this.steps = new Set();
 }
@@ -139,11 +145,6 @@ Recipe.prototype.setName = function({ name }) {
 Recipe.prototype.setServings = function({ quantity, unit }) {
   let span = this.node.querySelector('header span');
   span.textContent = `Zutaten für ${quantity} ${unit}`;
-
-  let buttons = this.node.querySelectorAll('button');
-  buttons[0].onclick = () => this.onServingsClicked(-1);
-  buttons[1].onclick = () => this.onServingsClicked(+1);
-
   return this;
 };
 
@@ -187,7 +188,6 @@ Recipe.Ingredient.prototype.setLabel = function({ quantity, unit, ingredient }) 
   let label = append(ingredient, append(unit, append(quantity)));
   let span = this.node.querySelector('span');
   span.textContent = label;
-
   return this;
 
   function append(value, label = '') {
@@ -232,14 +232,24 @@ Recipe.Step.prototype.addIngredient = function() {
   return view;
 };
 
-export function Form() {
-  this.node = importNode(Form.template);
+export const Form = function() {
+  let node = importNode(Form.template);
+
+  var button = node.querySelector('header > button');
+  button.onclick = () => this.onDoneClicked();
+
+  var button = node.querySelector('section > button');
+  button.onclick = () => this.onAddClicked();
+
+  this.node = node;
+  this.setTitle('Neues Rezept');
 }
 
 Form.template = html`
 <div class="form">
   <header>
-    <h1><!-- title -->Neues Rezept</h1>
+    <button></button>
+    <h1><!-- title --></h1>
     <!-- name + servings -->
     <fieldset name="label">
       <legend>Bezeichnung</legend>
@@ -252,17 +262,87 @@ Form.template = html`
     </fieldset>
   </header>
   <section>
-    <ul>
-      <li>
-        <span>200 g Frischkäse</span><span>1 Ei</span>
-        <input type="text" placeholder="Zutaten hinzufügen">
-        <textarea placeholder="Arbeitsschritte beschreiben"></textarea>
-      </li>
-    </ul>
+    <ol><!-- steps + ingredients --></ol>
+    <button></button>
   </section>
-  <!-- steps + ingredients -->
 </div>
 `;
+
+Form.prototype.setTitle = function(title) {
+  let h1 = this.node.querySelector('header h1');
+  h1.textContent = title;
+};
+
+Form.prototype.addStep = function() {
+  let ol = this.node.querySelector('section > ol');
+
+  let view = new Form.Step();
+  ol.appendChild(view.node);
+
+  let options = { behavior: 'smooth' };
+  let scroll = () => view.node.scrollIntoView(options);
+  setTimeout(scroll, 100);
+
+  return view;
+};
+
+Form.prototype.onAddClicked = function() {
+};
+
+Form.prototype.onDoneClicked = function() {
+};
+
+Form.Step = function() {
+  let node = importNode(Form.Step.template);
+
+  let form = node.querySelector('form');
+  let input = node.querySelector('form input');
+  form.onsubmit = (event) => {
+    event.preventDefault();
+    if (input.value.length) {
+      this.onIngredientSubmitted(input.value);
+      input.value = '';
+    }
+  };
+
+  let textarea = node.querySelector('textarea');
+  textarea.oninput = () => {
+    textarea.style.height = 'auto';
+    textarea.style.height = (textarea.scrollHeight) + 'px';
+  };
+
+  this.node = node;
+}
+
+Form.Step.template = html`
+<li>
+  <form><input type="text" placeholder="Zutaten hinzufügen"></form>
+  <textarea rows="1" placeholder="Arbeitsschritte beschreiben"></textarea>
+</li>
+`;
+
+Form.Step.prototype.addIngredient = function(ingredient) {
+  let span = document.createElement('span');
+  span.textContent = ingredient;
+
+  let spans = this.node.querySelectorAll('span');
+  if (spans.length) {
+    insertAfter(span, spans[spans.length - 1]);
+  } else {
+    this.node.prepend(span);
+  }
+
+  span.onclick = () => {
+    span.remove();
+    this.onIngredientRemoved(ingredient);
+  }
+};
+
+Form.Step.prototype.onIngredientRemoved = function(ingredient) {
+};
+
+Form.Step.prototype.onIngredientSubmitted = function(ingredient) {
+};
 
 function html(source) {
   let template = document.createElement('template');
@@ -273,6 +353,10 @@ function html(source) {
 function importNode(template) {
   let node = document.importNode(template, true);
   return normalizeNodes(node.firstElementChild);
+}
+
+function insertAfter(newNode, node) {
+  node.parentNode.insertBefore(newNode, node.nextSibling);
 }
 
 function normalizeNodes(node) {
