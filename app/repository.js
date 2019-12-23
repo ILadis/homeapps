@@ -49,6 +49,21 @@ Repository.prototype.fetchByAlias = async function(alias, fresh) {
   let json = await response.json();
   json.alias = alias;
 
-  return new Recipe(json);
+  return toRecipe(json);
 };
 
+function toRecipe({ name, alias, servings, steps, ingredients }) {
+  let recipe = new Recipe(name, alias);
+  recipe.setServings(servings.quantity, servings.unit);
+
+  let ingredientOf = (ref) => ingredients[ref];
+
+  for (let { step, ingredients = [] } of steps) {
+    recipe.addStep(step, ingredients.map(({ ref, quantity }) => {
+      var ref = ingredientOf(ref);
+      return recipe.addIngredient(ref.ingredient, quantity || ref.quantity, ref.unit);
+    }));
+  }
+
+  return recipe;
+}
