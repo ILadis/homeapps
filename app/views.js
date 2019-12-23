@@ -142,13 +142,13 @@ Recipe.prototype.setName = function({ name }) {
   return this;
 };
 
-Recipe.prototype.setServings = function({ quantity, unit }) {
+Recipe.prototype.setServings = function({ servings }) {
   let span = this.node.querySelector('header span');
-  span.textContent = `Zutaten für ${quantity} ${unit}`;
+  span.textContent = `Zutaten für ${servings}`;
   return this;
 };
 
-Recipe.prototype.onServingsClicked = function(change) {
+Recipe.prototype.onServingsClicked = function(delta) {
 };
 
 Recipe.prototype.addIngredient = function() {
@@ -184,19 +184,11 @@ Recipe.Ingredient.template = html`
 </li>
 `;
 
-Recipe.Ingredient.prototype.setLabel = function({ quantity, unit, ingredient }) {
-  let label = append(ingredient, append(unit, append(quantity)));
+Recipe.Ingredient.prototype.setLabel = function({ name, quantity }) {
+  let label = quantity + ' ' + name;
   let span = this.node.querySelector('span');
   span.textContent = label;
   return this;
-
-  function append(value, label = '') {
-    if (value) {
-      label += label ? ' ' : '';
-      label += value;
-    }
-    return label;
-  }
 };
 
 Recipe.Step = function() {
@@ -212,13 +204,13 @@ Recipe.Step.template = html`
 </li>
 `;
 
-Recipe.Step.prototype.setText = function({ step, ingredients }) {
+Recipe.Step.prototype.setText = function({ text, ingredients }) {
   let h3 = this.node.querySelector('h3');
   h3.textContent = 'Zutaten';
   h3.hidden = Boolean(!ingredients);
 
   let span = this.node.querySelector('span');
-  span.textContent = step;
+  span.textContent = text;
   return this;
 };
 
@@ -377,4 +369,3 @@ function normalizeNodes(node) {
   }
   return node;
 }
-
