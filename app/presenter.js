@@ -28,11 +28,11 @@ Presenter.prototype.showIndex = async function() {
     let search = new Search(recipes);
     search.execute(query, function*(recipe) {
       yield recipe.name;
-      for (let { ingredient } of recipe.ingredients) {
-        yield ingredient;
+      for (let { name } of recipe.ingredients.values()) {
+        yield name;
       }
-      for (let { step } of recipe.steps) {
-        yield step;
+      for (let { text } of recipe.steps.values()) {
+        yield text;
       }
     });
 
@@ -83,15 +83,15 @@ Presenter.prototype.showRecipe = async function(alias) {
 
   let view = new Views.Recipe();
   view.setName(recipe);
-  view.setServings(recipe.servings);
+  view.setServings(recipe);
 
   this.shell.setTitle(recipe.name);
   this.shell.setContent(view);
 
-  view.onServingsClicked = (change) => {
-    change *= recipe.servings.increment || 1;
-    recipe.servings.quantity += change;
-    view.setServings(recipe.servings);
+  view.onServingsClicked = (delta) => {
+    delta *= recipe.servings.increment || 1;
+    recipe.convertServings(delta);
+    view.setServings(recipe);
 
     showIngredients(view, recipe);
     showSteps(view, recipe);
@@ -99,7 +99,7 @@ Presenter.prototype.showRecipe = async function(alias) {
 
   let showIngredients = (view, { ingredients }) => {
     let views = view.ingredients.values();
-    for (let ingredient of ingredients) {
+    for (let ingredient of ingredients.values()) {
       let v = views.next().value || view.addIngredient();
       v.setLabel(ingredient);
     }
@@ -107,7 +107,7 @@ Presenter.prototype.showRecipe = async function(alias) {
 
   let showSteps = (view, { steps }) => {
     let views = view.steps.values();
-    for (let step of steps) {
+    for (let step of steps.values()) {
       let v = views.next().value || view.addStep();
       v.setText(step);
 
@@ -148,4 +148,3 @@ Presenter.prototype.showForm = function() {
 
 Presenter.prototype.onFormShown = function() {
 };
-
