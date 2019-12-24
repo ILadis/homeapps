@@ -52,7 +52,7 @@ Repository.prototype.fetchByAlias = async function(alias, fresh) {
   return toRecipe(json);
 };
 
-Repository.prototype.save = function(recipe) {
+Repository.prototype.save = async function(recipe) {
   let alias = recipe.alias;
   let name = `${alias}.json`;
   let json = JSON.stringify(toJSON(recipe));
