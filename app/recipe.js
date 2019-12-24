@@ -13,17 +13,17 @@ Recipe.prototype.setServings = function(quantity, unit) {
 };
 
 Recipe.prototype.convertServings = function(delta) {
-  let scale = (this.servings.value + delta) / this.servings[$value];
-  this.servings[$scale] = scale;
+  let scale = this.servings.scalingFor(delta);
+  this.servings.scaleBy(scale);
 
   for (let ingredient of this.ingredients.values()) {
-    ingredient.quantity[$scale] = scale;
+    ingredient.quantity.scaleBy(scale);
   }
 
   for (let step of this.steps.values()) {
     for (let ingredient of step.ingredients.values()) {
       if (ingredient[$quantity]) {
-        ingredient[$quantity][$scale] = scale;
+        ingredient.quantity.scaleBy(scale);
       }
     }
   }
@@ -67,6 +67,14 @@ Quantity.prototype = {
       return this[$value] * this[$scale];
     }
   }
+};
+
+Quantity.prototype.scalingFor = function(delta) {
+  return (this.value + delta) / this[$value];
+};
+
+Quantity.prototype.scaleBy = function(scale) {
+  this[$scale] = scale;
 };
 
 Quantity.prototype.toString = function() {
