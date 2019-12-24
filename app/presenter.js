@@ -138,10 +138,7 @@ Presenter.prototype.showForm = function() {
   };
 
   view.onServingsChanged = (quantity) => {
-    var quantity = Number(quantity);
-    if (!Number.isNaN(quantity)) {
-      recipe.setServings(quantity, 'Stück');
-    }
+    recipe.setServings(quantity, 'Stück');
   };
 
   let addStep = view.onAddClicked = () => {
@@ -169,6 +166,7 @@ Presenter.prototype.showForm = function() {
   };
 
   view.onDoneClicked = () => {
+    this.repository.save(recipe);
     this.showIndex();
   };
 

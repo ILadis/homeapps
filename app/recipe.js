@@ -14,21 +14,24 @@ Recipe.prototype.setName = function(name, alias) {
 };
 
 Recipe.prototype.setServings = function(quantity, unit) {
-  this.servings = new Quantity(quantity, unit);
+  var quantity = Number(quantity);
+  if (!Number.isNaN(quantity)) {
+    this.servings = new Quantity(quantity, unit);
+  }
 };
 
 Recipe.prototype.convertServings = function(delta) {
   let scale = this.servings.scalingFor(delta);
-  this.servings.scaleBy(scale);
+  this.servings.scaleTo(scale);
 
   for (let ingredient of this.ingredients.values()) {
-    ingredient.quantity.scaleBy(scale);
+    ingredient.quantity.scaleTo(scale);
   }
 
   for (let step of this.steps.values()) {
     for (let ingredient of step.ingredients.values()) {
       if (ingredient[$quantity]) {
-        ingredient.quantity.scaleBy(scale);
+        ingredient.quantity.scaleTo(scale);
       }
     }
   }
@@ -37,8 +40,10 @@ Recipe.prototype.convertServings = function(delta) {
 Recipe.prototype.addIngredient = function(name, quantity, unit) {
   let ingredient = this.ingredients.get(name);
 
+  var quantity = Number(quantity) || quantity;
+
   if (ingredient) {
-    ingredient.quantity[$value] += quantity;
+    ingredient.quantity.changeBy(quantity);
   } else {
     ingredient = new Ingredient(name, new Quantity(quantity, unit));
   }
@@ -83,11 +88,17 @@ Quantity.prototype = {
   }
 };
 
+Quantity.prototype.changeBy = function(delta = 0) {
+  if (this[$value]) {
+    this[$value] += delta;
+  }
+}
+
 Quantity.prototype.scalingFor = function(delta) {
   return (this.value + delta) / this[$value];
 };
 
-Quantity.prototype.scaleBy = function(scale) {
+Quantity.prototype.scaleTo = function(scale) {
   this[$scale] = scale;
 };
 
@@ -147,7 +158,12 @@ Ingredient.Ref.prototype = {
 
 Ingredient.Ref.prototype.setQuantity = function(quantity) {
   this[$quantity] = new Quantity(quantity, this.quantity.unit);
-}
+};
+
+Ingredient.Ref.prototype.indexIn = function(recipe) {
+  let ingredients = Array.from(recipe.ingredients.values());
+  return ingredients.indexOf(this[$ingredient]);
+};
 
 function Step(text, ingredients) {
   this.text = text;

@@ -52,13 +52,36 @@ Repository.prototype.fetchByAlias = async function(alias, fresh) {
   return toRecipe(json);
 };
 
-function toRecipe({ name, alias, servings, steps, ingredients }) {
+Repository.prototype.save = function(recipe) {
+  let alias = recipe.alias;
+  let name = `${alias}.json`;
+  let json = JSON.stringify(toJSON(recipe));
+
+  let request = new Request(`./recipes/${name}`, {
+    method: 'PUT',
+    body: json,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error(`failed to save recipe '${alias}'`);
+  }
+
+  return recipe;
+};
+
+function toRecipe(json) {
+  let { name, alias, servings, steps, ingredients } = json;
+
   let recipe = new Recipe(name, alias);
   recipe.setServings(servings.quantity, servings.unit);
 
   let ingredientOf = (ref) => ingredients[ref];
 
-  for (let { step, ingredients = [] } of steps) {
+  for (let { step, ingredients = [] } of steps.values()) {
     recipe.addStep(step, ingredients.map(({ ref, quantity }) => {
       var ref = ingredientOf(ref);
       return recipe.addIngredient(ref.ingredient, quantity || ref.quantity, ref.unit);
@@ -66,4 +89,38 @@ function toRecipe({ name, alias, servings, steps, ingredients }) {
   }
 
   return recipe;
+}
+
+function toJSON(recipe) {
+  let { name, servings, steps, ingredients } = recipe;
+
+  let json = {
+    name,
+    servings: {
+      quantity: servings.value,
+      unit: servings.unit
+    },
+    ingredients: [],
+    steps: []
+  };
+
+  for (let { name, quantity } of ingredients.values()) {
+    json.ingredients.push({
+      ingredient: name,
+      quantity: quantity.value,
+      unit: quantity.unit
+    });
+  }
+
+  for (let { text, ingredients } of steps.values()) {
+    json.steps.push({
+      step: text,
+      ingredients: Array.from(ingredients).map(ingredient => ({
+        ref: ingredient.indexIn(recipe),
+        quantity: ingredient.quantity.value
+      }))
+    });
+  }
+
+  return json;
 }
