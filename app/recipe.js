@@ -8,6 +8,11 @@ export function Recipe(name, alias) {
   Object.seal(this);
 }
 
+Recipe.prototype.setName = function(name, alias) {
+  this.name = name;
+  this.alias = alias;
+};
+
 Recipe.prototype.setServings = function(quantity, unit) {
   this.servings = new Quantity(quantity, unit);
 };
@@ -43,6 +48,15 @@ Recipe.prototype.addIngredient = function(name, quantity, unit) {
   let ref = new Ingredient.Ref(ingredient);
   ref.setQuantity(quantity);
   return ref;
+};
+
+Recipe.prototype.removeIngredient = function(ingredient) {
+  let quantity = this.ingredients.get(ingredient.name).quantity;
+  quantity[$value] -= ingredient.quantity.value;
+
+  if (quantity[$value] == 0) {
+    this.ingredients.delete(ingredient.name);
+  }
 };
 
 Recipe.prototype.addStep = function(text, ingredients) {
@@ -138,5 +152,17 @@ Ingredient.Ref.prototype.setQuantity = function(quantity) {
 function Step(text, ingredients) {
   this.text = text;
   this.ingredients = new Set(ingredients);
-  Object.freeze(this);
+  Object.seal(this);
 }
+
+Step.prototype.setText = function(text) {
+  this.text = text;
+};
+
+Step.prototype.addIngredient = function(ingredient) {
+  this.ingredients.add(ingredient);
+};
+
+Step.prototype.removeIngredient = function(ingredient) {
+  this.ingredients.delete(ingredient);
+};

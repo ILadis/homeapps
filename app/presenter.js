@@ -1,6 +1,7 @@
 
 import { Repository } from './repository.js';
 import { Search } from './search.js';
+import { Recipe } from './recipe.js';
 import * as Views from './views.js';
 
 export function Presenter() {
@@ -127,20 +128,61 @@ Presenter.prototype.onRecipeShown = function(recipe) {
 
 Presenter.prototype.showForm = function() {
   let view = new Views.Form();
+  let recipe = new Recipe();
 
   this.shell.setTitle('Neues Rezept');
   this.shell.setContent(view);
 
+  view.onLabelChanged = (name) => {
+    recipe.setName(name);
+  };
+
+  view.onServingsChanged = (quantity) => {
+    var quantity = Number(quantity);
+    if (!Number.isNaN(quantity)) {
+      recipe.setServings(quantity, 'Stück');
+    }
+  };
+
   let addStep = view.onAddClicked = () => {
-    let step = view.addStep();
-    step.onIngredientSubmitted = (ingredient) => {
+    let step = recipe.addStep();
+
+    let v = view.addStep();
+    v.onIngredientSubmitted = (ingredient) => {
+      var ingredient = addIngredient(ingredient);
+      if (!ingredient) {
+        return false;
+      }
+
       step.addIngredient(ingredient);
+
+      v.addIngredient(ingredient).onClicked = function() {
+        step.removeIngredient(ingredient);
+        recipe.removeIngredient(ingredient);
+        v.removeIngredient(this);
+      };
+    };
+
+    v.onStepTextChanged = (text) => {
+      step.setText(text);
     };
   };
 
   view.onDoneClicked = () => {
     this.showIndex();
   };
+
+  let addIngredient = (ingredient) => {
+    let parts = ingredient.split(' ').filter(p => !!p);
+    switch (parts.length) {
+    case 1:
+      return recipe.addIngredient(parts[0]);
+    case 2:
+      return recipe.addIngredient(parts[1], parts[0]);
+    case 3:
+      return recipe.addIngredient(parts[2], parts[0], parts[1]);
+    }
+  }
 
   addStep();
   this.onFormShown();

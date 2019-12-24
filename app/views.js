@@ -227,6 +227,12 @@ Recipe.Step.prototype.addIngredient = function() {
 export const Form = function() {
   let node = importNode(Form.template);
 
+  var input = node.querySelector('fieldset[name=label] > input');
+  input.onchange = (event) => this.onLabelChanged(event.target.value);
+
+  var input = node.querySelector('fieldset[name=servings] > input');
+  input.onchange = (event) => this.onServingsChanged(event.target.value);
+
   var button = node.querySelector('header > button');
   button.onclick = () => this.onDoneClicked();
 
@@ -260,6 +266,12 @@ Form.template = html`
 </div>
 `;
 
+Form.prototype.onLabelChanged = function(name) {
+};
+
+Form.prototype.onServingsChanged = function(quantity) {
+};
+
 Form.prototype.setTitle = function(title) {
   let h1 = this.node.querySelector('header h1');
   h1.textContent = title;
@@ -289,6 +301,7 @@ Form.Step = function() {
 
   let form = node.querySelector('form');
   let input = node.querySelector('form input');
+  input.onchange =
   form.onsubmit = (event) => {
     event.preventDefault();
     if (input.value.length) {
@@ -298,6 +311,7 @@ Form.Step = function() {
   };
 
   let textarea = node.querySelector('textarea');
+  textarea.onchange = () => this.onStepTextChanged(textarea.value);
   textarea.oninput = () => {
     textarea.style.height = 'auto';
     textarea.style.height = (textarea.scrollHeight) + 'px';
@@ -313,27 +327,41 @@ Form.Step.template = html`
 </li>
 `;
 
-Form.Step.prototype.addIngredient = function(ingredient) {
-  let span = document.createElement('span');
-  span.textContent = ingredient;
+Form.Step.prototype.addIngredient = function({ name, quantity }) {
+  let view = new Form.Step.Ingredient(name, quantity);
 
   let spans = this.node.querySelectorAll('span');
   if (spans.length) {
-    insertAfter(span, spans[spans.length - 1]);
+    insertAfter(view.node, spans[spans.length - 1]);
   } else {
-    this.node.prepend(span);
+    this.node.prepend(view.node);
   }
 
-  span.onclick = () => {
-    span.remove();
-    this.onIngredientRemoved(ingredient);
-  }
+  return view;
 };
 
-Form.Step.prototype.onIngredientRemoved = function(ingredient) {
+Form.Step.prototype.removeIngredient = function(view) {
+  this.node.removeChild(view.node);
 };
 
 Form.Step.prototype.onIngredientSubmitted = function(ingredient) {
+};
+
+Form.Step.prototype.onStepTextChanged = function(text) {
+};
+
+Form.Step.Ingredient = function(name, quantity) {
+  let node = importNode(Form.Step.Ingredient.template);
+  node.textContent = quantity + ' ' + name;
+  node.onclick = () => this.onClicked();
+  this.node = node;
+}
+
+Form.Step.Ingredient.template = html`
+<span></span>
+`;
+
+Form.Step.Ingredient.prototype.onClicked = function() {
 };
 
 function html(source) {
