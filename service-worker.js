@@ -5,17 +5,22 @@ async function refreshAssets() {
   let resources = [
     './',
     './index.html',
-    './assets/favicon.ico',
-    './assets/styles.css',
-    './assets/refresh.svg',
-    './assets/create.svg',
-    './assets/manifest.webmanifest',
-    './app/router.js',
+
+    './app/client.js',
     './app/presenter.js',
-    './app/search.js',
-    './app/repository.js',
     './app/recipe.js',
-    './app/views.js'
+    './app/repository.js',
+    './app/router.js',
+    './app/search.js',
+    './app/views.js',
+
+    './assets/create.svg',
+    './assets/done.svg',
+    './assets/favicon.ico',
+    './assets/icon.png',
+    './assets/manifest.webmanifest',
+    './assets/refresh.svg',
+    './assets/styles.css'
   ];
 
   for (let url of resources) {
