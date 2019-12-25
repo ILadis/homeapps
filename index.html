@@ -27,11 +27,11 @@
   presenter.onFormShown = () =>
     router.navigateTo(create);
 
-  let recipe = router.register('recipe', ['alias'], ({ alias }) =>
-    presenter.showRecipe(alias));
+  let recipe = router.register('recipe', ['id'], ({ id }) =>
+    presenter.showRecipe(id));
 
-  presenter.onRecipeShown = ({ alias }) =>
-    router.navigateTo(recipe, { alias });
+  presenter.onRecipeShown = ({ id }) =>
+    router.navigateTo(recipe, { id });
 
   router.navigateTo = function(route, values) {
     if (!route.equals(location.hash, values)) {

@@ -207,7 +207,7 @@ Recipe.Step.template = html`
 Recipe.Step.prototype.setText = function({ text, ingredients }) {
   let h3 = this.node.querySelector('h3');
   h3.textContent = 'Zutaten';
-  h3.hidden = Boolean(!ingredients);
+  h3.hidden = ingredients.size == 0;
 
   let span = this.node.querySelector('span');
   span.textContent = text;

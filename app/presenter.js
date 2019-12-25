@@ -1,4 +1,5 @@
 
+import { Client } from './client.js';
 import { Repository } from './repository.js';
 import { Search } from './search.js';
 import { Recipe } from './recipe.js';
@@ -6,11 +7,12 @@ import * as Views from './views.js';
 
 export function Presenter() {
   this.shell = new Views.Shell();
-  this.repository = new Repository();
+  this.client = new Client();
+  this.repository = Repository.create();
 }
 
 Presenter.prototype.showIndex = async function() {
-  let iterator = this.repository.fetchAll();
+  let repo = await this.repository;
   let recipes = new Set();
 
   let view = new Views.Index();
@@ -47,7 +49,7 @@ Presenter.prototype.showIndex = async function() {
       view.removeRecipe(v);
     }
 
-    let iterator = this.repository.fetchAll(true);
+    let iterator = repo.fetchAll();
     recipes.clear();
 
     showRecipes(view, iterator);
@@ -64,7 +66,7 @@ Presenter.prototype.showIndex = async function() {
 
       let v = views.next().value || view.addRecipe();
       v.setName(recipe);
-      v.onClicked = () => this.showRecipe(recipe.alias);
+      v.onClicked = () => this.showRecipe(recipe.id);
     }
 
     for (let v of views) {
@@ -72,6 +74,15 @@ Presenter.prototype.showIndex = async function() {
     }
   };
 
+  let empty = await repo.isEmpty();
+  if (empty) {
+    let iterator = this.client.fetchAll(true);
+    for await (let recipe of iterator) {
+      await repo.save(recipe);
+    }
+  }
+
+  let iterator = repo.fetchAll();
   showRecipes(view, iterator);
   this.onIndexShown();
 };
@@ -79,8 +90,9 @@ Presenter.prototype.showIndex = async function() {
 Presenter.prototype.onIndexShown = function() {
 };
 
-Presenter.prototype.showRecipe = async function(alias) {
-  let recipe = await this.repository.fetchByAlias(alias);
+Presenter.prototype.showRecipe = async function(id) {
+  let repo = await this.repository;
+  let recipe = await repo.fetchById(id);
 
   let view = new Views.Recipe();
   view.setName(recipe);
@@ -112,9 +124,7 @@ Presenter.prototype.showRecipe = async function(alias) {
       let v = views.next().value || view.addStep();
       v.setText(step);
 
-      if ('ingredients' in step) {
-        showIngredients(v, step);
-      }
+      showIngredients(v, step);
     }
   };
 
@@ -126,7 +136,9 @@ Presenter.prototype.showRecipe = async function(alias) {
 Presenter.prototype.onRecipeShown = function(recipe) {
 };
 
-Presenter.prototype.showForm = function() {
+Presenter.prototype.showForm = async function() {
+  let repo = await this.repository;
+
   let view = new Views.Form();
   let recipe = new Recipe();
 
@@ -166,8 +178,10 @@ Presenter.prototype.showForm = function() {
   };
 
   view.onDoneClicked = () => {
-    this.repository.save(recipe);
-    this.showIndex();
+    if (recipe.name && recipe.servings) {
+      repo.save(recipe);
+      this.showIndex();
+    }
   };
 
   let addIngredient = (ingredient) => {
