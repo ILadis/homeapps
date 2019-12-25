@@ -1,126 +1,114 @@
 
 import { Recipe } from './recipe.js';
 
-const whiteList = new RegExp('^([a-z\\-]+)\\.json$');
-
-export function Repository() {
+export function Repository(db) {
+  this.db = db;
 }
 
-Repository.prototype.fetchAll = async function*(fresh = false) {
-  let request = new Request('./recipes');
-  if (fresh) {
-    request.headers.set('cache-control', 'no-cache');
-  }
-
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw new Error('failed to fetch index');
-  }
-
-  let index = await response.json();
-  for (let { name } of index) {
-    let matches = name.match(whiteList);
-    if (!matches) {
-      continue;
+Repository.create = async function() {
+  let schema = {
+    'recipes': {
+      keyPath: 'id',
+      autoIncrement: true
     }
+  };
 
-    let alias = matches[1];
-    yield this.fetchByAlias(alias, fresh);
+  let db = await Database.create('cookbook', schema);
+  return new Repository(db);
+};
+
+Repository.prototype.isEmpty = async function() {
+  this.db.beginTx('recipes', 'readonly');
+  let count = await this.db.count();
+  return count == 0;
+}
+
+Repository.prototype.fetchAll = async function*() {
+  this.db.beginTx('recipes', 'readonly');
+  let iterator = this.db.iterateAll();
+
+  for await (let data of iterator) {
+    yield Recipe.fromJSON(data);
   }
 };
 
-Repository.prototype.fetchByAlias = async function(alias, fresh) {
-  let name = `${alias}.json`;
-  let matches = name.match(whiteList);
-  if (!matches) {
-    throw new Error(`failed to fetch recipe '${alias}'`);
-  }
-
-  let request = new Request(`./recipes/${name}`);
-  if (fresh) {
-    request.headers.set('cache-control', 'no-cache');
-  }
-
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw new Error(`failed to fetch recipe '${alias}'`);
-  }
-
-  let json = await response.json();
-  json.alias = alias;
-
-  return toRecipe(json);
+Repository.prototype.fetchById = async function(id) {
+  this.db.beginTx('recipes', 'readonly');
+  let data = await this.db.fetchByKey(Number(id));
+  return Recipe.fromJSON(data);
 };
 
 Repository.prototype.save = async function(recipe) {
-  let alias = recipe.alias;
-  let name = `${alias}.json`;
-  let json = JSON.stringify(toJSON(recipe));
+  this.db.beginTx('recipes', 'readwrite');
 
-  let request = new Request(`./recipes/${name}`, {
-    method: 'PUT',
-    body: json,
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw new Error(`failed to save recipe '${alias}'`);
-  }
-
-  return recipe;
+  let data = Recipe.toJSON(recipe);
+  await this.db.save(data);
 };
 
-function toRecipe(json) {
-  let { name, alias, servings, steps, ingredients } = json;
-
-  let recipe = new Recipe(name, alias);
-  recipe.setServings(servings.quantity, servings.unit);
-
-  let ingredientOf = (ref) => ingredients[ref];
-
-  for (let { step, ingredients = [] } of steps.values()) {
-    recipe.addStep(step, ingredients.map(({ ref, quantity }) => {
-      var ref = ingredientOf(ref);
-      return recipe.addIngredient(ref.ingredient, quantity || ref.quantity, ref.unit);
-    }));
-  }
-
-  return recipe;
+function Database(db) {
+  this.db = db;
 }
 
-function toJSON(recipe) {
-  let { name, servings, steps, ingredients } = recipe;
+Database.create = async function(name, schema) {
+  let request = indexedDB.open(name);
 
-  let json = {
-    name,
-    servings: {
-      quantity: servings.value,
-      unit: servings.unit
-    },
-    ingredients: [],
-    steps: []
+  request.onupgradeneeded = () => {
+    let db = request.result;
+    for (let name in schema) {
+      let options = schema[name];
+      db.createObjectStore(name, options);
+    }
   };
 
-  for (let { name, quantity } of ingredients.values()) {
-    json.ingredients.push({
-      ingredient: name,
-      quantity: quantity.value,
-      unit: quantity.unit
-    });
-  }
+  let db = await Database.promisify(request);
+  return new Database(db);
+};
 
-  for (let { text, ingredients } of steps.values()) {
-    json.steps.push({
-      step: text,
-      ingredients: Array.from(ingredients).map(ingredient => ({
-        ref: ingredient.indexIn(recipe),
-        quantity: ingredient.quantity.value
-      }))
-    });
-  }
-
-  return json;
+Database.promisify = function(request) {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
 }
+
+Database.prototype.beginTx = function(name, mode) {
+  let store = this.db.transaction(name, mode).objectStore(name);
+  this.store = store;
+  return this;
+};
+
+Database.prototype.save = function(data) {
+  let keyPath = this.store.keyPath;
+  if (data[keyPath]) {
+    var request = this.store.put(data);
+  } else {
+    delete data[keyPath];
+    var request = this.store.add(data);
+  }
+  return Database.promisify(request);
+};
+
+Database.prototype.count = function() {
+  let request = this.store.count();
+  return Database.promisify(request);
+};
+
+Database.prototype.fetchByKey = function(key) {
+  let request = this.store.get(key);
+  return Database.promisify(request);
+};
+
+Database.prototype.iterateAll = async function*() {
+  let request = this.store.openCursor();
+
+  do {
+    let cursor = await Database.promisify(request);
+    if (!cursor) {
+      return;
+    }
+
+    yield cursor.value;
+
+    cursor.continue();
+  } while (true);
+};
