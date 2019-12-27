@@ -2,7 +2,7 @@
 export function Recipe(name, id) {
   this.id = toNumber(id);
   this.name = toString(name);
-  this.servings = null;
+  this.servings = undefined;
   this.ingredients = new Map();
   this.steps = new Set();
   Object.seal(this);
@@ -53,7 +53,7 @@ Recipe.prototype.addIngredient = function(name, quantity, unit) {
   }
 
   this.ingredients.set(name, ingredient);
-  
+
   let ref = new Ingredient.Ref(ingredient);
   ref.setQuantity(quantity);
 
@@ -152,11 +152,10 @@ function Ingredient(name, quantity) {
 }
 
 const $ingredient = Symbol('ingredient');
-const $quantity = Symbol('quantity');
 
-Ingredient.Ref = function(ingredient, quantity) {
+Ingredient.Ref = function(ingredient) {
   this[$ingredient] = ingredient;
-  this[$quantity] = quantity;
+  this.quantity = undefined;
   this[$ingredient][$refs].add(this);
   Object.seal(this);
 };
@@ -164,16 +163,13 @@ Ingredient.Ref = function(ingredient, quantity) {
 Ingredient.Ref.prototype = {
   get name() {
     return this[$ingredient].name;
-  },
-  get quantity() {
-    return this[$quantity] || this[$ingredient].quantity;
   }
 };
 
 Ingredient.Ref.prototype.setQuantity = function(quantity) {
-  if (quantity) {
-    this[$quantity] = new Quantity(quantity, this.quantity.unit);
-  }
+  let ingredient = this[$ingredient];
+  var quantity = new Quantity(quantity, ingredient.quantity.unit);
+  this.quantity = quantity;
 };
 
 Ingredient.Ref.prototype.indexIn = function(recipe) {
@@ -229,6 +225,7 @@ Recipe.fromJSON = function(json) {
   for (let { step, ingredients = [] } of steps.values()) {
     recipe.addStep(step, ingredients.map(({ ref, quantity }) => {
       var ref = ingredientOf(ref);
+      var quantity = quantity || ref.quantity;
 
       let ingredient = recipe.addIngredient(ref.ingredient);
       ingredient.setQuantity(quantity);
