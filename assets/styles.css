@@ -283,13 +283,12 @@ h3 {
 .form > header > fieldset {
   margin: 0 8pt 6pt;
   padding: 1pt 14pt;
-  width: 100%;
   font-size: 12pt;
   border-radius: 4pt;
   border: solid 1pt #ccc;
   box-sizing: border-box;
   background: #fff;
-  display: inline-block;
+  display: block;
 }
 
 .form > header > fieldset > legend {
@@ -308,7 +307,7 @@ h3 {
   background: transparent;
 }
 
-.form > header > fieldset[name=servings] { width: auto; }
+.form > header > fieldset[name=servings] { display: inline-block; }
 .form > header > fieldset[name=servings] > input { width: 60pt; text-align: end; }
 
 .form > section > ol > li {
