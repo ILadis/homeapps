@@ -148,6 +148,7 @@ Presenter.prototype.showForm = async function(id) {
     view.setTitle('Rezept bearbeiten');
   } else {
     var recipe = new Recipe();
+    recipe.setServings(undefined, 'Stück');
     recipe.addStep();
     view.setTitle('Neues Rezept');
   }
@@ -171,7 +172,7 @@ Presenter.prototype.showForm = async function(id) {
   };
 
   view.onDoneClicked = () => {
-    if (recipe.name && recipe.servings) {
+    if (recipe.name && recipe.servings.value) {
       repo.save(recipe);
       this.showIndex();
     }
