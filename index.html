@@ -24,22 +24,17 @@
   let create = router.register('new', [], () =>
     presenter.showForm());
 
-  presenter.onFormShown = () =>
-    router.navigateTo(create);
+  let edit = router.register('edit', ['id'], ({ id }) =>
+    presenter.showForm(id));
+
+  presenter.onFormShown = ({ id }) =>
+    router.navigateTo(id ? edit : create, { id });
 
   let recipe = router.register('recipe', ['id'], ({ id }) =>
     presenter.showRecipe(id));
 
   presenter.onRecipeShown = ({ id }) =>
     router.navigateTo(recipe, { id });
-
-  router.navigateTo = function(route, values) {
-    if (!route.equals(location.hash, values)) {
-      let hash = route.compute(values);
-      let uri = location.pathname + hash;
-      history.pushState(null, '', uri);
-    }
-  };
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js');
