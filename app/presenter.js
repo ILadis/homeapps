@@ -16,8 +16,7 @@ Presenter.prototype.showIndex = async function() {
   let recipes = new Set();
 
   let view = new Views.Index();
-  view.setRefreshable(true);
-  view.setCreatable(true);
+  view.setTitle('Kochbuch');
 
   this.shell.setTitle('Kochbuch');
   this.shell.setContent(view);
@@ -101,6 +100,10 @@ Presenter.prototype.showRecipe = async function(id) {
   this.shell.setTitle(recipe.name);
   this.shell.setContent(view);
 
+  view.onEditClicked = () => {
+    this.showForm(id);
+  };
+
   view.onServingsClicked = (delta) => {
     delta *= recipe.servings.increment || 1;
     recipe.convertServings(delta);
@@ -136,51 +139,78 @@ Presenter.prototype.showRecipe = async function(id) {
 Presenter.prototype.onRecipeShown = function(recipe) {
 };
 
-Presenter.prototype.showForm = async function() {
+Presenter.prototype.showForm = async function(id) {
   let repo = await this.repository;
 
   let view = new Views.Form();
-  let recipe = new Recipe();
+  if (id) {
+    var recipe = await repo.fetchById(id);
+    view.setTitle('Rezept bearbeiten');
+  } else {
+    var recipe = new Recipe();
+    recipe.addStep();
+    view.setTitle('Neues Rezept');
+  }
 
   this.shell.setTitle('Neues Rezept');
   this.shell.setContent(view);
 
+  view.setLabel(recipe);
   view.onLabelChanged = (name) => {
     recipe.setName(name);
   };
 
+  view.setServings(recipe);
   view.onServingsChanged = (quantity) => {
     recipe.setServings(quantity, 'Stück');
   };
 
-  let addStep = view.onAddClicked = () => {
-    let step = recipe.addStep();
-
-    let v = view.addStep();
-    v.onIngredientSubmitted = (ingredient) => {
-      var ingredient = addIngredient(ingredient);
-      if (!ingredient) {
-        return false;
-      }
-
-      step.addIngredient(ingredient);
-
-      v.addIngredient(ingredient).onClicked = function() {
-        step.removeIngredient(ingredient);
-        recipe.removeIngredient(ingredient);
-        v.removeIngredient(this);
-      };
-    };
-
-    v.onStepTextChanged = (text) => {
-      step.setText(text);
-    };
+  view.onAddStepClicked = () => {
+    recipe.addStep();
+    showSteps(view, recipe);
   };
 
   view.onDoneClicked = () => {
     if (recipe.name && recipe.servings) {
       repo.save(recipe);
       this.showIndex();
+    }
+  };
+
+  let showIngredients = (view, step) => {
+    let iterator = step.ingredients.values();
+    let views = view.ingredients.values();
+    for (let ingredient of iterator) {
+      let v = views.next().value || view.addIngredient();
+      v.setLabel(ingredient);
+      v.onClicked = removeIngredient(view, step, ingredient);
+    }
+
+    for (let v of views) {
+      view.removeIngredient(v);
+    }
+  };
+
+  let showSteps = (view, { steps }) => {
+    let iterator = steps.values();
+    let views = view.steps.values();
+    for (let step of iterator) {
+      let v = views.next().value || view.addStep();
+      v.setStepText(step);
+
+      v.onIngredientSubmitted = (ingredient) => {
+        var ingredient = addIngredient(ingredient);
+        if (ingredient) {
+          step.addIngredient(ingredient);
+          showIngredients(v, step);
+        }
+      };
+  
+      v.onStepTextChanged = (text) => {
+        step.setText(text);
+      };
+
+      showIngredients(v, step);
     }
   };
 
@@ -194,11 +224,20 @@ Presenter.prototype.showForm = async function() {
     case 3:
       return recipe.addIngredient(parts[2], parts[0], parts[1]);
     }
-  }
+  };
 
-  addStep();
-  this.onFormShown();
+  let removeIngredient = (view, step, ingredient) => {
+    return function() {
+      step.removeIngredient(ingredient);
+      recipe.removeIngredient(ingredient);
+      view.removeIngredient(this);
+    };
+  };
+
+  showSteps(view, recipe);
+  this.onFormShown(recipe);
 };
 
-Presenter.prototype.onFormShown = function() {
+Presenter.prototype.onFormShown = function(edit) {
 };
+
