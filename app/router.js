@@ -1,6 +1,7 @@
 
 export function Router() {
   this.routes = new Map();
+  this.init = false;
 }
 
 Router.prototype.register = function(segment, params, action) {
@@ -19,6 +20,21 @@ Router.prototype.apply = function(hash) {
       return route;
     }
   }
+};
+
+Router.prototype.navigateTo = function(route, values) {
+  if (!route.equals(location.hash, values)) {
+    let hash = route.compute(values);
+    let uri = location.pathname + hash;
+
+    if (!this.init) {
+      history.replaceState(null, '', uri);
+    } else {
+      history.pushState(null, '', uri);
+    }
+  }
+
+  this.init = true;
 };
 
 export function Route(segment, params) {
