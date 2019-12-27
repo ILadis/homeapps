@@ -171,9 +171,13 @@ Presenter.prototype.showForm = async function(id) {
     showSteps(view, recipe);
   };
 
-  view.onDoneClicked = () => {
-    if (recipe.name && recipe.servings.value) {
-      repo.save(recipe);
+  view.onDoneClicked = async () => {
+    if (!recipe.name && recipe.id) {
+      await repo.delete(recipe);
+      this.showIndex();
+    }
+    else if (recipe.name && recipe.servings.value) {
+      await repo.save(recipe);
       this.showIndex();
     }
   };
@@ -206,7 +210,7 @@ Presenter.prototype.showForm = async function(id) {
           showIngredients(v, step);
         }
       };
-  
+
       v.onStepTextChanged = (text) => {
         step.setText(text);
       };

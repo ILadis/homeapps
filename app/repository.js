@@ -45,6 +45,11 @@ Repository.prototype.save = async function(recipe) {
   await this.db.save(data);
 };
 
+Repository.prototype.delete = async function(recipe) {
+  this.db.beginTx('recipes', 'readwrite');
+  await this.db.deleteByKey(recipe.id);
+};
+
 function Database(db) {
   this.db = db;
 }
@@ -95,6 +100,11 @@ Database.prototype.count = function() {
 
 Database.prototype.fetchByKey = function(key) {
   let request = this.store.get(key);
+  return Database.promisify(request);
+};
+
+Database.prototype.deleteByKey = function(key) {
+  let request = this.store.delete(key);
   return Database.promisify(request);
 };
 
