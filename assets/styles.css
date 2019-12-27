@@ -50,25 +50,29 @@ h3 {
   z-index: 1;
 }
 
-.index > header > button,
-.form  > header > button {
-  margin: 4pt 0;
+.index  > header > h1,
+.recipe > header > h1,
+.form   > header > h1 {
+  position: relative;
+  padding-bottom: 16pt;
+}
+
+.index  > header > h1 > button,
+.recipe > header > h1 > button,
+.form   > header > h1 > button {
+  position: absolute;
+  top: 4pt; right: 0;
   width: 26pt;
   height: 26pt;
   border: none;
   background-color: transparent;
   background-size: contain;
-  float: right;
   display: block;
 }
 
-.index > header > button { background-image: url(./refresh.svg); }
-.form  > header > button { background-image: url(./done.svg); }
-
-.index > header > h1,
-.form  > header > h1 {
-  padding-bottom: 16pt;
-}
+.index  > header > h1 > button { background-image: url(./refresh.svg); }
+.recipe > header > h1 > button { background-image: url(./edit.svg); }
+.form   > header > h1 > button { background-image: url(./done.svg); }
 
 .index > header > h1 + input {
   margin: 0 auto;
@@ -89,6 +93,9 @@ h3 {
   overflow: scroll;
   scrollbar-width: none;
 }
+
+.index > section::-webkit-scrollbar,
+.form  > section::-webkit-scrollbar { display: none; }
 
 .index > section > ol,
 .form  > section > ol {
@@ -164,6 +171,8 @@ h3 {
   scrollbar-width: none;
 }
 
+.recipe > header > ul::-webkit-scrollbar { display: none; }
+
 .recipe > header > ul > li {
   padding: 8pt 0;
   border-bottom: solid 1pt #ccc;
@@ -204,6 +213,8 @@ h3 {
   overflow: scroll;
   scrollbar-width: none;
 }
+
+.recipe > section > ol::-webkit-scrollbar { display: none; }
 
 .recipe > section > ol > li {
   position: relative;
@@ -272,38 +283,33 @@ h3 {
 .form > header > fieldset {
   margin: 0 8pt 6pt;
   padding: 1pt 14pt;
+  width: 100%;
   font-size: 12pt;
   border-radius: 4pt;
   border: solid 1pt #ccc;
   box-sizing: border-box;
   background: #fff;
-  display: flex;
-  align-items: baseline;
+  display: inline-block;
 }
 
-.form > header > fieldset legend {
+.form > header > fieldset > legend {
   padding: 0 3pt;
   font-size: 8pt;
   font-weight: 600;
   text-transform: uppercase;
 }
 
-.form > header > fieldset input {
+.form > header > fieldset > input {
   padding: 5pt 2pt 3pt;
-  width: 0;
+  width: 100%;
   font-size: 12pt;
   color: #4a4a4a;
   border: none;
   background: transparent;
-  flex-grow: 1;
 }
 
-.form > header > fieldset span {
-  font-size: 12pt;
-}
-
-.form > header > fieldset[name=servings] { max-width: 120pt; }
-.form > header > fieldset[name=servings] input { text-align: end; }
+.form > header > fieldset[name=servings] { width: auto; }
+.form > header > fieldset[name=servings] > input { width: 60pt; text-align: end; }
 
 .form > section > ol > li {
   position: relative;
@@ -312,10 +318,9 @@ h3 {
   flex-wrap: wrap;
 }
 
-.form > section > ol > li span {
+.form > section > ol > li > span {
   margin: 2pt 3pt;
   padding: 0 10pt;
-  height: 20pt;
   line-height: 20pt;
   font-size: 11pt;
   color: #4a4a4a;
@@ -325,16 +330,15 @@ h3 {
   display: inline-block;
 }
 
-.form > section > ol > li form {
+.form > section > ol > li > form {
   margin: 2pt 3pt;
   width: 40pt;
   display: inline-block;
   flex-grow: 1;
 }
 
-.form > section > ol > li form input {
+.form > section > ol > li > form > input {
   width: 100%;
-  height: 20pt;
   line-height: 20pt;
   font-size: 11pt;
   text-overflow: ellipsis;
@@ -344,7 +348,7 @@ h3 {
   display: inline-block;
 }
 
-.form > section > ol > li textarea {
+.form > section > ol > li > textarea {
   padding: 3pt 72pt 0 3pt;
   width: 100%;
   font: 11pt sans-serif;
@@ -352,6 +356,6 @@ h3 {
   border: none;
   resize: none;
   box-sizing: border-box;
-  overflow: none;
+  overflow: hidden;
 }
 
