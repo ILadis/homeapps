@@ -1,24 +1,20 @@
 
 export function Recipe(name, id) {
-  this.id = id;
-  this.name = name;
-  this.servings = undefined;
+  this.id = toNumber(id);
+  this.name = toString(name);
+  this.servings = null;
   this.ingredients = new Map();
   this.steps = new Set();
   Object.seal(this);
 }
 
 Recipe.prototype.setName = function(name) {
-  this.name = name;
+  this.name = toString(name);
 };
 
 Recipe.prototype.setServings = function(quantity, unit) {
-  var quantity = Number(quantity);
-  var unit = unit ? String(unit) : undefined;
-
-  if (isNaN(quantity)) {
-    return null;
-  }
+  var quantity = toNumber(quantity);
+  var unit = toString(unit);
 
   let servings = new Quantity(quantity, unit);
   this.servings = servings;
@@ -27,7 +23,9 @@ Recipe.prototype.setServings = function(quantity, unit) {
 };
 
 Recipe.prototype.convertServings = function(delta) {
-  let scale = this.servings.scalingFor(delta);
+  var delta = toNumber(delta);
+
+  let scale = this.servings.scalingFor(delta || 0);
   this.servings.scaleTo(scale);
 
   for (let ingredient of this.ingredients.values()) {
@@ -44,9 +42,9 @@ Recipe.prototype.convertServings = function(delta) {
 Recipe.prototype.addIngredient = function(name, quantity, unit) {
   let ingredient = this.ingredients.get(name);
 
-  var name = String(name);
-  var quantity = quantity ? Number(quantity) : undefined;
-  var unit = unit ? String(unit) : undefined;
+  var name = toString(name);
+  var quantity = toNumber(quantity);
+  var unit = toString(unit);
 
   if (ingredient) {
     ingredient.quantity.changeBy(quantity || 0);
@@ -55,22 +53,23 @@ Recipe.prototype.addIngredient = function(name, quantity, unit) {
   }
 
   this.ingredients.set(name, ingredient);
-
-  let ref = ingredient.createRef();
+  
+  let ref = new Ingredient.Ref(ingredient);
   ref.setQuantity(quantity);
+
   return ref;
 };
 
-Recipe.prototype.removeIngredient = function(ref) {
-  let ingredient = this.ingredients.get(ref.name);
-  let orphaned = ingredient.deleteRef(ref);
+Recipe.prototype.removeIngredient = function(ingredient) {
+  let orphaned = ingredient.delete();
 
   if (orphaned) {
-    this.ingredients.delete(ref.name);
+    this.ingredients.delete(ingredient.name);
   }
 
   else {
-    let quantity = -(ref.quantity.value || 0);
+    let quantity = -(ingredient.quantity.value || 0);
+    var ingredient = this.ingredients.get(ingredient.name);
     ingredient.quantity.changeBy(quantity);
   }
 };
@@ -103,7 +102,7 @@ Quantity.prototype.changeBy = function(delta) {
   if (this[$value]) {
     this[$value] += delta;
   }
-}
+};
 
 Quantity.prototype.scalingFor = function(delta) {
   return (this.value + delta) / this[$value];
@@ -152,24 +151,13 @@ function Ingredient(name, quantity) {
   Object.freeze(this);
 }
 
-Ingredient.prototype.createRef = function() {
-  let ref = new Ingredient.Ref(this);
-  this[$refs].add(ref);
-  return ref;
-};
-
-Ingredient.prototype.deleteRef = function(ref) {;
-  let refs = this[$refs];
-  refs.delete(ref);
-  return refs.size == 0;
-};
-
 const $ingredient = Symbol('ingredient');
 const $quantity = Symbol('quantity');
 
-Ingredient.Ref = function(ingredient) {
+Ingredient.Ref = function(ingredient, quantity) {
   this[$ingredient] = ingredient;
-  this[$quantity] = undefined;
+  this[$quantity] = quantity;
+  this[$ingredient][$refs].add(this);
   Object.seal(this);
 };
 
@@ -183,12 +171,20 @@ Ingredient.Ref.prototype = {
 };
 
 Ingredient.Ref.prototype.setQuantity = function(quantity) {
-  this[$quantity] = new Quantity(quantity, this.quantity.unit);
+  if (quantity) {
+    this[$quantity] = new Quantity(quantity, this.quantity.unit);
+  }
 };
 
 Ingredient.Ref.prototype.indexIn = function(recipe) {
   let ingredients = Array.from(recipe.ingredients.values());
   return ingredients.indexOf(this[$ingredient]);
+};
+
+Ingredient.Ref.prototype.delete = function() {;
+  let refs = this[$ingredient][$refs];
+  refs.delete(this);
+  return refs.size == 0;
 };
 
 function Step(text, ingredients) {
@@ -209,6 +205,14 @@ Step.prototype.removeIngredient = function(ingredient) {
   this.ingredients.delete(ingredient);
 };
 
+function toString(value, fallback = undefined) {
+  return value ? String(value) : fallback;
+}
+
+function toNumber(value, fallback = undefined) {
+  return Number(value) || fallback;
+}
+
 Recipe.fromJSON = function(json) {
   let { name, id, servings, steps, ingredients } = json;
 
@@ -218,7 +222,8 @@ Recipe.fromJSON = function(json) {
   let ingredientOf = (ref) => ingredients[ref];
 
   for (let { ingredient, quantity, unit } of ingredients.values()) {
-    recipe.addIngredient(ingredient, quantity, unit);
+    let ref = recipe.addIngredient(ingredient, quantity, unit);
+    ref.delete();
   }
 
   for (let { step, ingredients = [] } of steps.values()) {
@@ -226,7 +231,7 @@ Recipe.fromJSON = function(json) {
       var ref = ingredientOf(ref);
 
       let ingredient = recipe.addIngredient(ref.ingredient);
-      ingredient.setQuantity(quantity || ref.quantity);
+      ingredient.setQuantity(quantity);
 
       return ingredient;
     }));
