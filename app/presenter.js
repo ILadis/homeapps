@@ -226,13 +226,29 @@ Presenter.prototype.showForm = async function(id) {
   let addIngredient = (ingredient) => {
     let parts = ingredient.split(' ').filter(p => !!p);
     switch (parts.length) {
+    case 0:
+      return;
     case 1:
-      return recipe.addIngredient(parts[0]);
+      var ingredient = parts[0];
+      break;
     case 2:
-      return recipe.addIngredient(parts[1], parts[0]);
+      var quantity = parts[0];
+      var ingredient = parts[1];
+      break;
     case 3:
-      return recipe.addIngredient(parts[2], parts[0], parts[1]);
+    default:
+      var quantity = parts[0];
+      var unit = parts[1];
+      var ingredient = parts.slice(2).join(' ');
+      break;
     }
+
+    if (quantity && isNaN(Number(quantity))) {
+      ingredient = quantity + ' ' + ingredient;
+      quantity = undefined;
+    }
+
+    return recipe.addIngredient(ingredient, quantity, unit);
   };
 
   let removeIngredient = (view, step, ingredient) => {
