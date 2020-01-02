@@ -20,7 +20,7 @@ Shell.prototype.setContent = function(content) {
 export const Index = function() {
   let node = importNode(Index.template);
 
-  let buttons = node.querySelectorAll('button');
+  let buttons = node.querySelectorAll('a, button');
   buttons[0].onclick = () => this.onRefreshClicked();
   buttons[1].onclick = () => this.onCreateClicked();
 
@@ -36,7 +36,7 @@ Index.template = html`
   <header>
     <h1>
       <span><!-- title --></span>
-      <button></button>
+      <a></a>
     </h1>
     <input type="search" placeholder="Suchbegriff...">
   </header>
@@ -52,13 +52,13 @@ Index.prototype.setTitle = function(title) {
   span.textContent = title;
 };
 
-Index.prototype.onQueryChanged = function(query) {
-};
-
 Index.prototype.onRefreshClicked = function() {
 };
 
 Index.prototype.onCreateClicked = function() {
+};
+
+Index.prototype.onQueryChanged = function(query) {
 };
 
 Index.prototype.addRecipe = function() {
@@ -102,7 +102,7 @@ Index.Recipe.prototype.onClicked = function() {
 export const Recipe = function() {
   let node = importNode(Recipe.template);
 
-  let buttons = node.querySelectorAll('button');
+  let buttons = node.querySelectorAll('a, button');
   buttons[0].onclick = () => this.onEditClicked();
   buttons[1].onclick = () => this.onServingsClicked(-1);
   buttons[2].onclick = () => this.onServingsClicked(+1);
@@ -117,7 +117,7 @@ Recipe.template = html`
   <header>
     <h1>
       <span><!-- name --></span>
-      <button></button>
+      <a></a>
     </h1>
     <h2>
       <button>-</button>
@@ -224,16 +224,15 @@ Recipe.Step.prototype.addIngredient = function() {
 export const Form = function() {
   let node = importNode(Form.template);
 
+  let buttons = node.querySelectorAll('a, button');
+  buttons[0].onclick = () => this.onDeleteClicked();
+  buttons[1].onclick = () => this.onExportClicked();
+  buttons[2].onclick = () => this.onDoneClicked();
+  buttons[3].onclick = () => this.onAddStepClicked();
+
   let inputs = node.querySelectorAll('fieldset input');
   inputs[0].onchange = (event) => this.onLabelChanged(event.target.value);
   inputs[1].onchange = (event) => this.onServingsChanged(event.target.value);
-
-  let buttons = node.querySelectorAll('button');
-  buttons[0].onclick = () => this.onDoneClicked();
-  buttons[1].onclick = () => this.onAddStepClicked();
-
-  let a = node.querySelector('a');
-  a.onclick = () => this.onExportClicked();
 
   this.node = node;
   this.steps = new Set();
@@ -244,8 +243,9 @@ Form.template = html`
   <header>
     <h1>
       <span><!-- title --></span>
-      <a></a>
-      <button></button>
+      <a name="delete"></a>
+      <a name="export"></a>
+      <a name="done"></a>
     </h1>
     <!-- name + servings -->
     <fieldset name="label">
@@ -270,29 +270,11 @@ Form.prototype.setTitle = function(title) {
   span.textContent = title;
 };
 
-Form.prototype.setLabel = function({ name }) {
-  let input = this.node.querySelector('fieldset[name=label] input');
-  input.value = name || '';
-};
-
-Form.prototype.onLabelChanged = function(name) {
-};
-
-Form.prototype.setServings = function({ servings }) {
-  if (servings) {
-    let input = this.node.querySelector('fieldset[name=servings] input');
-    input.value = servings.value || '';
-
-    let span = this.node.querySelector('fieldset[name=servings] span');
-    span.textContent = servings.unit || '';
-  }
-};
-
-Form.prototype.onServingsChanged = function(quantity) {
+Form.prototype.onDoneClicked = function() {
 };
 
 Form.prototype.setExportUrl = function(name, url) {
-  let a = this.node.querySelector('header a');
+  let a = this.node.querySelector('header a[name=export]');
   if (!name || !url) {
     a.removeAttribute('download');
     a.removeAttribute('href');
@@ -303,6 +285,28 @@ Form.prototype.setExportUrl = function(name, url) {
 };
 
 Form.prototype.onExportClicked = function() {
+};
+
+Form.prototype.onDeleteClicked = function() {
+};
+
+Form.prototype.setLabel = function({ name }) {
+  let input = this.node.querySelector('fieldset[name=label] input');
+  input.value = name || '';
+};
+
+Form.prototype.onLabelChanged = function(name) {
+};
+
+Form.prototype.setServings = function({ servings }) {
+  let input = this.node.querySelector('fieldset[name=servings] input');
+  input.value = servings.value || '';
+
+  let span = this.node.querySelector('fieldset[name=servings] span');
+  span.textContent = servings.unit || '';
+};
+
+Form.prototype.onServingsChanged = function(quantity) {
 };
 
 Form.prototype.addStep = function() {
@@ -326,9 +330,6 @@ Form.prototype.removeStep = function(view) {
 };
 
 Form.prototype.onAddStepClicked = function() {
-};
-
-Form.prototype.onDoneClicked = function() {
 };
 
 Form.Step = function() {

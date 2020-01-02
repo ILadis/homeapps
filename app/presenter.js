@@ -168,10 +168,9 @@ Presenter.prototype.showForm = async function(id) {
   };
 
   view.onExportClicked = () => {
-    let name, url;
     if (recipe.name && recipe.servings.value) {
-      name = recipe.name + '.json';
-      url = Recipe.toURL(recipe);
+      var name = recipe.name + '.json';
+      var url = Recipe.toURL(recipe);
     }
 
     view.setExportUrl(name, url);
@@ -183,14 +182,17 @@ Presenter.prototype.showForm = async function(id) {
   };
 
   view.onDoneClicked = async () => {
-    if (!recipe.name && recipe.id) {
-      await repo.delete(recipe);
-      this.showIndex();
-    }
-    else if (recipe.name && recipe.servings.value) {
+    if (recipe.name && recipe.servings.value) {
       await repo.save(recipe);
       this.showIndex();
     }
+  };
+
+  view.onDeleteClicked = async () => {
+    if (recipe.id) {
+      await repo.delete(recipe);
+    }
+    this.showIndex();
   };
 
   let showIngredients = (view, step) => {

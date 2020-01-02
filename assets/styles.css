@@ -57,10 +57,9 @@ h3 {
   padding-bottom: 16pt;
 }
 
-.index  > header > h1 > button,
-.recipe > header > h1 > button,
-.form   > header > h1 > a,
-.form   > header > h1 > button {
+.index  > header > h1 > a,
+.recipe > header > h1 > a,
+.form   > header > h1 > a {
   margin: -2pt 0 0 12pt;
   width: 22pt;
   height: 22pt;
@@ -71,10 +70,11 @@ h3 {
   display: block;
 }
 
-.index  > header > h1 > button { background-image: url(./refresh.svg); }
-.recipe > header > h1 > button { background-image: url(./edit.svg); }
-.form   > header > h1 > a { background-image: url(./export.svg); }
-.form   > header > h1 > button { background-image: url(./done.svg); }
+.index  > header > h1 > a { background-image: url(./refresh.svg); }
+.recipe > header > h1 > a { background-image: url(./edit.svg); }
+.form   > header > h1 > a[name=delete] { background-image: url(./delete.svg); }
+.form   > header > h1 > a[name=export] { background-image: url(./export.svg); }
+.form   > header > h1 > a[name=done] { background-image: url(./done.svg); }
 
 .index > header > h1 + input {
   margin: 0 auto;
