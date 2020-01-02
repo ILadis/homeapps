@@ -35,8 +35,8 @@ Index.template = html`
 <div class="index">
   <header>
     <h1>
-      <span><!-- title --></span>
       <a></a>
+      <span><!-- title --></span>
     </h1>
     <input type="search" placeholder="Suchbegriff...">
   </header>
@@ -116,8 +116,8 @@ Recipe.template = html`
 <div class="recipe">
   <header>
     <h1>
-      <span><!-- name --></span>
       <a></a>
+      <span><!-- name --></span>
     </h1>
     <h2>
       <button>-</button>
@@ -242,10 +242,10 @@ Form.template = html`
 <div class="form">
   <header>
     <h1>
-      <span><!-- title --></span>
       <a name="delete"></a>
       <a name="export"></a>
       <a name="done"></a>
+      <span><!-- title --></span>
     </h1>
     <!-- name + servings -->
     <fieldset name="label">

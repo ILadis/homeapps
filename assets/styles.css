@@ -57,10 +57,19 @@ h3 {
   padding-bottom: 16pt;
 }
 
+.index  > header > h1 > span,
+.recipe > header > h1 > span,
+.form   > header > h1 > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
 .index  > header > h1 > a,
 .recipe > header > h1 > a,
 .form   > header > h1 > a {
-  margin: -2pt 0 0 12pt;
+  margin-left: 12pt;
   width: 22pt;
   height: 22pt;
   border: none;
