@@ -117,7 +117,6 @@ Recipe.template = html`
   <header>
     <h1>
       <span><!-- name --></span>
-      <a></a>
       <button></button>
     </h1>
     <h2>
@@ -144,12 +143,6 @@ Recipe.prototype.setServings = function({ servings }) {
   let span = this.node.querySelector('header h2 span');
   span.textContent = `Zutaten für ${servings}`;
   return this;
-};
-
-Recipe.prototype.setExportUrl = function(name, url) {
-  let a = this.node.querySelector('header a');
-  a.download = name;
-  a.href = url;
 };
 
 Recipe.prototype.onServingsClicked = function(delta) {
@@ -239,6 +232,9 @@ export const Form = function() {
   buttons[0].onclick = () => this.onDoneClicked();
   buttons[1].onclick = () => this.onAddStepClicked();
 
+  let a = node.querySelector('a');
+  a.onclick = () => this.onExportClicked();
+
   this.node = node;
   this.steps = new Set();
 }
@@ -248,6 +244,7 @@ Form.template = html`
   <header>
     <h1>
       <span><!-- title --></span>
+      <a></a>
       <button></button>
     </h1>
     <!-- name + servings -->
@@ -292,6 +289,20 @@ Form.prototype.setServings = function({ servings }) {
 };
 
 Form.prototype.onServingsChanged = function(quantity) {
+};
+
+Form.prototype.setExportUrl = function(name, url) {
+  let a = this.node.querySelector('header a');
+  if (!name || !url) {
+    a.removeAttribute('download');
+    a.removeAttribute('href');
+  } else {
+    a.setAttribute("download", name);
+    a.setAttribute("href", url);
+  }
+};
+
+Form.prototype.onExportClicked = function() {
 };
 
 Form.prototype.addStep = function() {

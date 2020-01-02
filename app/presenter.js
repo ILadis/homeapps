@@ -97,9 +97,6 @@ Presenter.prototype.showRecipe = async function(id) {
   view.setName(recipe);
   view.setServings(recipe);
 
-  let url = Recipe.toURL(recipe);
-  view.setExportUrl(`recipe-${id}.json`, url);
-
   this.shell.setTitle(recipe.name);
   this.shell.setContent(view);
 
@@ -168,6 +165,16 @@ Presenter.prototype.showForm = async function(id) {
   view.setServings(recipe);
   view.onServingsChanged = (quantity) => {
     recipe.setServings(quantity, 'Stück');
+  };
+
+  view.onExportClicked = () => {
+    let name, url;
+    if (recipe.name && recipe.servings.value) {
+      name = recipe.name + '.json';
+      url = Recipe.toURL(recipe);
+    }
+
+    view.setExportUrl(name, url);
   };
 
   view.onAddStepClicked = () => {
