@@ -270,3 +270,11 @@ Recipe.toJSON = function(recipe) {
 
   return json;
 };
+
+Recipe.toURL = function(recipe) {
+  let json = JSON.stringify(Recipe.toJSON(recipe));
+  let url = 'data:application/json;charset=utf-8,'
+    + encodeURIComponent(json);
+
+  return url;
+};

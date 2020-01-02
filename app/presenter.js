@@ -97,6 +97,9 @@ Presenter.prototype.showRecipe = async function(id) {
   view.setName(recipe);
   view.setServings(recipe);
 
+  let url = Recipe.toURL(recipe);
+  view.setExportUrl(`recipe-${id}.json`, url);
+
   this.shell.setTitle(recipe.name);
   this.shell.setContent(view);
 
@@ -105,6 +108,7 @@ Presenter.prototype.showRecipe = async function(id) {
   };
 
   view.onServingsClicked = (delta) => {
+    // TODO this does currently not work
     delta *= recipe.servings.increment || 1;
     recipe.convertServings(delta);
     view.setServings(recipe);

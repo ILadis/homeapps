@@ -117,6 +117,7 @@ Recipe.template = html`
   <header>
     <h1>
       <span><!-- name --></span>
+      <a></a>
       <button></button>
     </h1>
     <h2>
@@ -143,6 +144,12 @@ Recipe.prototype.setServings = function({ servings }) {
   let span = this.node.querySelector('header h2 span');
   span.textContent = `Zutaten für ${servings}`;
   return this;
+};
+
+Recipe.prototype.setExportUrl = function(name, url) {
+  let a = this.node.querySelector('header a');
+  a.download = name;
+  a.href = url;
 };
 
 Recipe.prototype.onServingsClicked = function(delta) {

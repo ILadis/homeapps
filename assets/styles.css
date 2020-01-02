@@ -59,19 +59,21 @@ h3 {
 
 .index  > header > h1 > button,
 .recipe > header > h1 > button,
+.recipe > header > h1 > a,
 .form   > header > h1 > button {
-  position: absolute;
-  top: 4pt; right: 0;
-  width: 26pt;
-  height: 26pt;
+  margin: -2pt 0 0 12pt;
+  width: 22pt;
+  height: 22pt;
   border: none;
   background-color: transparent;
   background-size: contain;
+  float: right;
   display: block;
 }
 
 .index  > header > h1 > button { background-image: url(./refresh.svg); }
 .recipe > header > h1 > button { background-image: url(./edit.svg); }
+.recipe > header > h1 > a { background-image: url(./export.svg); }
 .form   > header > h1 > button { background-image: url(./done.svg); }
 
 .index > header > h1 + input {
