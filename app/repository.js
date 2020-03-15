@@ -42,7 +42,9 @@ Repository.prototype.save = async function(recipe) {
   this.db.beginTx('recipes', 'readwrite');
 
   let data = Recipe.toJSON(recipe);
-  await this.db.save(data);
+  let id = await this.db.save(data);
+
+  recipe.id = id;
 };
 
 Repository.prototype.delete = async function(recipe) {

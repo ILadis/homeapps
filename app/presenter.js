@@ -184,7 +184,7 @@ Presenter.prototype.showForm = async function(id) {
   view.onDoneClicked = async () => {
     if (recipe.name && recipe.servings.value) {
       await repo.save(recipe);
-      this.showIndex();
+      this.showRecipe(recipe.id);
     }
   };
 

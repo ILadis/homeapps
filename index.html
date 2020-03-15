@@ -33,8 +33,12 @@
   let recipe = router.register('recipe', ['id'], ({ id }) =>
     presenter.showRecipe(id));
 
-  presenter.onRecipeShown = ({ id }) =>
+  presenter.onRecipeShown = async ({ id }) => {
+    if (router.referFrom(create, edit)) {
+      await router.gobackTo(index);
+    }
     router.navigateTo(recipe, { id });
+  };
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js');
