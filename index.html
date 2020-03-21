@@ -34,7 +34,7 @@
     presenter.showRecipe(id));
 
   presenter.onRecipeShown = async ({ id }) => {
-    if (router.referFrom(create, edit)) {
+    if (router.referer(create, edit)) {
       await router.gobackTo(index);
     }
     router.navigateTo(recipe, { id });

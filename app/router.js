@@ -21,8 +21,8 @@ Router.prototype.apply = function(hash) {
   }
 };
 
-Router.prototype.referFrom = function(...routes) {
-  let hashes = history.state;
+Router.prototype.referer = function(...routes) {
+  let hashes = history.state || [];
   for (let hash of hashes) {
     for (let route of routes) {
       if (route.matches(hash)) {
@@ -35,16 +35,12 @@ Router.prototype.referFrom = function(...routes) {
 };
 
 Router.prototype.gobackTo = async function(route, values) {
-  let hashes = history.state;
+  let hashes = history.state || [];
 
   let hash = route.compute(values);
   let uri = location.pathname + hash;
 
-  let index = hashes.indexOf(hash);
-  if (index == -1) {
-    index = 0;
-  }
-
+  let index = Math.max(0, hashes.indexOf(hash));
   let delta = ++index - hashes.length;
 
   await historyGoto(delta);
@@ -54,12 +50,12 @@ Router.prototype.gobackTo = async function(route, values) {
 };
 
 Router.prototype.navigateTo = function(route, values) {
-  let hashes = history.state;
+  let hashes = history.state || [];
 
   let hash = route.compute(values);
   let uri = location.pathname + hash;
 
-  if (!hashes) {
+  if (!hashes.length) {
     hashes = [hash];
     history.replaceState(hashes, '', uri);
   }
@@ -72,7 +68,7 @@ Router.prototype.navigateTo = function(route, values) {
 
 function historyGoto(delta) {
   return new Promise(function(resolve) {
-    if (delta == 0) resolve();
+    if (delta <= 0) resolve();
     else {
       addEventListener('popstate', resolve, { once: true });
       history.go(delta);
