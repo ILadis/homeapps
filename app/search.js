@@ -7,6 +7,7 @@ export function Search(objects) {
 
 Search.prototype.execute = function(query, contents) {
   let terms = query.match(words) || [];
+  var contents = stringify(contents);
 
   this.results = new Map();
   for (let term of terms) {
@@ -44,7 +45,8 @@ function inverseFrequency(term, objects, contents) {
   for (let object of objects) {
     count++;
     for (let content of contents(object)) {
-      if (content.includes(term)) {
+      let include = content.includes(term);
+      if (include) {
         frequency++;
         break;
       }
@@ -69,5 +71,16 @@ function termFrequency(term, object, contents) {
   }
 
   return frequency;
+}
+
+function stringify(contents) {
+  return function*(object) {
+    for (let content of contents(object)) {
+      if (['string', 'number'].includes(typeof content)) {
+        yield content.toString();
+      }
+      yield '';
+    }
+  }
 }
 
