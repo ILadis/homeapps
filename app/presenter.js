@@ -182,7 +182,8 @@ Presenter.prototype.showForm = async function(id) {
   };
 
   view.onDoneClicked = async () => {
-    if (recipe.name && recipe.servings.value) {
+    recipe.removeEmptySteps();
+    if (recipe.isValid()) {
       await repo.save(recipe);
       this.showRecipe(recipe.id);
     }

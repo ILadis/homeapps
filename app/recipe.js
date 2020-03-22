@@ -80,6 +80,22 @@ Recipe.prototype.addStep = function(text, ingredients) {
   return step;
 };
 
+Recipe.prototype.removeEmptySteps = function() {
+  for (let step of this.steps) {
+    if (!step.text || !step.ingredients.size) {
+      this.steps.delete(step);
+    }
+  }
+};
+
+Recipe.prototype.isValid = function() {
+  return true
+    && this.name
+    && this.servings
+    && this.servings.value
+    && this.steps.size;
+};
+
 const $value = Symbol('value');
 const $scale = Symbol('scale');
 
