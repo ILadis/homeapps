@@ -231,8 +231,13 @@ export const Form = function() {
   buttons[3].onclick = () => this.onAddStepClicked();
 
   let inputs = node.querySelectorAll('fieldset input');
-  inputs[0].onchange = (event) => this.onLabelChanged(event.target.value);
-  inputs[1].onchange = (event) => this.onServingsChanged(event.target.value);
+  inputs[0].onchange = ({ target }) => this.onLabelChanged(target.value);
+  inputs[1].onchange = ({ target }) => this.onQuantityChanged(target.value);
+
+  let select = node.querySelector('fieldset select');
+  select.onchange = ({ target }) => target.value === 'other'
+    ? this.onOtherUnitClicked()
+    : this.onUnitChanged(target.value);
 
   this.node = node;
   this.steps = new Set();
@@ -255,7 +260,11 @@ Form.template = html`
     <fieldset name="servings">
       <legend>Mengenangabe</legend>
       <input type="text">
-      <span>Stück</span>
+      <select>
+        <option>Stück</option>
+        <option>Personen</option>
+        <option value="other">andere...</option>
+      </select>
     </fieldset>
   </header>
   <section>
@@ -302,11 +311,37 @@ Form.prototype.setServings = function({ servings }) {
   let input = this.node.querySelector('fieldset[name=servings] input');
   input.value = servings.value || '';
 
-  let span = this.node.querySelector('fieldset[name=servings] span');
-  span.textContent = servings.unit || '';
+  let select = this.node.querySelector('fieldset[name=servings] select');
+
+  let byUnit = o => o.textContent === servings.unit;
+  let option = Array.from(select.options).find(byUnit);
+
+  if (!option && servings.unit) {
+    option = document.createElement('option');
+    option.textContent = servings.unit;
+    select.prepend(option);
+  }
+
+  if (!option) {
+    option = select.options[0];
+  }
+
+  option.selected = true;
 };
 
-Form.prototype.onServingsChanged = function(quantity) {
+Form.prototype.onQuantityChanged = function(quantity) {
+};
+
+Form.prototype.onUnitChanged = function(unit) {
+};
+
+Form.prototype.onOtherUnitClicked = function() {
+};
+
+Form.prototype.promptForUnit = function() {
+  // replace this with HTML5 dialog once it's usable
+  let unit = prompt('Einheit für Mengenangabe angeben:');
+  this.onUnitChanged(unit);
 };
 
 Form.prototype.addStep = function() {
@@ -423,10 +458,9 @@ function insertAfter(newNode, node) {
 }
 
 function autoResizeHandler() {
-  return (event) => {
-    let node = event.target;
-    node.style.height = 'auto';
-    node.style.height = (node.scrollHeight) + 'px';
+  return ({ target }) => {
+    target.style.height = 'auto';
+    target.style.height = (target.scrollHeight) + 'px';
   };
 }
 

@@ -163,12 +163,25 @@ Presenter.prototype.showForm = async function(id) {
   };
 
   view.setServings(recipe);
-  view.onServingsChanged = (quantity) => {
-    recipe.setServings(quantity, 'Stück');
+  view.onQuantityChanged = (quantity) => {
+    recipe.setServings(quantity, recipe.servings.unit);
+    view.setServings(recipe);
+  };
+
+  view.onUnitChanged = (unit) => {
+    recipe.setServings(recipe.servings.value, unit);
+    view.setServings(recipe);
+  };
+
+  view.onOtherUnitClicked = () => {
+    view.promptForUnit();
   };
 
   view.onExportClicked = () => {
-    if (recipe.name && recipe.servings.value) {
+    recipe.removeEmptySteps();
+    showSteps(view, recipe);
+
+    if (recipe.isValid()) {
       var name = recipe.name + '.json';
       var url = Recipe.toURL(recipe);
     }
@@ -183,6 +196,8 @@ Presenter.prototype.showForm = async function(id) {
 
   view.onDoneClicked = async () => {
     recipe.removeEmptySteps();
+    showSteps(view, recipe);
+
     if (recipe.isValid()) {
       await repo.save(recipe);
       this.showRecipe(recipe.id);

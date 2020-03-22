@@ -297,7 +297,6 @@ h3 {
   font-size: 12pt;
   border-radius: 4pt;
   border: solid 1pt #ccc;
-  box-sizing: border-box;
   background: #fff;
   display: block;
 }
@@ -319,7 +318,16 @@ h3 {
 }
 
 .form > header > fieldset[name=servings] { display: inline-block; }
-.form > header > fieldset[name=servings] > input { width: 60pt; text-align: end; }
+.form > header > fieldset[name=servings] > input { max-width: 60pt; text-align: end; }
+
+.form > header > fieldset > select {
+  max-width: 120pt;
+  font-size: 12pt;
+  text-overflow: ellipsis;
+  color: #4a4a4a;
+  border: none;
+  background: transparent;
+}
 
 .form > section > ol > li {
   position: relative;
