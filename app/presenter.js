@@ -2,7 +2,7 @@
 import { Client } from './client.js';
 import { Repository } from './repository.js';
 import { Search } from './search.js';
-import { Recipe } from './recipe.js';
+import { Recipe, Ingredient } from './recipe.js';
 import * as Views from './views.js';
 
 export function Presenter() {
@@ -246,34 +246,17 @@ Presenter.prototype.showForm = async function(id) {
 
       showIngredients(v, step);
     }
+
+    for (let v of views) {
+      view.removeStep(v);
+    }
   };
 
-  let addIngredient = (ingredient) => {
-    let parts = ingredient.split(' ').filter(p => !!p);
-    switch (parts.length) {
-    case 0:
-      return;
-    case 1:
-      var ingredient = parts[0];
-      break;
-    case 2:
-      var quantity = parts[0];
-      var ingredient = parts[1];
-      break;
-    case 3:
-    default:
-      var quantity = parts[0];
-      var unit = parts[1];
-      var ingredient = parts.slice(2).join(' ');
-      break;
+  let addIngredient = (text) => {
+    let { ingredient, quantity, unit } = Ingredient.parse(text);
+    if (ingredient) {
+      return recipe.addIngredient(ingredient, quantity, unit);
     }
-
-    if (quantity && isNaN(Number(quantity))) {
-      ingredient = quantity + ' ' + ingredient;
-      quantity = undefined;
-    }
-
-    return recipe.addIngredient(ingredient, quantity, unit);
   };
 
   let removeIngredient = (view, step, ingredient) => {

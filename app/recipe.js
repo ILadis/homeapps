@@ -160,12 +160,38 @@ Quantity.prototype.toString = function() {
 
 const $refs = Symbol('refs');
 
-function Ingredient(name, quantity) {
+export function Ingredient(name, quantity) {
   this[$refs] = new Set();
   this.name = name;
   this.quantity = quantity;
   Object.freeze(this);
 }
+
+Ingredient.parse = function(text) {
+  let parts = text.split(' ').filter(p => !!p);
+  switch (parts.length) {
+  case 1:
+    var ingredient = parts[0];
+    break;
+  case 2:
+    var quantity = parts[0];
+    var ingredient = parts[1];
+    break;
+  case 3:
+  default:
+    var quantity = parts[0];
+    var unit = parts[1];
+    var ingredient = parts.slice(2).join(' ');
+    break;
+  }
+
+  if (quantity && isNaN(Number(quantity))) {
+    ingredient = quantity + ' ' + ingredient;
+    quantity = undefined;
+  }
+
+  return { ingredient, quantity, unit };
+};
 
 const $ingredient = Symbol('ingredient');
 
@@ -199,7 +225,7 @@ Ingredient.Ref.prototype.delete = function() {;
   return refs.size == 0;
 };
 
-function Step(text, ingredients) {
+export function Step(text, ingredients) {
   this.text = text;
   this.ingredients = new Set(ingredients);
   Object.seal(this);
