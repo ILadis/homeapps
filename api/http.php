@@ -34,10 +34,11 @@ interface HttpHandler {
 }
 
 class HttpRouter {
-  private $routes;
+  private $routes, $base;
 
-  public function __construct() {
+  public function __construct($base = '') {
     $this->routes = array();
+    $this->base = $base;
   }
 
   public function add($method, $uri, $handler) {
@@ -48,8 +49,13 @@ class HttpRouter {
   }
 
   public function apply($request, $response) {
+    if (strpos($request->uri, '/api') !== false) {
+      $response->status = 404;
+      return true;
+    }
+
     foreach ($this->routes as $route) {
-      if ($route->matches($request)) {
+      if ($route->matches($this->base, $request)) {
         $route->activate($request, $response);
         return $route;
       }
@@ -68,9 +74,9 @@ class HttpRoute {
     $this->handler = $handler;
   }
 
-  public function matches($request) {
+  public function matches($base, $request) {
     return preg_match("|^{$this->method}$|i", $request->method)
-      && preg_match("|^{$this->uri}$|i", $request->uri);
+      && preg_match("|^{$base}{$this->uri}$|i", $request->uri);
   }
 
   public function activate($request, $response) {
