@@ -1,27 +1,113 @@
 <?php
 
 class ListRecipes implements HttpHandler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
   public function handle($request, $response) {
-    $files = array();
+    $list = array();
+    $documents = $this->repository->listAll();
 
-    $folder = __DIR__ . '/../recipes';
-    $dir = new DirectoryIterator($folder);
-
-    foreach ($dir as $file) {
-      $ext = $file->getExtension();
-      $name = $file->getFilename();
-
-      if ($ext != 'json') {
-        continue;
-      }
+    foreach ($documents as $document) {
+      $json = $document->get();
+      $uri = $request->getPath() . '/' . $document->id();
 
       $files[] = [
-        'name' => $name
+        'name' => $json['name'],
+        'uri' => $uri
       ];
     }
 
-    $response->headers['Content-Type'] = 'application/json';
-    $response->body = json_encode($files);
+    $response->setStatus(200);
+    $response->setBodyAsJson($files);
+
+    return true;
+  }
+}
+
+class FindRecipe implements HttpHandler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $id = basename($request->getPath());
+    $document = $this->repository->findById($id);
+
+    if (!$document) {
+      $response->setStatus(404);
+      return false;
+    }
+
+    $json = $document->get();
+
+    $response->setStatus(200);
+    $response->setBodyAsJson($json);
+
+    return true;
+  }
+}
+
+class CreateRecipe implements HttpHandler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $json = $request->getBodyAsJson();
+    if (!$json) {
+      $response->setStatus(415);
+      return false;
+    }
+
+    $document = $this->repository->createNew();
+    $document->put($json);
+
+    $uri = $request->getPath() . '/' . $document->id();
+
+    $response->setStatus(201);
+    $response->setHeader('Location', $uri);
+    $response->setBodyAsJson($json);
+
+    return true;
+  }
+}
+
+class UpdateRecipe implements HttpHandler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $id = basename($request->getPath());
+    $document = $this->repository->findById($id);
+
+    if (!$document) {
+      $response->setStatus(404);
+      return false;
+    }
+
+    $json = $request->getBodyAsJson();
+    if (!$json) {
+      $response->setStatus(415);
+      return false;
+    }
+
+    $document->put($json);
+
+    $response->setStatus(200);
+    $response->setBodyAsJson($json);
+
+    return true;
   }
 }
 

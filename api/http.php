@@ -1,18 +1,60 @@
 <?php
 
+trait HttpMessage {
+  public function setHeader($name, $value) {
+    $this->headers[$name] = $value;
+  }
+
+  public function getHeader($name) {
+    return $this->headers[$name];
+  }
+
+  public function setBody($body) {
+    $this->body = $body;
+  }
+
+  public function setBodyAsJson($body) {
+    $this->headers['Content-Type'] = 'application/json';
+    $this->body = json_encode($body);
+  }
+
+  public function getBody() {
+    return $this->body;
+  }
+
+  public function getBodyAsJson() {
+    $body = json_decode($this->body, true);
+    if (!is_array($body)) {
+      return false;
+    }
+
+    return $body;
+  }
+}
+
 class HttpRequest {
-  public $method, $uri, $headers, $body;
+  use HttpMessage;
+  private $method, $path, $headers, $body;
 
   public function __construct() {
     $this->method = $_SERVER['REQUEST_METHOD'];
-    $this->uri = $_SERVER['REQUEST_URI'];
+    $this->path = $_SERVER['REQUEST_URI'];
     $this->headers = getallheaders();
     $this->body = file_get_contents('php://input');
+  }
+
+  public function getMethod() {
+    return $this->method;
+  }
+
+  public function getPath() {
+    return $this->path;
   }
 }
 
 class HttpResponse {
-  public $status, $headers, $body;
+  use HttpMessage;
+  private $status, $headers, $body;
 
   public function __construct() {
     $this->status = 200;
@@ -20,12 +62,16 @@ class HttpResponse {
     $this->body = null;
   }
 
+  public function setStatus($status) {
+    $this->status = $status;
+  }
+
   public function send() {
     http_response_code($this->status);
     foreach ($this->headers as $name => $value) {
       header("{$name}: {$value}");
     }
-    echo $this->body;
+    echo($this->body);
   }
 }
 
@@ -49,8 +95,8 @@ class HttpRouter {
   }
 
   public function apply($request, $response) {
-    if (strpos($request->uri, '/api') !== false) {
-      $response->status = 404;
+    if (strpos($request->getPath(), '/api') !== false) {
+      $response->setStatus(404);
       return true;
     }
 
@@ -66,17 +112,17 @@ class HttpRouter {
 }
 
 class HttpRoute {
-  private $method, $uri, $handler;
+  private $method, $path, $handler;
 
-  public function __construct($method, $uri, $handler) {
+  public function __construct($method, $path, $handler) {
     $this->method = $method;
-    $this->uri = $uri;
+    $this->path = $path;
     $this->handler = $handler;
   }
 
   public function matches($base, $request) {
-    return preg_match("|^{$this->method}$|i", $request->method)
-      && preg_match("|^{$base}{$this->uri}$|i", $request->uri);
+    return preg_match("|^{$this->method}$|i", $request->getMethod())
+      && preg_match("|^{$base}{$this->path}$|i", $request->getPath());
   }
 
   public function activate($request, $response) {
