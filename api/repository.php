@@ -31,8 +31,8 @@ class Repository {
     return false;
   }
 
-  public function createNew() {
-    return Document::create($this->dir);
+  public function createNew($id = null) {
+    return Document::create($this->dir, $id);
   }
 }
 
@@ -42,9 +42,9 @@ class Document {
     return new Document($file);
   }
 
-  public static function create($dir) {
+  public static function create($dir, $id = null) {
     do {
-      $id = bin2hex(random_bytes(16));
+      $id = $id ?: bin2hex(random_bytes(16));
       $file = "{$dir}/{$id}.json";
     } while (file_exists($file));
     return new Document($file);

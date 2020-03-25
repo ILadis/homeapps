@@ -91,8 +91,7 @@ class SaveRecipe implements HttpHandler {
     $document = $this->repository->findById($id);
 
     if (!$document) {
-      $response->setStatus(404);
-      return false;
+      $document = $this->repository->createNew($id);
     }
 
     $document->put($json);
