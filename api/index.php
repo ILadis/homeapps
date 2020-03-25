@@ -13,8 +13,9 @@ $router = new HttpRouter();
 
 $router->add('GET', '/recipes', new ListRecipes($repository));
 $router->add('GET', '/recipes/[a-z0-9-]+', new FindRecipe($repository));
-$router->add('POST','/recipes', new CreateRecipe($repository));
-$router->add('PUT', '/recipes/[a-z0-9-]+', new UpdateRecipe($repository));
+$router->add('POST', '/recipes', new CreateRecipe($repository));
+$router->add('PUT', '/recipes/[a-z0-9-]+', new SaveRecipe($repository));
+$router->add('DELETE', '/recipes/[a-z0-9-]+', new DeleteRecipe($repository));
 
 if (!$router->apply($request, $response)) {
   return false;

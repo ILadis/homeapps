@@ -44,7 +44,8 @@ class Document {
 
   public static function create($dir) {
     do {
-      $file = $dir .'/' . uniqid() . '.json';
+      $id = bin2hex(random_bytes(16));
+      $file = "{$dir}/{$id}.json";
     } while (file_exists($file));
     return new Document($file);
   }
@@ -60,10 +61,19 @@ class Document {
   }
 
   public function get() {
-    return json_decode(file_get_contents($this->file), true);
+    $value = file_get_contents($this->file);
+    $value = (object) json_decode($value, true);
+    $value->id = $this->id();
+    return $value;
   }
 
   public function put($value) {
-    file_put_contents($this->file, json_encode($value));
+    $value->id = $this->id();
+    $value = json_encode($value);
+    file_put_contents($this->file, $value);
+  }
+
+  public function delete() {
+    unlink($this->file);
   }
 }

@@ -12,13 +12,7 @@ class ListRecipes implements HttpHandler {
     $documents = $this->repository->listAll();
 
     foreach ($documents as $document) {
-      $json = $document->get();
-      $uri = $request->getPath() . '/' . $document->id();
-
-      $files[] = [
-        'name' => $json['name'],
-        'uri' => $uri
-      ];
+      $files[] = ['id' => $document->id()];
     }
 
     $response->setStatus(200);
@@ -73,14 +67,13 @@ class CreateRecipe implements HttpHandler {
     $uri = $request->getPath() . '/' . $document->id();
 
     $response->setStatus(201);
-    $response->setHeader('Location', $uri);
     $response->setBodyAsJson($json);
 
     return true;
   }
 }
 
-class UpdateRecipe implements HttpHandler {
+class SaveRecipe implements HttpHandler {
   private $repository;
 
   public function __construct($repository) {
@@ -107,6 +100,26 @@ class UpdateRecipe implements HttpHandler {
     $response->setStatus(200);
     $response->setBodyAsJson($json);
 
+    return true;
+  }
+}
+
+class DeleteRecipe implements HttpHandler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $id = basename($request->getPath());
+    $document = $this->repository->findById($id);
+
+    if ($document) {
+      $document->delete();
+    }
+
+    $response->setStatus(204);
     return true;
   }
 }
