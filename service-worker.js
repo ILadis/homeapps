@@ -6,7 +6,6 @@ async function refreshAssets() {
     './',
     './index.html',
 
-    './app/client.js',
     './app/presenter.js',
     './app/recipe.js',
     './app/repository.js',
@@ -24,8 +23,7 @@ async function refreshAssets() {
   ];
 
   for (let url of resources) {
-    let request = new Request(url);
-    request.headers.set('cache-control', 'no-cache');
+    let request = new Request(url, { cache:  'no-cache' });
 
     let response = await fetch(request);
     await cache.put(request, response);

@@ -1,55 +1,166 @@
 
 import { Recipe } from './recipe.js';
 
-export function Repository(db) {
-  this.db = db;
+export function Repository() {
+  this.remote = new RemoteRepository();
+  this.local = new LocalRepository();
 }
 
-Repository.create = async function() {
-  let schema = {
-    'recipes': {
-      keyPath: 'id',
-      autoIncrement: true
-    }
-  };
-
-  let db = await Database.create('cookbook', schema);
-  return new Repository(db);
+Repository.prototype.isEmpty = function() {
+  return this.local.isEmpty();
 };
 
-Repository.prototype.isEmpty = async function() {
-  this.db.beginTx('recipes', 'readonly');
-  let count = await this.db.count();
-  return count == 0;
+Repository.prototype.fetchAll = async function*(fresh = false) {
+  if (fresh) {
+    let recipes = this.remote.fetchAll();
+    for await (let recipe of recipes) {
+      await this.local.save(recipe);
+    }
+  }
+
+  let recipes = this.local.fetchAll();
+  for await (let recipe of recipes) {
+    yield recipe;
+  }
+};
+
+Repository.prototype.fetchById = function(id) {
+  return this.local.fetchById(id);
+};
+
+Repository.prototype.save = async function(recipe) {
+  await this.remote.save(recipe);
+  await this.local.save(recipe);
+};
+
+Repository.prototype.delete = async function(recipe) {
+  await this.remote.delete(recipe);
+  await this.local.delete(recipe);
+};
+
+function RemoteRepository() {
 }
 
-Repository.prototype.fetchAll = async function*() {
-  this.db.beginTx('recipes', 'readonly');
-  let iterator = this.db.iterateAll();
+RemoteRepository.prototype.fetchAll = async function*() {
+  let request = new Request('./recipes', {
+    method: 'GET',
+    headers: {
+      'Cache-Control': 'no-cache'
+    }
+  });
 
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to fetch index');
+  }
+
+  let index = await response.json();
+  for (let { id } of index) {
+    yield this.fetchById(id);
+  }
+}
+
+RemoteRepository.prototype.fetchById = async function(id) {
+  let request = new Request(`./recipes/${id}`, {
+    method: 'GET',
+    headers: {
+      'Cache-Control': 'no-cache'
+    }
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to fetch recipe');
+  }
+
+  let json = await response.json();
+  return Recipe.fromJSON(json);
+};
+
+RemoteRepository.prototype.save = async function(recipe) {
+  let url = ['recipes', recipe.id].filter(Boolean);
+  var json = Recipe.toJSON(recipe);
+
+  let request = new Request(`./${url.join('/')}`, {
+    method: recipe.id ? 'PUT' : 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache'
+    },
+    body: JSON.stringify(json)
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to save recipe');
+  }
+
+  var json = await response.json();
+  recipe.id = json.id;
+};
+
+RemoteRepository.prototype.delete = async function(recipe) {
+  let request = new Request(`./recipes/${recipe.id}`, {
+    method: 'DELETE',
+    headers: {
+      'Cache-Control': 'no-cache'
+    }
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to delete recipe');
+  }
+};
+
+function LocalRepository() {
+  this.db = Database.create('cookbook', {
+    'recipes': {
+      keyPath: 'id',
+      autoIncrement: false
+    }
+  });
+}
+
+LocalRepository.prototype.isEmpty = async function() {
+  let db = await this.db;
+  db.beginTx('recipes', 'readonly');
+
+  let count = await db.count();
+  return count == 0;
+};
+
+LocalRepository.prototype.fetchAll = async function*() {
+  let db = await this.db;
+  db.beginTx('recipes', 'readonly');
+
+  let iterator = db.iterateAll();
   for await (let data of iterator) {
     yield Recipe.fromJSON(data);
   }
 };
 
-Repository.prototype.fetchById = async function(id) {
-  this.db.beginTx('recipes', 'readonly');
-  let data = await this.db.fetchByKey(Number(id));
+LocalRepository.prototype.fetchById = async function(id) {
+  let db = await this.db;
+  db.beginTx('recipes', 'readonly');
+
+  let data = await db.fetchByKey(id);
   return Recipe.fromJSON(data);
 };
 
-Repository.prototype.save = async function(recipe) {
-  this.db.beginTx('recipes', 'readwrite');
+LocalRepository.prototype.save = async function(recipe) {
+  let db = await this.db;
+  db.beginTx('recipes', 'readwrite');
 
   let data = Recipe.toJSON(recipe);
-  let id = await this.db.save(data);
-
-  recipe.id = id;
+  await db.save(data);
 };
 
-Repository.prototype.delete = async function(recipe) {
-  this.db.beginTx('recipes', 'readwrite');
-  await this.db.deleteByKey(recipe.id);
+LocalRepository.prototype.delete = async function(recipe) {
+  let db = await this.db;
+  db.beginTx('recipes', 'readwrite');
+
+  await db.deleteByKey(recipe.id);
 };
 
 function Database(db) {

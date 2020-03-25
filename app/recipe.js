@@ -1,12 +1,22 @@
 
 export function Recipe(name, id) {
-  this.id = toNumber(id);
+  this.id = toString(id);
   this.name = toString(name);
   this.servings = undefined;
   this.ingredients = new Map();
   this.steps = new Set();
   Object.seal(this);
 }
+
+Recipe.search = function*(recipe) {
+  yield recipe.name;
+  for (let { name } of recipe.ingredients.values()) {
+    yield name;
+  }
+  for (let { text } of recipe.steps.values()) {
+    yield text;
+  }
+};
 
 Recipe.prototype.setName = function(name) {
   this.name = toString(name);
@@ -75,8 +85,11 @@ Recipe.prototype.removeIngredient = function(ingredient) {
 };
 
 Recipe.prototype.addStep = function(text, ingredients) {
+  var text = toString(text);
+
   let step = new Step(text, ingredients);
   this.steps.add(step);
+
   return step;
 };
 
