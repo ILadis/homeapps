@@ -88,17 +88,17 @@ class UpdateRecipe implements HttpHandler {
   }
 
   public function handle($request, $response) {
+    $json = $request->getBodyAsJson();
+    if (!$json) {
+      $response->setStatus(415);
+      return false;
+    }
+
     $id = basename($request->getPath());
     $document = $this->repository->findById($id);
 
     if (!$document) {
       $response->setStatus(404);
-      return false;
-    }
-
-    $json = $request->getBodyAsJson();
-    if (!$json) {
-      $response->setStatus(415);
       return false;
     }
 

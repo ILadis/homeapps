@@ -28,7 +28,7 @@ trait HttpMessage {
       return false;
     }
 
-    return $body;
+    return (object) $body;
   }
 }
 
