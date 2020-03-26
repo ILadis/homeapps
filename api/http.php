@@ -95,11 +95,6 @@ class HttpRouter {
   }
 
   public function apply($request, $response) {
-    if (strpos($request->getPath(), '/api') !== false) {
-      $response->setStatus(404);
-      return true;
-    }
-
     foreach ($this->routes as $route) {
       if ($route->matches($this->base, $request)) {
         $route->activate($request, $response);

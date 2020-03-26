@@ -123,4 +123,39 @@ class DeleteRecipe implements HttpHandler {
   }
 }
 
+class ServeFile implements HttpHandler {
+  private $file;
+  private static $types = array(
+    'html' => 'text/html',
+    'css'  => 'text/css',
+    'js'   => 'text/javascript',
+    'svg'  => 'image/svg+xml',
+    'png'  => 'image/png',
+    'json' => 'application/json',
+    'webmanifest' => 'application/manifest+json',
+  );
+
+  public function __construct($file) {
+    $this->file = $file;
+  }
+
+  public function handle($request, $response) {
+    if (!file_exists($this->file)) {
+      $response->setStatus(404);
+      return false;
+    }
+
+    $ext = pathinfo($this->file, PATHINFO_EXTENSION);
+    $mime = self::$types[$ext];
+
+    $body = file_get_contents($this->file);
+
+    $response->setStatus(200);
+    $response->setHeader('Content-Type', $mime);
+    $response->setBody($body);
+    return true;
+  }
+
+}
+
 ?>
