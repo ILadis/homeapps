@@ -114,11 +114,15 @@ RemoteRepository.prototype.delete = async function(recipe) {
 };
 
 function LocalRepository() {
-  this.db = Database.create('cookbook', {
-    'recipes': {
+  this.db = Database.create('cookbook', (schema) => {
+    schema.createObjectStore('recipes', {
       keyPath: 'id',
       autoIncrement: false
-    }
+    }).createIndex('name', 'name', {
+      unique: false,
+      multiEntry: false,
+      locale: 'auto'
+    });
   });
 }
 
@@ -134,7 +138,7 @@ LocalRepository.prototype.fetchAll = async function*() {
   let db = await this.db;
   db.beginTx('recipes', 'readonly');
 
-  let iterator = db.iterateAll();
+  let iterator = db.iterateAll('name');
   for await (let data of iterator) {
     yield Recipe.fromJSON(data);
   }
@@ -172,10 +176,7 @@ Database.create = async function(name, schema) {
 
   request.onupgradeneeded = () => {
     let db = request.result;
-    for (let name in schema) {
-      let options = schema[name];
-      db.createObjectStore(name, options);
-    }
+    schema(db);
   };
 
   let db = await Database.promisify(request);
@@ -187,7 +188,7 @@ Database.promisify = function(request) {
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
-}
+};
 
 Database.prototype.beginTx = function(name, mode) {
   let store = this.db.transaction(name, mode).objectStore(name);
@@ -221,8 +222,13 @@ Database.prototype.deleteByKey = function(key) {
   return Database.promisify(request);
 };
 
-Database.prototype.iterateAll = async function*() {
-  let request = this.store.openCursor();
+Database.prototype.iterateAll = async function*(name) {
+  let index = this.store;
+  if (name) {
+    index = this.store.index(name);
+  }
+
+  let request = index.openCursor();
 
   do {
     let cursor = await Database.promisify(request);
