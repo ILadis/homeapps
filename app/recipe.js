@@ -95,7 +95,7 @@ Recipe.prototype.addStep = function(text, ingredients) {
 
 Recipe.prototype.removeEmptySteps = function() {
   for (let step of this.steps) {
-    if (!step.text || !step.ingredients.size) {
+    if (!step.text && !step.ingredients.size) {
       this.steps.delete(step);
     }
   }
