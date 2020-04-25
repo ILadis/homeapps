@@ -127,15 +127,17 @@ Presenter.prototype.showForm = async function(id) {
   let view = new Views.Form();
   if (id) {
     var recipe = await this.repo.fetchById(id);
-    view.setTitle('Rezept bearbeiten');
+    var title = 'Rezept bearbeiten';
   } else {
     var recipe = new Recipe();
     recipe.setServings(undefined, 'Stück');
     recipe.addStep();
-    view.setTitle('Neues Rezept');
+    var title = 'Neues Rezept';
   }
 
-  this.shell.setTitle('Neues Rezept');
+  view.setTitle(title);
+
+  this.shell.setTitle(title);
   this.shell.setContent(view);
 
   view.setLabel(recipe);

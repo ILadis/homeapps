@@ -78,10 +78,10 @@ RemoteRepository.prototype.fetchById = async function(id) {
 };
 
 RemoteRepository.prototype.save = async function(recipe) {
-  let url = ['recipes', recipe.id].filter(Boolean);
+  let url = toUrl('.', 'recipes', recipe.id);
   var json = Recipe.toJSON(recipe);
 
-  let request = new Request(`./${url.join('/')}`, {
+  let request = new Request(url, {
     method: recipe.id ? 'PUT' : 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -241,3 +241,7 @@ Database.prototype.iterateAll = async function*(name) {
     cursor.continue();
   } while (true);
 };
+
+function toUrl(...segments) {
+  return segments.filter(Boolean).join('/');
+}
