@@ -20,7 +20,7 @@ $router->add('POST', '/recipes', new CreateDocument($repository));
 $router->add('PUT', '/recipes/[a-z0-9-]+', new SaveDocument($repository));
 $router->add('DELETE', '/recipes/[a-z0-9-]+', new DeleteDocument($repository));
 
-$router->add('GET', '/', new ServeRedirect('/index.html'));
+$router->add('GET', '/', new ServeRedirect("{$base}/index.html"));
 
 foreach(array(
   '/index.html',
