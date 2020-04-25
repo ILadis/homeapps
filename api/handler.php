@@ -1,6 +1,6 @@
 <?php
 
-class ListRecipes implements HttpHandler {
+class ListDocuments implements HttpHandler {
   private $repository;
 
   public function __construct($repository) {
@@ -22,7 +22,7 @@ class ListRecipes implements HttpHandler {
   }
 }
 
-class FindRecipe implements HttpHandler {
+class FindDocument implements HttpHandler {
   private $repository;
 
   public function __construct($repository) {
@@ -47,7 +47,7 @@ class FindRecipe implements HttpHandler {
   }
 }
 
-class CreateRecipe implements HttpHandler {
+class CreateDocument implements HttpHandler {
   private $repository;
 
   public function __construct($repository) {
@@ -73,7 +73,7 @@ class CreateRecipe implements HttpHandler {
   }
 }
 
-class SaveRecipe implements HttpHandler {
+class SaveDocument implements HttpHandler {
   private $repository;
 
   public function __construct($repository) {
@@ -103,7 +103,7 @@ class SaveRecipe implements HttpHandler {
   }
 }
 
-class DeleteRecipe implements HttpHandler {
+class DeleteDocument implements HttpHandler {
   private $repository;
 
   public function __construct($repository) {
@@ -120,6 +120,19 @@ class DeleteRecipe implements HttpHandler {
 
     $response->setStatus(204);
     return true;
+  }
+}
+
+class ServeRedirect implements HttpHandler {
+  private $location;
+
+  public function __construct($location) {
+    $this->location = $location;
+  }
+
+  public function handle($request, $response) {
+    $response->setStatus(301);
+    $response->setHeader('Location', $this->location);
   }
 }
 
@@ -140,15 +153,16 @@ class ServeFile implements HttpHandler {
   }
 
   public function handle($request, $response) {
-    if (!file_exists($this->file)) {
+    $file = realpath($this->file);
+    if (!file_exists($file)) {
       $response->setStatus(404);
       return false;
     }
 
-    $ext = pathinfo($this->file, PATHINFO_EXTENSION);
+    $ext = pathinfo($file, PATHINFO_EXTENSION);
     $mime = self::$types[$ext];
 
-    $body = file_get_contents($this->file);
+    $body = file_get_contents($file);
 
     $response->setStatus(200);
     $response->setHeader('Content-Type', $mime);

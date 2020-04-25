@@ -4,24 +4,25 @@ require('http.php');
 require('handler.php');
 require('repository.php');
 
-$dir = dirname(__FILE__);
+$root = realpath(__DIR__ . '/..');
 $base = getenv('BASE');
 
-$repository = new Repository("{$dir}/../recipes");
+$repository = new Repository("{$root}/recipes");
 
 $request = new HttpRequest();
 $response = new HttpResponse();
 
 $router = new HttpRouter($base);
 
-$router->add('GET', '/recipes', new ListRecipes($repository));
-$router->add('GET', '/recipes/[a-z0-9-]+', new FindRecipe($repository));
-$router->add('POST', '/recipes', new CreateRecipe($repository));
-$router->add('PUT', '/recipes/[a-z0-9-]+', new SaveRecipe($repository));
-$router->add('DELETE', '/recipes/[a-z0-9-]+', new DeleteRecipe($repository));
+$router->add('GET', '/recipes', new ListDocuments($repository));
+$router->add('GET', '/recipes/[a-z0-9-]+', new FindDocument($repository));
+$router->add('POST', '/recipes', new CreateDocument($repository));
+$router->add('PUT', '/recipes/[a-z0-9-]+', new SaveDocument($repository));
+$router->add('DELETE', '/recipes/[a-z0-9-]+', new DeleteDocument($repository));
+
+$router->add('GET', '/', new ServeRedirect('/index.html'));
 
 foreach(array(
-  '/' => '/index.html',
   '/index.html',
   '/service-worker.js',
 
@@ -41,9 +42,8 @@ foreach(array(
   '/assets/manifest.webmanifest',
   '/assets/refresh.svg',
   '/assets/styles.css',
-) as $path => $file) {
-  $path = is_string($path) ? $path : $file;
-  $router->add('GET', $path, new ServeFile("{$dir}/..{$file}"));
+) as $file) {
+  $router->add('GET', $file, new ServeFile("{$root}/{$file}"));
 }
 
 if (!$router->apply($request, $response)) {
