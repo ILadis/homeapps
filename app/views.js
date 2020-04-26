@@ -1,4 +1,6 @@
 
+import { html, define, resizeHandler, submitHandler } from './dom.js';
+
 export function Shell() {
   this.content = null;
 }
@@ -325,11 +327,11 @@ Form.Step = define('form-step', 'li', html`
   let form = this.querySelector('form');
   let input = this.querySelector('form input');
   input.onchange =
-  form.onsubmit = submitHandler(input, (value) => this.onIngredientSubmitted(value));
+  form.onsubmit = submitHandler((value) => this.onIngredientSubmitted(value));
 
   let textarea = this.querySelector('textarea');
   textarea.onchange = () => this.onStepTextChanged(textarea.value);
-  textarea.oninput = autoResizeHandler();
+  textarea.oninput = resizeHandler();
 
   this.ingredients = new Set();
 });
@@ -379,67 +381,4 @@ Form.Step.Ingredient.prototype.setLabel = function({ name, quantity }) {
   this.textContent = label;
   return this;
 };
-
-
-function html(source) {
-  let template = document.createElement('template');
-  template.innerHTML = source[0];
-
-  let content = document.importNode(template.content, true);
-  return content;
-}
-
-function define(tag, base, template, init) {
-  let proto = document.createElement(base).constructor;
-  let options = { extends: base };
-
-  let element = (class extends proto {
-    constructor() {
-      super();
-      this.appendChild(template.cloneNode(true));
-      this.setAttribute('is', tag);
-      normalizeNodes(this);
-      if (init) init.call(this);
-    }
-  });
-
-  customElements.define(tag, element, options);
-  return element;
-}
-
-function autoResizeHandler() {
-  return ({ target }) => {
-    target.style.height = 'auto';
-    target.style.height = (target.scrollHeight) + 'px';
-  };
-}
-
-function submitHandler(input, delegate) {
-  return (event) => {
-    event.preventDefault();
-    if (input.value.length) {
-      delegate(input.value);
-      input.value = '';
-    }
-  };
-}
-
-function normalizeNodes(node) {
-  let childs = node.childNodes;
-  for (let child of childs) {
-    let text = child.textContent;
-    let type = child.nodeType;
-
-    switch (type) {
-    case Node.TEXT_NODE:
-      child.textContent = text.trim();
-      break;
-    case Node.COMMENT_NODE:
-      child.remove();
-      break;
-    }
-    normalizeNodes(child);
-  }
-  return node;
-}
 

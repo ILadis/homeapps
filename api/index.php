@@ -28,12 +28,14 @@ foreach(array(
   '/service-worker.js',
   '/manifest.webmanifest',
 
+  '/app/dom.js',
   '/app/presenter.js',
   '/app/recipe.js',
   '/app/repository.js',
   '/app/router.js',
   '/app/search.js',
   '/app/views.js',
+
   '/app/styles.css',
 ) as $file) {
   $router->add('GET', $file, new Http\Handler\ServeFile("{$root}/{$file}"));
