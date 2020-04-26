@@ -11,6 +11,10 @@ body {
   background: #fff;
 }
 
+body > svg {
+  display: none;
+}
+
 h1 {
   padding: 8pt;
   font: 18pt sans-serif;
@@ -57,33 +61,26 @@ h3 {
   padding-bottom: 16pt;
 }
 
-[is=recipe-index]   > header > h1 > span,
-[is=recipe-details] > header > h1 > span,
-[is=recipe-form]    > header > h1 > span {
+[is=recipe-index]   > header > h1 span,
+[is=recipe-details] > header > h1 span,
+[is=recipe-form]    > header > h1 span {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   display: block;
 }
 
-[is=recipe-index]   > header > h1 > a,
-[is=recipe-details] > header > h1 > a,
-[is=recipe-form]    > header > h1 > a {
+[is=recipe-index]   > header > h1 svg,
+[is=recipe-details] > header > h1 svg,
+[is=recipe-form]    > header > h1 svg {
   margin-left: 12pt;
-  width: 22pt;
-  height: 22pt;
-  border: none;
-  background-color: transparent;
-  background-size: contain;
+  width: 24pt;
+  height: 24pt;
   float: right;
   display: block;
+  cursor: pointer;
+  fill: #4a4a4a;
 }
-
-[is=recipe-index]   > header > h1 > a { background-image: url(./refresh.svg); }
-[is=recipe-details] > header > h1 > a { background-image: url(./edit.svg); }
-[is=recipe-form]    > header > h1 > a[name=delete] { background-image: url(./delete.svg); }
-[is=recipe-form]    > header > h1 > a[name=export] { background-image: url(./export.svg); }
-[is=recipe-form]    > header > h1 > a[name=done] { background-image: url(./done.svg); }
 
 [is=recipe-index] > header > h1 + input {
   margin: 0 auto;
@@ -122,19 +119,21 @@ h3 {
   border: none;
 }
 
-[is=recipe-index] > section > button,
-[is=recipe-form]  > section > button {
+[is=recipe-index] > section > svg,
+[is=recipe-form]  > section > svg {
   position: fixed;
   right: 30pt;
   bottom: 20pt;
-  width: 44pt;
-  height: 44pt;
+  width: 36pt;
+  height: 36pt;
+  padding: 4pt;
   border: none;
   border-radius: 50%;
-  background: #7f7f7f url('./create.svg') no-repeat center;
-  background-size: 32pt;
+  background: #7f7f7f;
   box-shadow: 0 4pt 6pt 1pt #bfbfbf;
   display: block;
+  cursor: pointer;
+  fill: #fff;
 }
 
 [is=recipe-details] {
@@ -161,12 +160,12 @@ h3 {
   text-align: center;
 }
 
-[is=recipe-details] > header > h2 > span {
+[is=recipe-details] > header > h2 span {
   margin: 0 8pt;
   vertical-align: middle;
 }
 
-[is=recipe-details] > header > h2 > button {
+[is=recipe-details] > header > h2 button {
   padding: 0 6pt;
   line-height: 15pt;
   vertical-align: middle;

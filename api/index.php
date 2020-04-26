@@ -23,8 +23,10 @@ $router->add('DELETE', '/recipes/[a-z0-9-]+', new DeleteDocument($repository));
 $router->add('GET', '/', new ServeRedirect("{$base}/index.html"));
 
 foreach(array(
+  '/icon.png',
   '/index.html',
   '/service-worker.js',
+  '/manifest.webmanifest',
 
   '/app/presenter.js',
   '/app/recipe.js',
@@ -32,16 +34,7 @@ foreach(array(
   '/app/router.js',
   '/app/search.js',
   '/app/views.js',
-
-  '/assets/create.svg',
-  '/assets/delete.svg',
-  '/assets/done.svg',
-  '/assets/edit.svg',
-  '/assets/export.svg',
-  '/assets/icon.png',
-  '/assets/manifest.webmanifest',
-  '/assets/refresh.svg',
-  '/assets/styles.css',
+  '/app/styles.css',
 ) as $file) {
   $router->add('GET', $file, new ServeFile("{$root}/{$file}"));
 }
