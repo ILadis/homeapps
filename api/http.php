@@ -1,6 +1,8 @@
 <?php
+namespace Http;
+use Closure;
 
-trait HttpMessage {
+trait Message {
   public function setHeader($name, $value) {
     $this->headers[$name] = $value;
   }
@@ -32,8 +34,8 @@ trait HttpMessage {
   }
 }
 
-class HttpRequest {
-  use HttpMessage;
+class Request {
+  use Message;
   private $method, $path, $headers, $body;
 
   public function __construct() {
@@ -52,8 +54,8 @@ class HttpRequest {
   }
 }
 
-class HttpResponse {
-  use HttpMessage;
+class Response {
+  use Message;
   private $status, $headers, $body;
 
   public function __construct() {
@@ -75,11 +77,11 @@ class HttpResponse {
   }
 }
 
-interface HttpHandler {
+interface Handler {
   public function handle($request, $response);
 }
 
-class HttpRouter {
+class Router {
   private $routes, $base;
 
   public function __construct($base = '') {
@@ -89,7 +91,7 @@ class HttpRouter {
 
   public function add($method, $uri, $handler) {
     $handler = Closure::fromCallable([$handler, 'handle']);
-    $route = new HttpRoute($method, $uri, $handler);
+    $route = new Route($method, $uri, $handler);
     $this->routes[] = $route;
     return $route;
   }
@@ -106,7 +108,7 @@ class HttpRouter {
   }
 }
 
-class HttpRoute {
+class Route {
   private $method, $path, $handler;
 
   public function __construct($method, $path, $handler) {

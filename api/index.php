@@ -9,18 +9,18 @@ $base = getenv('BASE');
 
 $repository = new Repository("{$root}/recipes");
 
-$request = new HttpRequest();
-$response = new HttpResponse();
+$request = new Http\Request();
+$response = new Http\Response();
 
-$router = new HttpRouter($base);
+$router = new Http\Router($base);
 
-$router->add('GET', '/recipes', new ListDocuments($repository));
-$router->add('GET', '/recipes/[a-z0-9-]+', new FindDocument($repository));
-$router->add('POST', '/recipes', new CreateDocument($repository));
-$router->add('PUT', '/recipes/[a-z0-9-]+', new SaveDocument($repository));
-$router->add('DELETE', '/recipes/[a-z0-9-]+', new DeleteDocument($repository));
+$router->add('GET', '/recipes', new Http\Handler\ListDocuments($repository));
+$router->add('GET', '/recipes/[a-z0-9-]+', new Http\Handler\FindDocument($repository));
+$router->add('POST', '/recipes', new Http\Handler\CreateDocument($repository));
+$router->add('PUT', '/recipes/[a-z0-9-]+', new Http\Handler\SaveDocument($repository));
+$router->add('DELETE', '/recipes/[a-z0-9-]+', new Http\Handler\DeleteDocument($repository));
 
-$router->add('GET', '/', new ServeRedirect("{$base}/index.html"));
+$router->add('GET', '/', new Http\Handler\ServeRedirect("{$base}/index.html"));
 
 foreach(array(
   '/icon.png',
@@ -36,7 +36,7 @@ foreach(array(
   '/app/views.js',
   '/app/styles.css',
 ) as $file) {
-  $router->add('GET', $file, new ServeFile("{$root}/{$file}"));
+  $router->add('GET', $file, new Http\Handler\ServeFile("{$root}/{$file}"));
 }
 
 if (!$router->apply($request, $response)) {
