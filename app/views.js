@@ -12,7 +12,7 @@ Shell.prototype.setContent = function(content) {
     this.content.remove();
   }
 
-  document.body.appendChild(content);
+  document.body.prepend(content);
   this.content = content;
 };
 
