@@ -90,7 +90,9 @@ class Router {
   }
 
   public function add($method, $uri, $handler) {
-    $handler = Closure::fromCallable([$handler, 'handle']);
+    if ($handler instanceof Handler) {
+      $handler = Closure::fromCallable([$handler, 'handle']);
+    }
     $route = new Route($method, $uri, $handler);
     $this->routes[] = $route;
     return $route;
