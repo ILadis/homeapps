@@ -21,14 +21,14 @@ Shell.prototype.setContent = function(content) {
 export const Index = define('recipe-index', 'div', html`
 <header>
   <h1>
-    <svg viewBox="0 0 24 24"><use href="#refresh"></svg>
+    <svg viewBox="0 0 24 24"><use href="#refresh"></use></svg>
     <span><!-- title --></span>
   </h1>
   <input type="search" placeholder="Suchbegriff...">
 </header>
 <section>
   <ol><!-- recipes --></ol>
-  <svg viewBox="0 0 24 24"><use href="#create"></svg>
+  <svg viewBox="0 0 24 24"><use href="#create"></use></svg>
 </section>`, function() {
   let buttons = this.querySelectorAll('svg');
   buttons[0].onclick = () => this.onRefreshClicked();
@@ -86,7 +86,7 @@ Index.Recipe.prototype.onClicked = function() {
 export const Recipe = define('recipe-details', 'div', html`
 <header>
   <h1>
-    <svg viewBox="0 0 24 24"><use href="#edit"></svg>
+    <svg viewBox="0 0 24 24"><use href="#edit"></use></svg>
     <span><!-- name --></span>
   </h1>
   <h2>
@@ -186,9 +186,9 @@ Recipe.Step.prototype.addIngredient = function() {
 export const Form = define('recipe-form', 'div', html`
 <header>
   <h1>
-    <svg viewBox="0 0 24 24"><use href="#delete"></svg>
-    <a><svg viewBox="0 0 24 24"><use href="#export"></svg></a>
-    <svg viewBox="0 0 24 24"><use href="#done"></svg>
+    <svg viewBox="0 0 24 24"><use href="#delete"></use></svg>
+    <a><svg viewBox="0 0 24 24"><use href="#export"></use></svg></a>
+    <svg viewBox="0 0 24 24"><use href="#done"></use></svg>
     <span><!-- title --></span>
   </h1>
   <!-- name + servings -->
@@ -208,7 +208,7 @@ export const Form = define('recipe-form', 'div', html`
 </header>
 <section>
   <ol><!-- steps + ingredients --></ol>
-  <svg viewBox="0 0 24 24"><use href="#create"></svg>
+  <svg viewBox="0 0 24 24"><use href="#create"></use></svg>
 </section>`, function() {
   let buttons = this.querySelectorAll('svg');
   buttons[0].onclick = () => this.onDeleteClicked();
