@@ -9,8 +9,8 @@ $base = getenv('BASE');
 
 $repository = new Repository("{$root}/recipes");
 
-$request = new Http\Request();
-$response = new Http\Response();
+$request = Http\newRequest();
+$response = Http\newResponse();
 
 $router = new Http\Router($base);
 
@@ -44,7 +44,5 @@ foreach(array(
 if (!$router->apply($request, $response)) {
   $response->setStatus(404);
 }
-
-$response->send();
 
 ?>

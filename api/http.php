@@ -2,47 +2,14 @@
 namespace Http;
 use Closure;
 
-trait Message {
-  public function setHeader($name, $value) {
-    $this->headers[$name] = $value;
-  }
-
-  public function getHeader($name) {
-    return $this->headers[$name];
-  }
-
-  public function setBody($body) {
-    $this->body = $body;
-  }
-
-  public function setBodyAsJson($body) {
-    $this->headers['Content-Type'] = 'application/json';
-    $this->body = json_encode($body);
-  }
-
-  public function getBody() {
-    return $this->body;
-  }
-
-  public function getBodyAsJson() {
-    $body = json_decode($this->body, true);
-    if (!is_array($body)) {
-      return false;
-    }
-
-    return (object) $body;
-  }
-}
-
 class Request {
-  use Message;
-  private $method, $path, $headers, $body;
+  protected $method, $path, $headers, $body;
 
-  public function __construct() {
-    $this->method = $_SERVER['REQUEST_METHOD'];
-    $this->path = $_SERVER['REQUEST_URI'];
-    $this->headers = getallheaders();
-    $this->body = file_get_contents('php://input');
+  public function __construct(&$method, &$path, &$headers, &$body) {
+    $this->method =& $method;
+    $this->path =& $path;
+    $this->headers =& $headers;
+    $this->body =& $body;
   }
 
   public function getMethod() {
@@ -52,28 +19,82 @@ class Request {
   public function getPath() {
     return $this->path;
   }
+
+  public function getHeader($name) {
+    return $this->headers[$name];
+  }
+
+  public function getBody() {
+    return $this->body;
+  }
 }
 
 class Response {
-  use Message;
-  private $status, $headers, $body;
+  protected $status, $headers, $body;
 
-  public function __construct() {
-    $this->status = 200;
-    $this->headers = array();
-    $this->body = null;
+  public function __construct(&$status, &$headers, &$body) {
+    $this->status =& $status;
+    $this->headers =& $headers;
+    $this->body =& $body;
   }
 
   public function setStatus($status) {
     $this->status = $status;
   }
 
-  public function send() {
-    http_response_code($this->status);
-    foreach ($this->headers as $name => $value) {
+  public function getStatus() {
+    return $this->status;
+  }
+
+  public function setHeader($name, $value) {
+    $this->headers[$name] = $value;
+  }
+
+  public function getHeader($name) {
+    return $this->headers[$name];
+  }
+
+  public function getBody() {
+    return $this->body;
+  }
+}
+
+function newRequest() {
+  $method = $_SERVER['REQUEST_METHOD'];
+  $path = $_SERVER['REQUEST_URI'];
+  $headers = getallheaders();
+  $body = fopen('php://input', 'r');
+
+  return new class($method, $path, $headers, $body)
+    extends Request { use JsonBody; };
+}
+
+function newResponse() {
+  $status = 200;
+  $headers = array();
+  $body = fopen('php://output', 'wb');
+
+  header_register_callback(function() use (&$status, &$headers) {
+    http_response_code($status);
+    foreach ($headers as $name => $value) {
       header("{$name}: {$value}");
     }
-    echo($this->body);
+  });
+
+  return new class($status, $headers, $body)
+    extends Response { use JsonBody; };
+}
+
+trait JsonBody {
+  public function setBodyAsJson($body) {
+    $this->headers['Content-Type'] = 'application/json';
+    fwrite($this->body, json_encode($body));
+  }
+
+  public function getBodyAsJson() {
+    $body = stream_get_contents($this->body);
+    $json = json_decode($body, true);
+    return (object) $json;
   }
 }
 

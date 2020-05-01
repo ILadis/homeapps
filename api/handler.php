@@ -38,14 +38,16 @@ class ServeFile implements HttpHandler {
       return false;
     }
 
+    $fd = fopen($file, 'rb');
+    $size = filesize($file);
     $ext = pathinfo($file, PATHINFO_EXTENSION);
     $mime = self::$types[$ext];
 
-    $body = file_get_contents($file);
-
     $response->setStatus(200);
     $response->setHeader('Content-Type', $mime);
-    $response->setBody($body);
+    $response->setHeader('Content-Length', $size);
+    stream_copy_to_stream($fd, $response->getBody());
+
     return true;
   }
 }
