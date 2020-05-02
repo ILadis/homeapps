@@ -11,9 +11,14 @@
   <script type="module">
   import { Router } from './app/router.js';
   import { Presenter } from './app/presenter.js';
+  import { Repository } from './app/repository.js';
+  import { Shell } from './app/views.js';
 
+  const repo = new Repository();
+  const shell = new Shell();
+
+  const presenter = new Presenter(shell, repo);
   const router = new Router();
-  const presenter = new Presenter();
 
   let index = router.register('list', [], () =>
     presenter.showIndex());

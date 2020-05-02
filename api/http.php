@@ -66,7 +66,7 @@ function newRequest() {
   $body = fopen('php://input', 'r');
 
   return new class($method, $path, $headers, $body)
-    extends Request { use JsonBody; };
+    extends Request { use TextBody, JsonBody; };
 }
 
 function newResponse() {
@@ -82,13 +82,27 @@ function newResponse() {
   });
 
   return new class($status, $headers, $body)
-    extends Response { use JsonBody; };
+    extends Response { use TextBody, JsonBody; };
+}
+
+trait TextBody {
+  public function setBodyAsText($body) {
+    $this->headers['Content-Type'] = 'text/plain';
+    $this->headers['Content-Length'] = strlen($body);
+    fwrite($this->body, $body);
+  }
+
+  public function getBodyAsText() {
+    return stream_get_contents($this->body);
+  }
 }
 
 trait JsonBody {
   public function setBodyAsJson($body) {
+    $json = json_encode($body);
     $this->headers['Content-Type'] = 'application/json';
-    fwrite($this->body, json_encode($body));
+    $this->headers['Content-Length'] = strlen($json);
+    fwrite($this->body, $json);
   }
 
   public function getBodyAsJson() {
@@ -100,6 +114,48 @@ trait JsonBody {
 
 interface Handler {
   public function handle($request, $response);
+}
+
+class MediaType {
+  private static $fallback = 'application/octet-stream';
+  private static $exts = array(
+    'html' => 'text/html',
+    'css'  => 'text/css',
+    'js'   => 'text/javascript',
+    'svg'  => 'image/svg+xml',
+    'png'  => 'image/png',
+    'json' => 'application/json',
+    'webmanifest' => 'application/manifest+json',
+  );
+
+  public static function fromFileExt($file) {
+    $ext = pathinfo($file, PATHINFO_EXTENSION);
+    if (array_key_exists($ext, MediaType::$exts)) {
+      return MediaType::$exts[$ext];
+    }
+
+    return MediaType::$fallback;
+  }
+}
+
+function serveRedirect($location) {
+  return function($request, $response) use ($location) {
+    $response->setStatus(301);
+    $response->setHeader('Location', $location);
+  };
+}
+
+function serveFile($file) {
+  return function($request, $response) use ($file) {
+    $fd = fopen($file, 'rb');
+    $size = filesize($file);
+    $mime = MediaType::fromFileExt($file);
+
+    $response->setStatus(200);
+    $response->setHeader('Content-Type', $mime);
+    $response->setHeader('Content-Length', $size);
+    stream_copy_to_stream($fd, $response->getBody());
+  };
 }
 
 class Router {

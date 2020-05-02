@@ -1,12 +1,11 @@
 
 import { Search } from './search.js';
-import { Repository } from './repository.js';
 import { Recipe, Ingredient } from './recipe.js';
 import * as Views from './views.js';
 
-export function Presenter() {
-  this.shell = new Views.Shell();
-  this.repo = new Repository();
+export function Presenter(shell, repo) {
+  this.shell = shell;
+  this.repo = repo;
 }
 
 Presenter.prototype.showIndex = async function() {

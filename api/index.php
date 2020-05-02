@@ -1,26 +1,29 @@
 <?php
 
+set_error_handler(function($severity, $message, $file, $line) {
+  throw new ErrorException($message, 0, $severity, $file, $line);
+});
+
 require('http.php');
 require('handler.php');
 require('repository.php');
 
-$root = realpath(__DIR__ . '/..');
+$root = realpath(__DIR__.'/..');
 $base = getenv('BASE');
 
-$repository = new Repository("{$root}/recipes");
+$repository = new Persistence\Repository("{$root}/recipes");
 
 $request = Http\newRequest();
 $response = Http\newResponse();
 
 $router = new Http\Router($base);
+$router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
+$router->add('POST', '/recipes', new Http\Handler\CreateDocument($repository));
 $router->add('GET', '/recipes', new Http\Handler\ListDocuments($repository));
 $router->add('GET', '/recipes/[a-z0-9-]+', new Http\Handler\FindDocument($repository));
-$router->add('POST', '/recipes', new Http\Handler\CreateDocument($repository));
 $router->add('PUT', '/recipes/[a-z0-9-]+', new Http\Handler\SaveDocument($repository));
 $router->add('DELETE', '/recipes/[a-z0-9-]+', new Http\Handler\DeleteDocument($repository));
-
-$router->add('GET', '/', new Http\Handler\ServeRedirect("{$base}/index.html"));
 
 foreach(array(
   '/icon.png',
@@ -38,11 +41,16 @@ foreach(array(
 
   '/app/styles.css',
 ) as $file) {
-  $router->add('GET', $file, new Http\Handler\ServeFile("{$root}/{$file}"));
+  $router->add('GET', $file, Http\serveFile("{$root}/{$file}"));
 }
 
-if (!$router->apply($request, $response)) {
-  $response->setStatus(404);
+try {
+  if (!$router->apply($request, $response)) {
+    $response->setStatus(404);
+  }
+} catch (Exception $e) {
+  $response->setStatus(500);
+  $response->setBodyAsText($e->getMessage());
 }
 
 ?>

@@ -58,7 +58,7 @@ RemoteRepository.prototype.fetchAll = async function*() {
   for (let { id } of index) {
     yield this.fetchById(id);
   }
-}
+};
 
 RemoteRepository.prototype.fetchById = async function(id) {
   let request = new Request(`./recipes/${id}`, {
