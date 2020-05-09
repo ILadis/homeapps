@@ -22,16 +22,12 @@ Presenter.prototype.showFileList = async function() {
     let progress = new Array();
 
     for (let file of files) {
-      let upload = this.repo.saveFile(file);
+      let upload = this.repo.uploadFile(file);
       progress.push(showProgress(view.addItem(), file, upload));
     }
 
     view.pullUp();
     await Promise.all(progress);
-
-    for (let file of files) {
-      this.repo.addTag(file, 'NEW');
-    }
 
     let iterator = this.repo.listFiles();
     showFiles(fileList, iterator);
@@ -53,14 +49,24 @@ Presenter.prototype.showFileList = async function() {
         .setDate(file.date);
 
       v.onClicked = () => this.showFileDetails(file);
-      v.clearTags();
-      for (let tag of file.tags) {
-        v.addTag(tag);
-      }
+
+      showTags(v, file.tags);
     }
 
     for (let v of views) {
       view.removeItem(v);
+    }
+  };
+
+  let showTags = (view, iterator) => {
+    let views = view.tags.values();
+    for (let tag of iterator) {
+      let v = (views.next().value || view.addTag());
+      v.setLabel(tag);
+    }
+
+    for (let v of views) {
+      view.removeTag(v);
     }
   };
 
@@ -75,15 +81,41 @@ Presenter.prototype.showFileDetails = function(file) {
   this.shell.setContent(fileDetails);
 
   bottomBar.clearActions();
-  bottomBar.addAction('back', () => false);
-  bottomBar.addAction('save', () => false);
-  bottomBar.setFloatingAction('download', () => false);
+  bottomBar.addAction('back', () => this.showFileList());
+  bottomBar.addAction('save', () => saveFile());
+  bottomBar.setFloatingAction('download', () => downloadFile());
+
+  fileDetails.onNameChanged = (name) => file.name = name;
+  fileDetails.onDateChanged = (date) => file.date = date;
+  fileDetails.onTagSubmitted = (tag) => addTag(fileDetails, tag);
+
+  let downloadFile = () => {
+    window.location.href = file.uri;
+  };
+
+  let tags = new Set();
+
+  let saveFile = async () => {
+    file.tags = Array.from(tags);
+    await this.repo.saveFile(file);
+    this.showFileList();
+  };
+
+  let addTag = (view, tag) => {
+    if (!tags.has(tag)) {
+      tags.add(tag);
+      let v = view.addTag().setLabel(tag);
+      v.onClicked = () => {
+        tags.delete(tag);
+        view.removeTag(v);
+      };
+    }
+  };
 
   fileDetails.setName(file.name);
   fileDetails.setDate(file.date);
   for (let tag of file.tags) {
-    fileDetails.addTag(tag);
+    addTag(fileDetails, tag);
   }
-
-  fileDetails.onTagSubmitted = (tag) => fileDetails.addTag(tag);
 };
+

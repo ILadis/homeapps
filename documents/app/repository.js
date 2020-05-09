@@ -4,7 +4,7 @@ import { AsyncGenerator } from './async.js';
 export function Repository() {
 }
 
-Repository.prototype.saveFile = function(file) {
+Repository.prototype.uploadFile = function(file) {
   let fallbackType = 'application/octet-stream';
   let type = file.type || fallbackType;
 
@@ -40,6 +40,18 @@ Repository.prototype.saveFile = function(file) {
   return progress.asIterable();
 };
 
+Repository.prototype.saveFile = async function(file) {
+  let body = JSON.stringify(file);
+  let request = new Request(`./api/files/${file.id}`, {
+    method: 'POST', body
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to save file');
+  }
+};
+
 Repository.prototype.listFiles = async function*() {
   let request = new Request('./api/files', {
     method: 'GET'
@@ -52,6 +64,7 @@ Repository.prototype.listFiles = async function*() {
 
   let files = await response.json();
   for (let file of files) {
+    file.uri = `./api/files/${file.id}/raw`;
     yield file;
   }
 };

@@ -33,7 +33,7 @@ class Repository {
       .'  FOREIGN KEY ("id") REFERENCES "files" ("id") ON DELETE CASCADE)');
   }
 
-  public function saveFile($file, $data) {
+  public function uploadFile($file, $data) {
     $stmt = $this->db->prepare(''
       .'INSERT INTO "files" ("id", "name", "mime", "size", "date", "data") '
       .'VALUES (:id, :name, :mime, :size, :date, zeroblob(:size))');
@@ -51,6 +51,26 @@ class Repository {
     $id = $this->db->lastInsertRowID();
     $blob = $this->db->openBlob('files', 'data', $id, 'main', SQLITE3_OPEN_READWRITE);
     stream_copy_to_stream($data, $blob);
+  }
+
+  public function saveFile($file) {
+    $stmt = $this->db->prepare(''
+      .'UPDATE "files" SET "name"=:name, "date"=:date WHERE "id"=:id');
+
+    $stmt->bindValue(':id',   $file->id,   SQLITE3_TEXT);
+    $stmt->bindValue(':name', $file->name, SQLITE3_TEXT);
+    $stmt->bindValue(':date', $file->date, SQLITE3_TEXT);
+    $stmt->execute();
+
+    $changes = $this->db->changes();
+    if (!$changes) {
+      return false;
+    }
+
+    $tags = (array) $file->tags;
+    $this->replaceTags($file, $tags);
+
+    return true;
   }
 
   public function listFiles() {
@@ -106,6 +126,18 @@ class Repository {
     return $tags;
   }
 
+  public function replaceTags($file, $tags) {
+    $stmt = $this->db->prepare(''
+      .'DELETE FROM "file_tags" WHERE "id"=:id');
+
+    $stmt->bindValue(':id',  $file->id, SQLITE3_TEXT);
+    $stmt->execute();
+
+    foreach ($tags as $tag) {
+      $this->addTag($file, $tag);
+    }
+  }
+
   public function fetchData($file) {
     $stmt = $this->db->prepare(''
       .'SELECT "rowid" FROM "files" WHERE "id"=:id');
@@ -124,7 +156,7 @@ class Repository {
 }
 
 class File {
-  public $id, $name, $mime, $size, $date, $uri, $tags;
+  public $id, $name, $mime, $size, $date, $tags;
 
   public function __construct($args) {
     $this->id   = $args['id']   ?? null;
@@ -132,7 +164,6 @@ class File {
     $this->mime = $args['mime'] ?? null;
     $this->size = $args['size'] ?? null;
     $this->date = $args['date'] ?? null;
-    $this->uri  = $args['uri']  ?? null;
     $this->tags = $args['tags'] ?? null;
   }
 }

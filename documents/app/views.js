@@ -33,6 +33,23 @@ Shell.prototype.setContent = function(...contents) {
   }
 };
 
+export const Tag = define('app-tag', 'span', html``, function() {
+  this.className = 'chip';
+  this.onclick = () => this.onClicked();
+});
+
+Tag.prototype.onClicked = function() { };
+
+Tag.prototype.setLabel = function(label) {
+   this.textContent = label;
+   return this;
+};
+
+Tag.prototype.setColor = function(color) {
+   this.classList.add(color);
+   return this;
+};
+
 export const FileList = define('file-list', 'div', html`
 <h1>Dokumente</h1>
 <form>
@@ -76,6 +93,7 @@ FileList.Item = define('file-list-item', 'li', html`
 <h2></h2>
 <h2></h2>
 <hr>`, function() {
+  this.tags = new Set();
   this.onclick = () => this.onClicked();
 });
 
@@ -102,26 +120,19 @@ FileList.Item.prototype.setDate = function(date) {
   return this;
 };
 
-FileList.Item.prototype.addTag = function(tag, color) {
-  let span = document.createElement('span');
-  span.className = 'chip';
-  span.textContent = tag;
-
-  if (color) {
-    span.classList.add(color);
-  }
-
+FileList.Item.prototype.addTag = function() {
   let hr = this.querySelector('hr');
-  this.insertBefore(span, hr);
 
-  return this;
+  let view = new Tag();
+  this.insertBefore(view, hr);
+
+  this.tags.add(view);
+  return view;
 };
 
-FileList.Item.prototype.clearTags = function() {
-  let spans = this.querySelectorAll('span');
-  for (let span of spans) {
-    span.remove();
-  }
+FileList.Item.prototype.removeTag = function(view) {
+  this.removeChild(view);
+  this.tags.delete(view);
 };
 
 export const FileDetails = define('file-details', 'div', html`
@@ -129,7 +140,7 @@ export const FileDetails = define('file-details', 'div', html`
 <form>
   <div>
     <label>Tags</label>
-    <input type="text" name="tag">
+    <input type="text" name="tag" class="chips">
   </div>
   <div>
     <label>Name</label>
@@ -140,13 +151,20 @@ export const FileDetails = define('file-details', 'div', html`
     <input type="date" name="date">
   </div>
 </form>`, function() {
+  this.tags = new Set();
+
   let form = this.querySelector('form');
-  let input = this.querySelector('[name=tag]');
-  input.onchange =
-  form.onsubmit = submitHandler((value) => this.onTagSubmitted(value));
+  let inputs = this.querySelectorAll('input');
+
+  form.onsubmit = 
+  inputs[0].onchange = submitHandler((value) => this.onTagSubmitted(value));
+  inputs[1].onchange = ({ target }) => this.onNameChanged(target.value);
+  inputs[2].onchange = ({ target }) => this.onDateChanged(target.valueAsDate);
 });
 
 FileDetails.prototype.onTagSubmitted = function(tag) { };
+FileDetails.prototype.onNameChanged = function(name) { };
+FileDetails.prototype.onDateChanged = function(date) { };
 
 FileDetails.prototype.setName = function(name) {
   let h1 = this.querySelector('h1');
@@ -163,20 +181,23 @@ FileDetails.prototype.setDate = function(date) {
   input.valueAsDate = date;
 };
 
-FileDetails.prototype.addTag = function(tag, color) {
-  let span = document.createElement('span');
-  span.className = 'chip';
-  span.textContent = tag;
-
-  if (color) {
-    span.classList.add(color);
-  }
-
+FileDetails.prototype.addTag = function() {
   let input = this.querySelector('input');
   let parent = input.parentNode;
-  parent.insertBefore(span, input);
 
-  return this;
+  let view = new Tag();
+  parent.insertBefore(view, input);
+
+  this.tags.add(view);
+  return view;
+};
+
+FileDetails.prototype.removeTag = function(view) {
+  let input = this.querySelector('input');
+  let parent = input.parentNode;
+  parent.removeChild(view);
+
+  this.tags.delete(view);
 };
 
 /*

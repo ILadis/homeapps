@@ -14,6 +14,7 @@ $base = getenv('BASE');
 
 $db = new SQLite3('./db.sqlite');
 $repository = Persistence\Repository::openNew($db);
+
 $scanner = new Devices\Scanner('192.168.178.11', '54921');
 
 $request = Http\newRequest();
@@ -22,8 +23,9 @@ $response = Http\newResponse();
 $router = new Http\Router();
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
-$router->add('POST', '/api/files', new Http\Handler\CreateFile($repository));
+$router->add('POST', '/api/files', new Http\Handler\UploadFile($repository));
 $router->add('GET',  '/api/files', new Http\Handler\ListFiles($repository));
+$router->add('POST', '/api/files/[a-z0-9-]+', new Http\Handler\SaveFile($repository));
 $router->add('POST', '/api/files/[a-z0-9-]+/tags', new Http\Handler\AddTag($repository));
 $router->add('GET',  '/api/files/[a-z0-9-]+/raw', new Http\Handler\RawFile($repository));
 

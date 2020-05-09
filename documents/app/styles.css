@@ -182,7 +182,7 @@ input[type=date] {
 }
 
 [is=file-details] > form span { font-size: 15px; }
-[is=file-details] > form span + input {
+[is=file-details] > form input.chips {
   margin-left: -4px;
   width: 40px;
   height: 30px;

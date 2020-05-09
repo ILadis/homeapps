@@ -2,7 +2,7 @@
 namespace Http\Handler;
 use Http, Persistence;
 
-class CreateFile implements Http\Handler {
+class UploadFile implements Http\Handler {
   private $repository;
 
   public function __construct($repository) {
@@ -21,7 +21,30 @@ class CreateFile implements Http\Handler {
       'size' => $size
     ]);
 
-    $this->repository->saveFile($file, $data);
+    $this->repository->uploadFile($file, $data);
+
+    $response->setStatus(200);
+    $response->setBodyAsJson($file);
+    return true;
+  }
+}
+
+class SaveFile implements Http\Handler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $data = $request->getBodyAsJson();
+    $file = new Persistence\File((array) $data);
+
+    $saved = $this->repository->saveFile($file);
+    if (!$saved) {
+      $response->setStatus(404);
+      return false;
+    }
 
     $response->setStatus(200);
     $response->setBodyAsJson($file);
