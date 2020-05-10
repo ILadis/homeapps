@@ -52,6 +52,16 @@ Repository.prototype.saveFile = async function(file) {
   }
 };
 
+Repository.prototype.deleteFile = async function(file) {
+  let request = new Request(`./api/files/${file.id}`, {
+    method: 'DELETE'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to delete file');
+  }
+};
 Repository.prototype.listFiles = async function*() {
   let request = new Request('./api/files', {
     method: 'GET'

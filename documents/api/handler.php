@@ -100,6 +100,27 @@ class RawFile implements Http\Handler {
   }
 }
 
+class DeleteFile implements Http\Handler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $id = basename($request->getPath());
+    $deleted = $this->repository->deleteFileById($id);
+
+    if (!$deleted) {
+      $response->setStatus(404);
+      return false;
+    }
+
+    $response->setStatus(204);
+    return true;
+  }
+}
+
 class AddTag implements Http\Handler {
   private $repository;
 

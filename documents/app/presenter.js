@@ -82,6 +82,7 @@ Presenter.prototype.showFileDetails = function(file) {
 
   bottomBar.clearActions();
   bottomBar.addAction('back', () => this.showFileList());
+  bottomBar.addAction('delete', () => deleteFile());
   bottomBar.addAction('save', () => saveFile());
   bottomBar.setFloatingAction('download', () => downloadFile());
 
@@ -94,6 +95,11 @@ Presenter.prototype.showFileDetails = function(file) {
   };
 
   let tags = new Set();
+
+  let deleteFile = async () => {
+    await this.repo.deleteFile(file);
+    this.showFileList();
+  };
 
   let saveFile = async () => {
     file.tags = Array.from(tags);

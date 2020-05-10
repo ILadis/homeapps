@@ -101,6 +101,21 @@ class Repository {
     return false;
   }
 
+  public function deleteFileById($id) {
+    $stmt = $this->db->prepare(''
+      .'DELETE FROM "files" WHERE "id"=:id');
+
+    $stmt->bindValue(':id', $id, SQLITE3_TEXT);
+    $stmt->execute();
+
+    $changes = $this->db->changes();
+    if (!$changes) {
+      return false;
+    }
+
+    return true;
+  }
+
   public function addTag($file, $tag) {
     $stmt = $this->db->prepare(''
       .'INSERT OR IGNORE INTO "file_tags" ("id", "tag") '
