@@ -58,7 +58,12 @@ export const FileList = define('file-list', 'div', html`
 <hr>
 <ul></ul>`, function() {
   this.items = new Set();
+
+  let input = this.querySelector('input');
+  input.oninput = () => this.onSearchChanged(input.value);
 });
+
+FileList.prototype.onSearchChanged = function(query) { };
 
 FileList.prototype.setTitle = function(title) {
   let h1 = this.querySelector('h1');

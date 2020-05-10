@@ -73,10 +73,15 @@ function termFrequency(term, object, contents) {
   return frequency;
 }
 
+function isPrimitive(content) {
+  let types = ['string', 'number'];
+  return types.includes(typeof content);
+}
+
 function stringify(contents) {
   return function*(object) {
     for (let content of contents(object)) {
-      if (['string', 'number'].includes(typeof content)) {
+      if (isPrimitive(content)) {
         yield content.toString();
       }
       yield '';
