@@ -3,7 +3,7 @@
   --primary-color: 69, 90, 100;
   --accent-color: #fdd835;
   --divider-color: 230, 230, 230;
-  --shadow-color: #3e3e3e;
+  --shadow-color: 62, 62, 62;
   --primary-text: #212121;
   --secondary-text: #757575;
 }
@@ -56,6 +56,61 @@ input[type=date] {
   background: transparent;
 }
 
+form:last-child > :last-child { margin-bottom: 110px; }
+form {
+  overflow: scroll;
+  scrollbar-width: none;
+}
+
+form > div {
+  margin: 5px 46px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+form > hr {
+  margin: 5px 46px;
+}
+
+form > div label:first-of-type { margin-bottom: 12px; }
+form > div label {
+  margin-top: 24px;
+  width: 100%;
+  font-size: 14px;
+  color: var(--secondary-text);
+}
+
+form > div input[type=text],
+form > div input[type=date] {
+  margin: 3px 0;
+  width: 100%;
+  font-size: 24px;
+  font-weight: 200;
+  flex-grow: 1;
+}
+
+form > div .chip { font-size: 15px; }
+form > div .chip + input[type=text] {
+  margin-left: -4px;
+  width: 40px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 16px;
+  font-weight: 300;
+}
+
+form > div button:hover { background: rgba(var(--primary-color), 0.9); }
+form > div button {
+  padding: 6px 24px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  background: rgb(var(--primary-color));
+  box-shadow: 0 1px 2px 0 rgba(var(--shadow-color), 0.7);
+}
+
 .chip.blue { background: #1e88e5; }
 .chip.red { background: #ef5350; }
 .chip.green { background: #558b2f; }
@@ -71,7 +126,7 @@ input[type=date] {
   box-sizing: border-box;
 }
 
-[is=file-list] {
+[is=app-shell] > *:first-child {
   position: fixed;
   width: 100%;
   height: 100%;
@@ -79,15 +134,15 @@ input[type=date] {
   display: flex;
 }
 
-[is=file-list]  +
-[is=bottom-bar] > nav svg:nth-child(3) { margin-left: auto; }
-
-[is=file-list] > h1 {
-  padding: 26px 46px 0 46px;
+[is=app-shell] > * > h1 {
+  padding: 26px 46px 24px 46px;
   font-size: 36px;
   font-weight: 300;
   flex-shrink: 0;
 }
+
+[is=file-list]  +
+[is=bottom-bar] > nav svg:nth-child(3) { margin-left: auto; }
 
 [is=file-list] > form { padding: 24px 26px; flex-shrink: 0; }
 
@@ -141,62 +196,19 @@ input[type=date] {
 [is=file-list-item] > span { font-size: 12px; }
 [is=file-list-item] > hr { margin-top: 10px; width: 100%; }
 
-[is=file-details] {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  flex-direction: column;
-  display: flex;
-}
+[is=file-details] > form { flex-grow: 1; }
 
 [is=file-details] +
 [is=bottom-bar]   > nav svg:nth-child(2) { margin-left: auto; }
 
-[is=file-details] > h1 {
-  padding: 26px 46px 24px 46px;
-  font-size: 36px;
-  font-weight: 300;
-  flex-shrink: 0;
-}
+[is=file-scan] > form { flex-shrink: 0; }
+[is=file-scan] > ul { margin: 0 46px 60px; }
+[is=file-scan] > ul li { padding: 12px; }
 
-[is=file-details] > form {
-  flex-grow: 1;
-  overflow: scroll;
-  scrollbar-width: none;
-}
-
-[is=file-details] > form div:last-child { margin-bottom: 110px; }
-[is=file-details] > form div {
-  margin: 5px 46px;
-  border-bottom: solid 1px rgb(var(--divider-color));
-  display: flex;
-  flex-wrap: wrap;
-}
-
-[is=file-details] > form label:first-of-type { margin-bottom: 12px; }
-[is=file-details] > form label {
-  margin-top: 24px;
-  width: 100%;
-  font-size: 14px;
-  color: var(--secondary-text);
-}
-
-[is=file-details] > form span { font-size: 15px; }
-[is=file-details] > form input.chips {
-  margin-left: -4px;
-  width: 40px;
-  height: 30px;
-  line-height: 30px;
-  font-size: 16px;
-  font-weight: 300;
-}
-
-[is=file-details] > form input {
-  margin: 3px 0;
-  width: 100%;
-  font-size: 24px;
-  font-weight: 200;
-  flex-grow: 1;
+[is=file-scan] > ul li img {
+  max-width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 0 6px 0 rgba(var(--shadow-color), 0.2);
 }
 
 [is=upload-list] {
@@ -207,7 +219,7 @@ input[type=date] {
   max-height: 80%;
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
-  box-shadow: 0 0 6px 0 var(--shadow-color);
+  box-shadow: 0 0 6px 0 rgb(var(--shadow-color));
   background: #fff;
   flex-direction: column;
   display: flex;
@@ -260,7 +272,7 @@ input[type=date] {
   height: 40px;
   border: none;
   border-radius: 50%;
-  box-shadow: 0 2px 4px 1px var(--shadow-color);
+  box-shadow: 0 2px 4px 1px rgb(var(--shadow-color));
   background: var(--accent-color);
   transform: translateX(-50%);
   fill: #fff;
@@ -269,7 +281,7 @@ input[type=date] {
 [is=bottom-bar] > nav {
   height: 35px;
   padding: 13px 10px;
-  box-shadow: 0 2px 6px 1px var(--shadow-color);
+  box-shadow: 0 2px 6px 1px rgb(var(--shadow-color));
   background: rgb(var(--primary-color));
   display: flex;
 }

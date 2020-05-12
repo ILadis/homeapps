@@ -52,6 +52,22 @@ Repository.prototype.saveFile = async function(file) {
   }
 };
 
+Repository.prototype.scanFile = async function() {
+  let request = new Request(`./api/scan`, {
+    method: 'POST'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to scan file');
+  }
+
+  let blob = await response.blob();
+  let url = URL.createObjectURL(blob);
+
+  return url;
+};
+
 Repository.prototype.deleteFile = async function(file) {
   let request = new Request(`./api/files/${file.id}`, {
     method: 'DELETE'
@@ -62,6 +78,7 @@ Repository.prototype.deleteFile = async function(file) {
     throw new Error('failed to delete file');
   }
 };
+
 Repository.prototype.listFiles = async function*() {
   let request = new Request('./api/files', {
     method: 'GET'

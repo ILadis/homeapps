@@ -30,7 +30,7 @@ $router->add('DELETE', '/api/files/[a-z0-9-]+', new Http\Handler\DeleteFile($rep
 $router->add('POST', '/api/files/[a-z0-9-]+/tags', new Http\Handler\AddTag($repository));
 $router->add('GET',  '/api/files/[a-z0-9-]+/raw', new Http\Handler\RawFile($repository));
 
-$router->add('GET', '/api/scan', new Http\Handler\ScanImage($scanner, $repository));
+$router->add('POST', '/api/scan', new Http\Handler\ScanImage($scanner, $repository));
 
 foreach(array(
   '/index.html',

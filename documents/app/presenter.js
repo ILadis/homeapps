@@ -85,7 +85,7 @@ Presenter.prototype.showFileList = async function() {
 
   bottomBar.clearActions();
   bottomBar.addAction('menu', () => uploadList.pullUp());
-  bottomBar.addAction('inbox', () => false);
+  bottomBar.addAction('inbox', () => this.showFileScan());
   bottomBar.addAction('search', () => fileList.focusSearch());
   bottomBar.setFloatingAction('create', showUpload, true);
 
@@ -95,6 +95,22 @@ Presenter.prototype.showFileList = async function() {
   showFiles(iterator);
 
   this.shell.setContent(fileList);
+};
+
+Presenter.prototype.showFileScan = function() {
+  let { bottomBar } = this.shell;
+  let fileScan = new Views.FileScan();
+
+  bottomBar.clearActions();
+  bottomBar.addAction('back', () => this.showFileList());
+  bottomBar.setFloatingAction('print', async () => {
+    let url = await this.repo.scanFile();
+    let item = fileScan.addItem();
+    item.setImage(url);
+    item.scrollTo();
+  });
+
+  this.shell.setContent(fileScan);
 };
 
 Presenter.prototype.showFileDetails = function(file) {

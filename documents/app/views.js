@@ -145,16 +145,19 @@ export const FileDetails = define('file-details', 'div', html`
 <form>
   <div>
     <label>Tags</label>
-    <input type="text" name="tag" class="chips">
+    <input type="text" name="tag">
   </div>
+  <hr>
   <div>
     <label>Name</label>
     <input type="text" name="name">
   </div>
+  <hr>
   <div>
     <label>Datum</label>
     <input type="date" name="date">
   </div>
+  <hr>
 </form>`, function() {
   this.tags = new Set();
 
@@ -203,6 +206,45 @@ FileDetails.prototype.removeTag = function(view) {
   parent.removeChild(view);
 
   this.tags.delete(view);
+};
+
+export const FileScan = define('file-scan', 'div', html`
+<ul></ul>`, function() {
+  this.items = new Set();
+});
+
+FileScan.prototype.onScanSubmitted = function() { };
+
+FileScan.prototype.addItem = function() {
+  let view = new FileScan.Item();
+
+  let ul = this.querySelector('ul');
+  ul.appendChild(view);
+
+  this.items.add(view);
+  return view;
+};
+
+FileScan.prototype.removeItem = function(view) {
+  let ul = this.querySelector('ul');
+  ul.removeChild(view);
+
+  this.items.delete(view);
+};
+
+FileScan.Item = define('file-scan-item', 'li', html`
+<img>`);
+
+FileScan.Item.prototype.setImage = function(src) {
+  let img = this.querySelector('img');
+  img.src = src;
+  return this;
+};
+
+FileScan.Item.prototype.scrollTo = function() {
+  let options = { behavior: 'smooth' };
+  let scroll = () => this.scrollIntoView(options);
+  setTimeout(scroll, 100);
 };
 
 /*
