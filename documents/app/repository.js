@@ -7,11 +7,12 @@ export function Repository() {
 Repository.prototype.uploadFile = function(file) {
   let fallbackType = 'application/octet-stream';
   let type = file.type || fallbackType;
+  let name = encodeURI(file.name);
 
   let request = new XMLHttpRequest();
   request.responseType = 'json';
   request.open('POST', './api/files');
-  request.setRequestHeader('X-Filename', file.name);
+  request.setRequestHeader('X-Filename', name);
   request.overrideMimeType(type);
 
   let progress = new AsyncGenerator();
@@ -98,8 +99,7 @@ Repository.prototype.listFiles = async function*() {
 
 Repository.prototype.addTag = async function(file, tag) {
   let request = new Request(`./api/files/${file.id}/tags`, {
-    method: 'POST',
-    body: tag
+    method: 'POST', body: tag
   });
 
   let response = await fetch(request);

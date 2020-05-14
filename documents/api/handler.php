@@ -11,12 +11,12 @@ class UploadFile implements Http\Handler {
 
   public function handle($request, $response) {
     $name = $request->getHeader('X-Filename');
-    $mime = $request->getHeader('Content-Type');
+    $mime = $request->getHeader('Content-Type', 'application/octet-stream');
     $size = $request->getHeader('Content-Length');
     $data = $request->getBody();
 
     $file = new Persistence\File([
-      'name' => $name,
+      'name' => rawurldecode($name),
       'mime' => $mime,
       'size' => $size
     ]);
@@ -146,11 +146,10 @@ class AddTag implements Http\Handler {
 }
 
 class ScanImage implements Http\Handler {
-  private $scanner, $repository;
+  private $scanner;
 
-  public function __construct($scanner, $repository) {
+  public function __construct($scanner) {
     $this->scanner = $scanner;
-    $this->repository = $repository;
   }
 
   public function handle($request, $response) {
