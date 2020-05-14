@@ -20,8 +20,8 @@ class Request {
     return $this->path;
   }
 
-  public function getHeader($name) {
-    return $this->headers[$name];
+  public function getHeader($name, $default = null) {
+    return $this->headers[$name] ?? $default;
   }
 
   public function getBody() {
