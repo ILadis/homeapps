@@ -1,0 +1,14 @@
+{
+  "lang": "de",
+  "name": "Dokumente",
+  "short_name": "Dokumente",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#455a64",
+  "background_color": "#fbfbfb",
+  "icons": [{
+    "src": "./icon.png",
+    "sizes": "any",
+    "type": "image/png"
+  }]
+}

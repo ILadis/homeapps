@@ -4,26 +4,30 @@
   <title>Dokumente</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#eceff1">
+  <meta name="theme-color" content="#455a64">
   <link href="./favicon.ico" rel="icon">
+  <link href="./manifest.webmanifest" rel="manifest">
   <link href="./app/styles.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.min.js"></script>
   <script type="module">
-    import { Presenter } from './app/presenter.js';
-    import { Repository } from './app/repository.js';
-    import { Shell } from './app/views.js';
+  import { Presenter } from './app/presenter.js';
+  import { Repository } from './app/repository.js';
+  import { Shell } from './app/views.js';
 
-    const repo = new Repository();
-    const shell = new Shell();
+  const repo = new Repository();
+  const shell = new Shell();
 
-    const presenter = new Presenter(shell, repo);
+  const presenter = new Presenter(shell, repo);
 
-    window.onload = async () => {
-      document.body.prepend(shell);
-      presenter.showFileList();
-    };
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js');
+  }
 
-    document.onselectstart = () => false;
+  window.onload = async () => {
+    document.body.prepend(shell);
+    presenter.showFileList();
+  };
+
+  document.onselectstart = () => false;
   </script>
 </head>
 <body>
