@@ -204,12 +204,7 @@ form > div button {
 [is=file-scan] > form { flex-shrink: 0; }
 [is=file-scan] > ul { margin: 0 46px 60px; }
 [is=file-scan] > ul li { padding: 12px; }
-
-[is=file-scan] > ul li img {
-  max-width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 0 6px 0 rgba(var(--shadow-color), 0.2);
-}
+[is=file-scan] > ul li img { max-width: 100%; }
 
 [is=upload-list] {
   position: absolute;
