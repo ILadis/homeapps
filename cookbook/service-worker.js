@@ -3,27 +3,25 @@ self.oninstall = (event) => event.waitUntil(refreshAssets());
 async function refreshAssets() {
   let cache = await caches.open('cookbook');
   let resources = [
-    './',
-    './index.html',
+    '/',
+    '/icon.png',
+    '/index.html',
+    '/service-worker.js',
+    '/manifest.webmanifest',
 
-    './app/presenter.js',
-    './app/recipe.js',
-    './app/repository.js',
-    './app/router.js',
-    './app/search.js',
-    './app/views.js',
+    '/app/dom.js',
+    '/app/presenter.js',
+    '/app/recipe.js',
+    '/app/repository.js',
+    '/app/router.js',
+    '/app/search.js',
+    '/app/views.js',
 
-    './assets/create.svg',
-    './assets/done.svg',
-    './assets/favicon.ico',
-    './assets/icon.png',
-    './assets/manifest.webmanifest',
-    './assets/refresh.svg',
-    './assets/styles.css'
+    '/app/styles.css',
   ];
 
   for (let url of resources) {
-    let request = new Request(url, { cache:  'no-cache' });
+    let request = new Request(url, { cache: 'no-cache' });
 
     let response = await fetch(request);
     await cache.put(request, response);
@@ -44,5 +42,5 @@ async function handleRequest({ request }) {
   }
 
   return response;
-};
+}
 
