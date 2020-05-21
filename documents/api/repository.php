@@ -40,6 +40,7 @@ class Repository {
 
     $file->id   = bin2hex(random_bytes(16));
     $file->date = date('c');
+    $file->tags = array();
 
     $stmt->bindValue(':id',   $file->id,   SQLITE3_TEXT);
     $stmt->bindValue(':name', $file->name, SQLITE3_TEXT);
@@ -76,7 +77,7 @@ class Repository {
   public function listFiles() {
     $result = $this->db->query(''
       .'SELECT "id", "name", "mime", "size", "date" FROM "files" '
-      .'ORDER BY datetime("date") DESC');
+      .'ORDER BY datetime("date") ASC');
 
     while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
       $file = new File($row);

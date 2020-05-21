@@ -31,9 +31,7 @@ Repository.prototype.uploadFile = function(file) {
 
   // TODO implement onerror handlers
   request.onload = () => {
-    let { id, date } = request.response;
-    file.id = id;
-    file.date = date;
+    Object.assign(file, request.response);
     progress.advance(100, true);
   };
 

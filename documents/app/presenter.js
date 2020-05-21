@@ -30,19 +30,16 @@ Presenter.prototype.showFileList = async function() {
     showFiles(iterator);
   };
 
-  let showUpload = async (files) => {
+  let showUpload = async (iterator) => {
     let progress = new Array();
 
-    for (let file of files) {
+    for (let file of iterator) {
       let upload = this.repo.uploadFile(file);
       progress.push(showProgress(file, upload));
     }
 
     uploadList.pullUp();
     await Promise.all(progress);
-
-    let iterator = this.repo.listFiles();
-    showFiles(iterator);
   };
 
   let showProgress = async (file, upload) => {
@@ -53,6 +50,11 @@ Presenter.prototype.showFileList = async function() {
     for await (let percent of upload) {
       item.setProgress(percent);
     }
+
+    files.add(file);
+
+    let iterator = files.values();
+    showFiles(iterator);
   };
 
   let showFiles = async (iterator) => {
