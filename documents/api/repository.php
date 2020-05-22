@@ -33,20 +33,20 @@ class Repository {
       .'  FOREIGN KEY ("id") REFERENCES "files" ("id") ON DELETE CASCADE)');
   }
 
-  public function uploadFile($file, $data) {
+  public function uploadFile(&$file, $data) {
     $stmt = $this->db->prepare(''
       .'INSERT INTO "files" ("id", "name", "mime", "size", "date", "data") '
       .'VALUES (:id, :name, :mime, :size, :date, zeroblob(:size))');
 
-    $file->id   = bin2hex(random_bytes(16));
-    $file->date = date('c');
-    $file->tags = array();
+    $file['id']   = bin2hex(random_bytes(16));
+    $file['date'] = date('c');
+    $file['tags'] = array();
 
-    $stmt->bindValue(':id',   $file->id,   SQLITE3_TEXT);
-    $stmt->bindValue(':name', $file->name, SQLITE3_TEXT);
-    $stmt->bindValue(':mime', $file->mime, SQLITE3_TEXT);
-    $stmt->bindValue(':size', $file->size, SQLITE3_INTEGER);
-    $stmt->bindValue(':date', $file->date, SQLITE3_TEXT);
+    $stmt->bindValue(':id',   $file['id'],   SQLITE3_TEXT);
+    $stmt->bindValue(':name', $file['name'], SQLITE3_TEXT);
+    $stmt->bindValue(':mime', $file['mime'], SQLITE3_TEXT);
+    $stmt->bindValue(':size', $file['size'], SQLITE3_INTEGER);
+    $stmt->bindValue(':date', $file['date'], SQLITE3_TEXT);
     $stmt->execute();
 
     $id = $this->db->lastInsertRowID();
@@ -54,13 +54,13 @@ class Repository {
     stream_copy_to_stream($data, $blob);
   }
 
-  public function saveFile($file) {
+  public function saveFile(&$file) {
     $stmt = $this->db->prepare(''
       .'UPDATE "files" SET "name"=:name, "date"=:date WHERE "id"=:id');
 
-    $stmt->bindValue(':id',   $file->id,   SQLITE3_TEXT);
-    $stmt->bindValue(':name', $file->name, SQLITE3_TEXT);
-    $stmt->bindValue(':date', $file->date, SQLITE3_TEXT);
+    $stmt->bindValue(':id',   $file['id'],   SQLITE3_TEXT);
+    $stmt->bindValue(':name', $file['name'], SQLITE3_TEXT);
+    $stmt->bindValue(':date', $file['date'], SQLITE3_TEXT);
     $stmt->execute();
 
     $changes = $this->db->changes();
@@ -68,7 +68,7 @@ class Repository {
       return false;
     }
 
-    $tags = (array) $file->tags;
+    $tags = (array) $file['tags'];
     $this->replaceTags($file, $tags);
 
     return true;
@@ -79,9 +79,8 @@ class Repository {
       .'SELECT "id", "name", "mime", "size", "date" FROM "files" '
       .'ORDER BY datetime("date") ASC');
 
-    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-      $file = new File($row);
-      $file->tags = $this->fetchTags($file);
+    while ($file = $result->fetchArray(SQLITE3_ASSOC)) {
+      $file['tags'] = $this->fetchTags($file);
       yield $file;
     }
   }
@@ -93,9 +92,8 @@ class Repository {
     $stmt->bindValue(':id', $id, SQLITE3_TEXT);
     $result = $stmt->execute();
 
-    if ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-      $file = new File($row);
-      $file->tags = $this->fetchTags($file);
+    if ($file = $result->fetchArray(SQLITE3_ASSOC)) {
+      $file['tags'] = $this->fetchTags($file);
       return $file;
     }
 
@@ -117,21 +115,21 @@ class Repository {
     return true;
   }
 
-  public function addTag($file, $tag) {
+  public function addTag(&$file, $tag) {
     $stmt = $this->db->prepare(''
       .'INSERT OR IGNORE INTO "file_tags" ("id", "tag") '
       .'VALUES (:id, :tag)');
 
-    $stmt->bindValue(':id',  $file->id, SQLITE3_TEXT);
-    $stmt->bindValue(':tag', $tag,      SQLITE3_TEXT);
+    $stmt->bindValue(':id',  $file['id'], SQLITE3_TEXT);
+    $stmt->bindValue(':tag', $tag,        SQLITE3_TEXT);
     $stmt->execute();
   }
 
-  public function fetchTags($file) {
+  public function fetchTags(&$file) {
     $stmt = $this->db->prepare(''
       .'SELECT "tag" FROM "file_tags" WHERE "id"=:id');
 
-    $stmt->bindValue(':id', $file->id, SQLITE3_TEXT);
+    $stmt->bindValue(':id', $file['id'], SQLITE3_TEXT);
     $result = $stmt->execute();
 
     $tags = array();
@@ -142,11 +140,11 @@ class Repository {
     return $tags;
   }
 
-  public function replaceTags($file, $tags) {
+  public function replaceTags(&$file, $tags) {
     $stmt = $this->db->prepare(''
       .'DELETE FROM "file_tags" WHERE "id"=:id');
 
-    $stmt->bindValue(':id',  $file->id, SQLITE3_TEXT);
+    $stmt->bindValue(':id',  $file['id'], SQLITE3_TEXT);
     $stmt->execute();
 
     foreach ($tags as $tag) {
@@ -154,11 +152,11 @@ class Repository {
     }
   }
 
-  public function fetchData($file) {
+  public function fetchData(&$file) {
     $stmt = $this->db->prepare(''
       .'SELECT "rowid" FROM "files" WHERE "id"=:id');
 
-    $stmt->bindValue(':id', $file->id, SQLITE3_TEXT);
+    $stmt->bindValue(':id', $file['id'], SQLITE3_TEXT);
     $result = $stmt->execute();
 
     if ($row = $result->fetchArray(SQLITE3_ASSOC)) {
@@ -168,19 +166,6 @@ class Repository {
     }
 
     return false;
-  }
-}
-
-class File {
-  public $id, $name, $mime, $size, $date, $tags;
-
-  public function __construct($args) {
-    $this->id   = $args['id']   ?? null;
-    $this->name = $args['name'] ?? null;
-    $this->mime = $args['mime'] ?? null;
-    $this->size = $args['size'] ?? null;
-    $this->date = $args['date'] ?? null;
-    $this->tags = $args['tags'] ?? null;
   }
 }
 

@@ -31,6 +31,7 @@ Repository.prototype.uploadFile = function(file) {
 
   // TODO implement onerror handlers
   request.onload = () => {
+    Object.setPrototypeOf(file, null);
     Object.assign(file, request.response);
     progress.advance(100, true);
   };

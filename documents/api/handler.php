@@ -15,11 +15,11 @@ class UploadFile implements Http\Handler {
     $size = $request->getHeader('Content-Length');
     $data = $request->getBody();
 
-    $file = new Persistence\File([
+    $file = [
       'name' => rawurldecode($name),
       'mime' => $mime,
       'size' => $size
-    ]);
+    ];
 
     $this->repository->uploadFile($file, $data);
 
@@ -38,7 +38,13 @@ class SaveFile implements Http\Handler {
 
   public function handle($request, $response) {
     $data = $request->getBodyAsJson();
-    $file = new Persistence\File((array) $data);
+
+    $file = [
+      'id'   => $data->{'id'},
+      'name' => $data->{'name'},
+      'date' => $data->{'date'},
+      'tags' => $data->{'tags'}
+    ];
 
     $saved = $this->repository->saveFile($file);
     if (!$saved) {
