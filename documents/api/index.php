@@ -4,6 +4,7 @@ set_error_handler(function($severity, $message, $file, $line) {
   throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
+require('io.php');
 require('http.php');
 require('handler.php');
 require('repository.php');
@@ -15,7 +16,7 @@ $base = getenv('BASE');
 $db = new SQLite3('./db.sqlite');
 $repository = Persistence\Repository::openNew($db);
 
-$scanner = new Devices\Scanner('192.168.178.11', '54921');
+$scanner = new Devices\Scanner('192.168.178.11', 54921);
 
 $request = Http\newRequest();
 $response = Http\newResponse();

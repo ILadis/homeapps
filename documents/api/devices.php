@@ -1,6 +1,6 @@
 <?php
 namespace Devices;
-use Exception;
+use IO\Socket;
 
 class Scanner {
   private $host, $port;
@@ -19,14 +19,14 @@ class Scanner {
         return false;
       }
 
-      $this->sendAndReceive($socket, 'Q', [], 75);
-      $this->sendAndReceive($socket, 'I', [
+      $this->exchange($socket, 'Q', [], 75);
+      $this->exchange($socket, 'I', [
         'R=300,300',
         'M=CGRAY',
         'D=SIN'
       ], 27);
 
-      $head = $this->sendAndReceive($socket, 'X', [
+      $head = $this->exchange($socket, 'X', [
         'R=300,300',
         'M=CGRAY',
         'C=JPEG',
@@ -37,30 +37,13 @@ class Scanner {
         'D=SIN'
       ], 1);
 
-      if ($head == "\xc2") {
-        return false;
-      }
-
-      while (true) {
-        $head = $socket->read(2, $head);
-        if ($head != "\x64\x07") {
-          return true;
-        }
-
-        $head = $socket->read(12, $head);
-        $length = unpack("v", $head, 10)[1];
-
-        $data = $socket->read($length);
-        fwrite($image, $data);
-
-        $head = "";
-      }
+      return $this->receive($socket, $head, $image);
     } finally {
       $socket->close();
     }
   }
 
-  private function sendAndReceive($socket, $type, $params, $length) {
+  private function exchange($socket, $type, $params, $length) {
     $data  = "\x1b";
     $data .= $type."\n";
 
@@ -73,65 +56,23 @@ class Scanner {
     $socket->write($data);
     return $socket->read($length);
   }
-}
 
-class Socket {
-
-  public static function connect($host, $port) {
-    $fd = stream_socket_client("tcp://{$host}:{$port}");
-    if (!$fd) {
-      throw new IOException("could not connect to {$host}:{$port}");
+  private function receive($socket, $head, $image) {
+    if ($head == "\xc2") {
+      return false;
     }
 
-    return new Socket($fd);
-  }
+    while ($head == "\x64") {
+      $head .= $socket->read(11);
+      $length = unpack("v", $head, 10)[1];
 
-  private $fd;
+      $data = $socket->read($length);
+      fwrite($image, $data);
 
-  private function __construct($fd) {
-    $this->fd = $fd;
-  }
-
-  public function read($length, $data = "") {
-    $len = strlen($data);
-    $length -= $len;
-
-    while ($length > 0) {
-      $chunk = fread($this->fd, $length);
-      $len = strlen($chunk);
-
-      $data .= $chunk;
-      $length -= $len;
-
-      if ($len == 0) {
-        throw new IOException("could not read, returned 0");
-      }
+      $head = $socket->read(1);
     }
 
-    return $data;
-  }
-
-  public function write($data) {
-    $length = strlen($data);
-
-    while ($length > 0) {
-      $len = fwrite($this->fd, $data);
-      $length -= $len;
-
-      if ($len == 0) {
-        throw new IOException("could not write, returned 0");
-      }
-    }
-  }
-
-  public function close() {
-    fclose($this->fd);
-  }
-}
-
-class IOException extends Exception {
-  public function __construct($message, $code = 0, Exception $previous = null) {
-    parent::__construct($message, $code, $previous);
+    return true;
   }
 }
 
