@@ -95,12 +95,13 @@ class RawFile implements Http\Handler {
       return false;
     }
 
+    $name = rawurlencode($file['name']);
     $data = $this->repository->fetchData($file);
 
     $response->setStatus(200);
-    $response->setHeader('Content-Type', $file->mime);
-    $response->setHeader('Content-Length', $file->size);
-    $response->setHeader('Content-Disposition', 'attachment; filename="'.$file->name.'"');
+    $response->setHeader('Content-Type', $file['mime']);
+    $response->setHeader('Content-Length', $file['size']);
+    $response->setHeader('Content-Disposition', "attachment; filename*=UTF-8''{$name}");
     stream_copy_to_stream($data, $response->getBody());
     return true;
   }
