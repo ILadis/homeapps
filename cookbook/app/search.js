@@ -23,11 +23,18 @@ Search.prototype.execute = function(query, contents) {
       }
     }
   }
+
+  if (!terms.length) {
+    let score = 0;
+    for (let object of this.objects) {
+      this.results.set(object, score--);
+    }
+  }
 };
 
 Search.prototype.values = function*() {
   while (this.results.size > 0) {
-    let highest = 0, next;
+    let highest = -Infinity, next;
     for (let [object, score] of this.results) {
       if (score > highest) {
         highest = score;
@@ -73,15 +80,12 @@ function termFrequency(term, object, contents) {
   return frequency;
 }
 
-function isPrimitive(content) {
-  let types = ['string', 'number'];
-  return types.includes(typeof content);
-}
-
 function stringify(contents) {
+  let types = ['string', 'number'];
+
   return function*(object) {
     for (let content of contents(object)) {
-      if (isPrimitive(content)) {
+      if (types.includes(typeof content)) {
         yield content.toString();
       }
       yield '';

@@ -38,7 +38,18 @@ export const Index = define('recipe-index', 'div', html`
   input.oninput = () => this.onQueryChanged(input.value);
 
   this.recipes = new Set();
+  this.states = new Map();
 });
+
+Index.prototype.saveStates = function() {
+  let position = this.querySelector('section').scrollTop;
+  this.states.set('scrollTop', position);
+};
+
+Index.prototype.restoreStates = function() {
+  let position = this.states.get('scrollTop') || 0;
+  this.querySelector('section').scrollTop = position;
+};
 
 Index.prototype.setTitle = function(title) {
   let span = this.querySelector('header h1 span');
@@ -52,6 +63,11 @@ Index.prototype.onCreateClicked = function() {
 };
 
 Index.prototype.onQueryChanged = function(query) {
+};
+
+Index.prototype.getQuery = function() {
+  let input = this.querySelector('header input');
+  return input.value;
 };
 
 Index.prototype.addRecipe = function() {

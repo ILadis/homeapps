@@ -11,18 +11,18 @@ export function Presenter(shell, repo) {
 Presenter.prototype.showIndex = async function() {
   let recipes = new Set();
 
-  let view = new Views.Index();
-  view.setTitle('Kochbuch');
+  if (this.view) {
+    var view = this.view;
+  } else {
+    var view = new Views.Index();
+    view.setTitle('Kochbuch');
+  }
 
+  this.view = view;
   this.shell.setTitle('Kochbuch');
   this.shell.setContent(view);
 
   view.onQueryChanged = (query) => {
-    if (!query) {
-      let iterator = recipes.values();
-      return showRecipes(view, iterator);
-    }
-
     let search = new Search(recipes);
     search.execute(query, Recipe.search);
 
@@ -48,12 +48,13 @@ Presenter.prototype.showIndex = async function() {
 
   let showRecipes = async (view, iterator) => {
     let views = view.recipes.values();
-    for await (let recipe of iterator) {
-      recipes.add(recipe);
-
+    for (let recipe of iterator) {
       let v = views.next().value || view.addRecipe();
       v.setName(recipe);
-      v.onClicked = () => this.showRecipe(recipe.id);
+      v.onClicked = () => {
+        view.saveStates();
+        this.showRecipe(recipe.id);
+      };
     }
 
     for (let v of views) {
@@ -61,10 +62,19 @@ Presenter.prototype.showIndex = async function() {
     }
   };
 
+  view.restoreStates();
+
   let empty = await this.repo.isEmpty();
   let fresh = empty == true;
+  var iterator = this.repo.fetchAll(fresh);
+  for await(let recipe of iterator) {
+    recipes.add(recipe);
+  }
 
-  let iterator = this.repo.fetchAll(fresh);
+  let search = new Search(recipes);
+  search.execute(view.getQuery(), Recipe.search);
+
+  var iterator = search.values();
   showRecipes(view, iterator);
   this.onIndexShown();
 };
