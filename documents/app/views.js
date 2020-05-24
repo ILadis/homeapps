@@ -239,26 +239,26 @@ PdfFileViewer.prototype.renderUrl = async function(url) {
   let pdf = await task.promise;
   for (let i = 1; i <= pdf.numPages; i++) {
     let page = await pdf.getPage(i);
-    let scale = 1;
-
-    this.renderPage(page, scale);
+    this.addPage(page);
   }
 };
 
-PdfFileViewer.prototype.renderPage = function(page, scale) {
+PdfFileViewer.prototype.addPage = function(page) {
   let ul = this.querySelector('ul');
 
   let canvas = document.createElement('canvas');
   let context = canvas.getContext('2d');
 
-  let viewport = page.getViewport({ scale });
+  let pixelRatio = window.devicePixelRatio || 1;
+  let viewport = page.getViewport({ scale: 1 });
+  let transform = [pixelRatio, 0 , 0, pixelRatio, 0, 0];
 
-  canvas.height = viewport.height;
-  canvas.width = viewport.width;
+  canvas.width = viewport.width * pixelRatio;
+  canvas.height = viewport.height * pixelRatio;
 
   page.render({
     canvasContext: context,
-    viewport: viewport
+    viewport, transform
   });
 
   let li = document.createElement('li');
