@@ -204,6 +204,15 @@ form > div button {
 [is=file-details] +
 [is=bottom-bar]   > nav svg:nth-child(2) { margin-left: auto; }
 
+[is=pdf-file-viewer] > ul li { margin: 10px; }
+[is=pdf-file-viewer] > ul li:last-child { margin-bottom: 60px; }
+
+[is=pdf-file-viewer] > ul li canvas {
+  max-width: 100%;
+  margin: 0 auto;
+  display: block;
+}
+
 [is=file-scan] > form { flex-shrink: 0; }
 [is=file-scan] > ul { margin: 0 46px 60px; }
 [is=file-scan] > ul li { padding: 12px; }

@@ -33,6 +33,7 @@ Repository.prototype.uploadFile = function(file) {
   request.onload = () => {
     Object.setPrototypeOf(file, null);
     Object.assign(file, request.response);
+    file.uri = `./api/files/${file.id}/raw`;
     progress.advance(100, true);
   };
 

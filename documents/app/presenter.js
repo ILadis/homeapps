@@ -13,11 +13,6 @@ Presenter.prototype.showFileList = async function() {
   let files = new Set();
 
   let searchFiles = (query) => {
-    if (!query) {
-      let iterator = files.values();
-      return showFiles(iterator);
-    }
-
     let search = new Search(files);
     search.execute(query, function*(file) {
       yield file.name;
@@ -67,7 +62,10 @@ Presenter.prototype.showFileList = async function() {
         .setSize(file.size)
         .setDate(file.date);
 
-      item.onClicked = () => this.showFileDetails(file);
+      item.onClicked = () => {
+        uploadList.clearItems();
+        this.showFileDetails(file);
+      };
 
       let tags = item.tags.values();
       for (let tag of file.tags) {
@@ -132,7 +130,11 @@ Presenter.prototype.showFileDetails = function(file) {
   };
 
   let downloadFile = () => {
-    window.location.href = file.uri;
+    if (file.name.endsWith('pdf')) {
+      this.showPdfFileViewer(file);
+    } else {
+      window.location.href = file.uri;
+    }
   };
 
   let addTag = (tag) => {
@@ -166,5 +168,17 @@ Presenter.prototype.showFileDetails = function(file) {
   }
 
   this.shell.setContent(fileDetails);
+};
+
+Presenter.prototype.showPdfFileViewer = function(file) {
+  let { bottomBar } = this.shell;
+  let fileViewer = new Views.PdfFileViewer();
+
+  bottomBar.clearActions();
+  bottomBar.addAction('back', () => this.showFileDetails(file));
+
+  fileViewer.renderUrl(file.uri);
+
+  this.shell.setContent(fileViewer);
 };
 

@@ -164,7 +164,7 @@ export const FileDetails = define('file-details', 'div', html`
   let form = this.querySelector('form');
   let inputs = this.querySelectorAll('input');
 
-  form.onsubmit = 
+  form.onsubmit =
   inputs[0].onchange = submitHandler((value) => this.onTagSubmitted(value));
   inputs[1].onchange = ({ target }) => this.onNameChanged(target.value);
   inputs[2].onchange = ({ target }) => this.onDateChanged(target.valueAsDate);
@@ -208,6 +208,64 @@ FileDetails.prototype.removeTag = function(view) {
   this.tags.delete(view);
 };
 
+export const PdfFileViewer = define('pdf-file-viewer', 'div', html`
+<ul></ul>`);
+
+PdfFileViewer.prototype.loadPdfjs = function() {
+  if (window.pdfjsLib) {
+    return Promise.resolve(window.pdfjsLib);
+  }
+
+  let pdfjsSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.min.js';
+  let workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js';
+
+  let script = document.createElement('script');
+  script.src = pdfjsSrc;
+
+  this.appendChild(script);
+
+  return new Promise((resolve) => {
+    script.onload = () => {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+      resolve(window.pdfjsLib);
+    };
+  });
+};
+
+PdfFileViewer.prototype.renderUrl = async function(url) {
+  let pdfjsLib = await this.loadPdfjs();
+  let task = pdfjsLib.getDocument(url);
+
+  let pdf = await task.promise;
+  for (let i = 1; i <= pdf.numPages; i++) {
+    let page = await pdf.getPage(i);
+    let scale = 1;
+
+    this.renderPage(page, scale);
+  }
+};
+
+PdfFileViewer.prototype.renderPage = function(page, scale) {
+  let ul = this.querySelector('ul');
+
+  let canvas = document.createElement('canvas');
+  let context = canvas.getContext('2d');
+
+  let viewport = page.getViewport({ scale });
+
+  canvas.height = viewport.height;
+  canvas.width = viewport.width;
+
+  page.render({
+    canvasContext: context,
+    viewport: viewport
+  });
+
+  let li = document.createElement('li');
+  li.appendChild(canvas);
+  ul.appendChild(li);
+};
+
 export const FileScan = define('file-scan', 'div', html`
 <ul></ul>`, function() {
   this.items = new Set();
@@ -247,49 +305,6 @@ FileScan.Item.prototype.scrollTo = function() {
   setTimeout(scroll, 100);
 };
 
-/*
-export const PdfFileViewer = define('pdf-file-viewer', 'div', html`
-<styles>
-[is=file-viewer] {
-  position: fixed;
-  padding: 26px 46px 110px 46px;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-[is=file-viewer] > canvas {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-</styles>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.min.js"></script>
-<canvas></canvas>`, function() {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js';
-});
-
-PdfFileViewer.prototype.setUrl = async function({ url }) {
-  let task = pdfjsLib.getDocument(url);
-
-  let pdf = await task.promise;
-  let page = await pdf.getPage(1);
-
-  let scale = 1;
-  let viewport = page.getViewport({ scale });
-
-  let canvas = this.querySelector('canvas');
-  let context = canvas.getContext('2d');
-
-  canvas.height = viewport.height;
-  canvas.width = viewport.width;
-
-  page.render({
-    canvasContext: context,
-    viewport: viewport
-  });
-};*/
-
 export const UploadList = define('upload-list', 'div', html`
 <hr hidden>
 <ul></ul>`, function() {
@@ -307,11 +322,15 @@ UploadList.prototype.addItem = function() {
   return view;
 };
 
-UploadList.prototype.removeItem = function(view) {
-  let ul = this.querySelector('ul');
-  ul.removeChild(view);
+UploadList.prototype.clearItems = function() {
+  let [hr, ul] = this.querySelectorAll('hr, ul');
+  hr.hidden = true;
 
-  this.items.delete(view);
+  while (ul.firstChild) {
+    ul.removeChild(ul.firstChild);
+  }
+
+  this.items.clear();
 };
 
 UploadList.prototype.pullUp = function() {
