@@ -37,15 +37,7 @@ class SaveFile implements Http\Handler {
   }
 
   public function handle($request, $response) {
-    $data = $request->getBodyAsJson();
-
-    $file = [
-      'id'   => $data->{'id'},
-      'name' => $data->{'name'},
-      'date' => $data->{'date'},
-      'tags' => $data->{'tags'}
-    ];
-
+    $file = $request->getBodyAsJson();
     $saved = $this->repository->saveFile($file);
     if (!$saved) {
       $response->setStatus(404);

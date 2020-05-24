@@ -108,7 +108,7 @@ trait JsonBody {
   public function getBodyAsJson() {
     $body = stream_get_contents($this->body);
     $json = json_decode($body, true);
-    return (object) $json;
+    return $json;
   }
 }
 

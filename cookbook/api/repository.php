@@ -63,13 +63,13 @@ class Document {
 
   public function get() {
     $value = file_get_contents($this->file);
-    $value = (object) json_decode($value, true);
-    $value->id = $this->id();
+    $value = json_decode($value, true);
+    $value['id'] = $this->id();
     return $value;
   }
 
   public function put($value) {
-    $value->id = $this->id();
+    $value['id'] = $this->id();
     $value = json_encode($value);
     file_put_contents($this->file, $value);
   }
