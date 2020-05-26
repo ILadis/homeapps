@@ -71,6 +71,28 @@ class ListFiles implements Http\Handler {
   }
 }
 
+class FindFile implements Http\Handler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $id = basename($request->getPath());
+    $file = $this->repository->findFileById($id);
+
+    if (!$file) {
+      $response->setStatus(404);
+      return false;
+    }
+
+    $response->setStatus(200);
+    $response->setBodyAsJson($file);
+    return true;
+  }
+}
+
 class RawFile implements Http\Handler {
   private $repository;
 

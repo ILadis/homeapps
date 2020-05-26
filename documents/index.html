@@ -9,6 +9,7 @@
   <link href="./manifest.webmanifest" rel="manifest">
   <link href="./app/styles.css" rel="stylesheet">
   <script type="module">
+  import { Router } from './app/router.js';
   import { Presenter } from './app/presenter.js';
   import { Repository } from './app/repository.js';
   import { Shell } from './app/views.js';
@@ -17,14 +18,44 @@
   const shell = new Shell();
 
   const presenter = new Presenter(shell, repo);
+  const router = new Router();
+
+  let index = router.register('list', [], () =>
+    presenter.showList());
+
+  presenter.onListShown = () =>
+    router.navigateTo(index);
+
+  let scan = router.register('scan', [], () =>
+    presenter.showScan());
+
+  presenter.onScanShown = () =>
+    router.navigateTo(scan);
+
+  let details = router.register('file', ['id'], ({ id }) =>
+    presenter.showDetails(id));
+
+  presenter.onDetailsShown = ({ id }) =>
+    router.navigateTo(details, { id });
+
+  let viewer = router.register('view', ['id'], ({ id }) =>
+    presenter.showViewer(id));
+
+  presenter.onViewerShown = ({ id }) =>
+    router.navigateTo(viewer, { id });
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./service-worker.js');
   }
 
-  window.onload = async () => {
+  window.onhashchange =
+  window.onload = () => {
     document.body.prepend(shell);
-    presenter.showFileList();
+
+    let route = router.apply(location.hash);
+    if (!route) {
+      presenter.showList();
+    }
   };
 
   document.onselectstart = () => false;

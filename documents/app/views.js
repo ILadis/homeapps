@@ -38,7 +38,8 @@ export const Tag = define('app-tag', 'span', html``, function() {
   this.onclick = () => this.onClicked();
 });
 
-Tag.prototype.onClicked = function() { };
+Tag.prototype.onClicked = function() {
+};
 
 Tag.prototype.setLabel = function(label) {
    this.textContent = label;
@@ -63,7 +64,8 @@ export const FileList = define('file-list', 'div', html`
   input.oninput = () => this.onSearchChanged(input.value);
 });
 
-FileList.prototype.onSearchChanged = function(query) { };
+FileList.prototype.onSearchChanged = function(query) {
+};
 
 FileList.prototype.setTitle = function(title) {
   let h1 = this.querySelector('h1');
@@ -80,7 +82,7 @@ FileList.prototype.addItem = function() {
   let view = new FileList.Item();
 
   let ul = this.querySelector('ul');
-  ul.appendChild(view);
+  ul.insertBefore(view, ul.firstChild);
 
   this.items.add(view);
   return view;
@@ -102,7 +104,8 @@ FileList.Item = define('file-list-item', 'li', html`
   this.onclick = () => this.onClicked();
 });
 
-FileList.Item.prototype.onClicked = function() { };
+FileList.Item.prototype.onClicked = function() {
+};
 
 FileList.Item.prototype.setName = function(name) {
   let h1 = this.querySelector('h1');
@@ -170,9 +173,14 @@ export const FileDetails = define('file-details', 'div', html`
   inputs[2].onchange = ({ target }) => this.onDateChanged(target.valueAsDate);
 });
 
-FileDetails.prototype.onTagSubmitted = function(tag) { };
-FileDetails.prototype.onNameChanged = function(name) { };
-FileDetails.prototype.onDateChanged = function(date) { };
+FileDetails.prototype.onTagSubmitted = function(tag) {
+};
+
+FileDetails.prototype.onNameChanged = function(name) {
+};
+
+FileDetails.prototype.onDateChanged = function(date) {
+};
 
 FileDetails.prototype.setName = function(name) {
   let h1 = this.querySelector('h1');
@@ -271,7 +279,8 @@ export const FileScan = define('file-scan', 'div', html`
   this.items = new Set();
 });
 
-FileScan.prototype.onScanSubmitted = function() { };
+FileScan.prototype.onScanSubmitted = function() {
+};
 
 FileScan.prototype.addItem = function() {
   let view = new FileScan.Item();

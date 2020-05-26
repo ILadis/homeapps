@@ -97,6 +97,22 @@ Repository.prototype.listFiles = async function*() {
   }
 };
 
+Repository.prototype.findFileById = async function(id) {
+  let request = new Request(`./api/files/${id}`, {
+    method: 'GET'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to fetch file');
+  }
+
+  let file = await response.json();
+  file.uri = `./api/files/${file.id}/raw`;
+
+  return file;
+};
+
 Repository.prototype.addTag = async function(file, tag) {
   let request = new Request(`./api/files/${file.id}/tags`, {
     method: 'POST', body: tag

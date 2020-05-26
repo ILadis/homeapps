@@ -13,6 +13,7 @@ async function refreshAssets() {
     '/app/dom.js',
     '/app/presenter.js',
     '/app/repository.js',
+    '/app/router.js',
     '/app/search.js',
     '/app/views.js',
 

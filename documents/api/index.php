@@ -27,6 +27,7 @@ $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 $router->add('POST', '/api/files', new Http\Handler\UploadFile($repository));
 $router->add('GET',  '/api/files', new Http\Handler\ListFiles($repository));
 $router->add('POST', '/api/files/[a-z0-9-]+', new Http\Handler\SaveFile($repository));
+$router->add('GET', '/api/files/[a-z0-9-]+', new Http\Handler\FindFile($repository));
 $router->add('DELETE', '/api/files/[a-z0-9-]+', new Http\Handler\DeleteFile($repository));
 $router->add('POST', '/api/files/[a-z0-9-]+/tags', new Http\Handler\AddTag($repository));
 $router->add('GET',  '/api/files/[a-z0-9-]+/raw', new Http\Handler\RawFile($repository));
@@ -43,6 +44,7 @@ foreach(array(
   '/app/dom.js',
   '/app/presenter.js',
   '/app/repository.js',
+  '/app/router.js',
   '/app/search.js',
   '/app/views.js',
 

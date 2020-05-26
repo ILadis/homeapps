@@ -7,7 +7,7 @@ export function Presenter(shell, repo) {
   this.repo = repo;
 }
 
-Presenter.prototype.showFileList = async function() {
+Presenter.prototype.showList = async function() {
   let { bottomBar, uploadList } = this.shell;
   let fileList = new Views.FileList();
   let files = new Set();
@@ -62,10 +62,7 @@ Presenter.prototype.showFileList = async function() {
         .setSize(file.size)
         .setDate(file.date);
 
-      item.onClicked = () => {
-        uploadList.clearItems();
-        this.showFileDetails(file);
-      };
+      item.onClicked = () => this.showDetails(file.id);
 
       let tags = item.tags.values();
       for (let tag of file.tags) {
@@ -83,9 +80,10 @@ Presenter.prototype.showFileList = async function() {
     }
   };
 
+  uploadList.clearItems();
   bottomBar.clearActions();
   bottomBar.addAction('menu', () => uploadList.pullUp());
-  bottomBar.addAction('inbox', () => this.showFileScan());
+  bottomBar.addAction('inbox', () => this.showScan());
   bottomBar.addAction('search', () => fileList.focusSearch());
   bottomBar.setFloatingAction('create', showUpload, true);
 
@@ -95,14 +93,19 @@ Presenter.prototype.showFileList = async function() {
   showFiles(iterator);
 
   this.shell.setContent(fileList);
+  this.onListShown();
 };
 
-Presenter.prototype.showFileScan = function() {
-  let { bottomBar } = this.shell;
+Presenter.prototype.onListShown = function() {
+};
+
+Presenter.prototype.showScan = function() {
+  let { bottomBar, uploadList } = this.shell;
   let fileScan = new Views.FileScan();
 
+  uploadList.clearItems();
   bottomBar.clearActions();
-  bottomBar.addAction('back', () => this.showFileList());
+  bottomBar.addAction('back', () => this.showList());
   bottomBar.setFloatingAction('print', async () => {
     let url = await this.repo.scanFile();
     let item = fileScan.addItem();
@@ -111,27 +114,31 @@ Presenter.prototype.showFileScan = function() {
   });
 
   this.shell.setContent(fileScan);
+  this.onScanShown();
 };
 
-Presenter.prototype.showFileDetails = function(file) {
-  let { bottomBar } = this.shell;
+Presenter.prototype.onScanShown = function() {
+};
+
+Presenter.prototype.showDetails = async function(id) {
+  let { bottomBar, uploadList } = this.shell;
   let fileDetails = new Views.FileDetails();
   let tags = new Set();
 
   let deleteFile = async () => {
     await this.repo.deleteFile(file);
-    this.showFileList();
+    this.showList();
   };
 
   let saveFile = async () => {
     file.tags = Array.from(tags);
     await this.repo.saveFile(file);
-    this.showFileList();
+    this.showList();
   };
 
   let downloadFile = () => {
     if (file.name.endsWith('pdf')) {
-      this.showPdfFileViewer(file);
+      this.showViewer(file.id);
     } else {
       window.location.href = file.uri;
     }
@@ -150,12 +157,14 @@ Presenter.prototype.showFileDetails = function(file) {
     }
   };
 
+  uploadList.clearItems();
   bottomBar.clearActions();
-  bottomBar.addAction('back', () => this.showFileList());
+  bottomBar.addAction('back', () => this.showList());
   bottomBar.addAction('delete', deleteFile);
   bottomBar.addAction('save', saveFile);
   bottomBar.setFloatingAction('download', downloadFile);
 
+  let file = await this.repo.findFileById(id);
   fileDetails.setName(file.name);
   fileDetails.setDate(file.date);
 
@@ -168,17 +177,27 @@ Presenter.prototype.showFileDetails = function(file) {
   }
 
   this.shell.setContent(fileDetails);
+  this.onDetailsShown(file);
 };
 
-Presenter.prototype.showPdfFileViewer = function(file) {
-  let { bottomBar } = this.shell;
+Presenter.prototype.onDetailsShown = function(file) {
+};
+
+Presenter.prototype.showViewer = async function(id) {
+  let { bottomBar, uploadList } = this.shell;
   let fileViewer = new Views.PdfFileViewer();
 
+  uploadList.clearItems();
   bottomBar.clearActions();
-  bottomBar.addAction('back', () => this.showFileDetails(file));
+  bottomBar.addAction('back', () => this.showDetails(file.id));
 
+  let file = await this.repo.findFileById(id);
   fileViewer.renderUrl(file.uri);
 
   this.shell.setContent(fileViewer);
+  this.onViewerShown(file);
+};
+
+Presenter.prototype.onViewerShown = function(file) {
 };
 
