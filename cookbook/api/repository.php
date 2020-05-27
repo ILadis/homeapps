@@ -1,6 +1,6 @@
 <?php
 namespace Persistence;
-use DirectoryIterator;
+use DirectoryIterator, JsonSerializable;
 
 class Repository {
   private $dir;
@@ -37,7 +37,7 @@ class Repository {
   }
 }
 
-class Document {
+class Document implements JsonSerializable {
 
   public static function from($file) {
     return new Document($file);
@@ -76,6 +76,10 @@ class Document {
 
   public function delete() {
     unlink($this->file);
+  }
+
+  public function jsonSerialize() {
+    return $this->get();
   }
 }
 

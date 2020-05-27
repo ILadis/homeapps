@@ -48,7 +48,9 @@ Presenter.prototype.showIndex = async function() {
 
   let showRecipes = async (view, iterator) => {
     let views = view.recipes.values();
-    for (let recipe of iterator) {
+    for await (let recipe of iterator) {
+      recipes.add(recipe);
+
       let v = views.next().value || view.addRecipe();
       v.setName(recipe);
       v.onClicked = () => {
@@ -66,15 +68,8 @@ Presenter.prototype.showIndex = async function() {
 
   let empty = await this.repo.isEmpty();
   let fresh = empty == true;
-  var iterator = this.repo.fetchAll(fresh);
-  for await(let recipe of iterator) {
-    recipes.add(recipe);
-  }
 
-  let search = new Search(recipes);
-  search.execute(view.getQuery(), Recipe.search);
-
-  var iterator = search.values();
+  let iterator = this.repo.fetchAll(fresh);
   showRecipes(view, iterator);
   this.onIndexShown();
 };

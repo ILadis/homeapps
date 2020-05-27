@@ -22,7 +22,7 @@ class CreateDocument implements Http\Handler {
     $uri = $request->getPath() .'/'. $document->id();
 
     $response->setStatus(201);
-    $response->setBodyAsJson($json);
+    $response->setBodyAsJson($document);
 
     return true;
   }
@@ -66,10 +66,8 @@ class FindDocument implements Http\Handler {
       return false;
     }
 
-    $json = $document->get();
-
     $response->setStatus(200);
-    $response->setBodyAsJson($json);
+    $response->setBodyAsJson($document);
 
     return true;
   }
@@ -99,7 +97,7 @@ class SaveDocument implements Http\Handler {
     $document->put($json);
 
     $response->setStatus(200);
-    $response->setBodyAsJson($json);
+    $response->setBodyAsJson($document);
 
     return true;
   }

@@ -49,6 +49,7 @@ Index.prototype.saveStates = function() {
 Index.prototype.restoreStates = function() {
   let position = this.states.get('scrollTop') || 0;
   this.querySelector('section').scrollTop = position;
+  this.querySelector('header input').value = '';
 };
 
 Index.prototype.setTitle = function(title) {
