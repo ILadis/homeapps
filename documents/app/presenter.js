@@ -25,7 +25,7 @@ Presenter.prototype.showList = async function() {
     showFiles(iterator);
   };
 
-  let showUpload = async (iterator) => {
+  let uploadFiles = async (iterator) => {
     let progress = new Array();
 
     for (let file of iterator) {
@@ -83,9 +83,9 @@ Presenter.prototype.showList = async function() {
   uploadList.clearItems();
   bottomBar.clearActions();
   bottomBar.addAction('menu', () => uploadList.pullUp());
-  bottomBar.addAction('inbox', () => this.showScan());
+  bottomBar.addAction('inbox', () => this.showInbox());
   bottomBar.addAction('search', () => fileList.focusSearch());
-  bottomBar.setFloatingAction('create', showUpload, true);
+  bottomBar.setFloatingAction('create', uploadFiles, true);
 
   fileList.onSearchChanged = searchFiles;
 
@@ -99,25 +99,59 @@ Presenter.prototype.showList = async function() {
 Presenter.prototype.onListShown = function() {
 };
 
-Presenter.prototype.showScan = function() {
+Presenter.prototype.showInbox = function() {
   let { bottomBar, uploadList } = this.shell;
   let fileScan = new Views.FileScan();
+  let files = new Set();
+
+  let scanFile = async () => {
+    let file = await this.repo.scanInboxFile();
+    files.add(file);
+
+    let iterator = files.values();
+    showFiles(iterator);
+  };
+
+  let clearFiles = () => {
+    this.repo.deleteInboxFiles();
+    this.showList();
+  };
+
+  let convertFiles = async () => {
+    await this.repo.convertInboxFiles();
+    await this.repo.deleteInboxFiles();
+    this.showList();
+  };
+
+  let showFiles = async (iterator) => {
+    let items = fileScan.items.values();
+    for await (let file of iterator) {
+      files.add(file);
+
+      let item = (items.next().value || fileScan.addItem())
+        .setImage(file.uri);
+      // TODO call scrollTo, but image may still be loading
+    }
+
+    for (let item of items) {
+      fileScan.removeItem(item);
+    }
+  };
 
   uploadList.clearItems();
   bottomBar.clearActions();
-  bottomBar.addAction('back', () => this.showList());
-  bottomBar.setFloatingAction('print', async () => {
-    let url = await this.repo.scanFile();
-    let item = fileScan.addItem();
-    item.setImage(url);
-    item.scrollTo();
-  });
+  bottomBar.addAction('back', clearFiles);
+  bottomBar.addAction('save', convertFiles);
+  bottomBar.setFloatingAction('print', scanFile);
+
+  let iterator = this.repo.listInboxFiles();
+  showFiles(iterator);
 
   this.shell.setContent(fileScan);
-  this.onScanShown();
+  this.onInboxShown();
 };
 
-Presenter.prototype.onScanShown = function() {
+Presenter.prototype.onInboxShown = function() {
 };
 
 Presenter.prototype.showDetails = async function(id) {

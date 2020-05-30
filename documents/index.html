@@ -26,11 +26,11 @@
   presenter.onListShown = () =>
     router.navigateTo(index);
 
-  let scan = router.register('scan', [], () =>
-    presenter.showScan());
+  let inbox = router.register('inbox', [], () =>
+    presenter.showInbox());
 
-  presenter.onScanShown = () =>
-    router.navigateTo(scan);
+  presenter.onInboxShown = () =>
+    router.navigateTo(inbox);
 
   let details = router.register('file', ['id'], ({ id }) =>
     presenter.showDetails(id));

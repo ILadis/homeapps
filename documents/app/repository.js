@@ -53,33 +53,6 @@ Repository.prototype.saveFile = async function(file) {
   }
 };
 
-Repository.prototype.scanFile = async function() {
-  let request = new Request(`./api/scan`, {
-    method: 'POST'
-  });
-
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw new Error('failed to scan file');
-  }
-
-  let blob = await response.blob();
-  let url = URL.createObjectURL(blob);
-
-  return url;
-};
-
-Repository.prototype.deleteFile = async function(file) {
-  let request = new Request(`./api/files/${file.id}`, {
-    method: 'DELETE'
-  });
-
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw new Error('failed to delete file');
-  }
-};
-
 Repository.prototype.listFiles = async function*() {
   let request = new Request('./api/files', {
     method: 'GET'
@@ -113,6 +86,17 @@ Repository.prototype.findFileById = async function(id) {
   return file;
 };
 
+Repository.prototype.deleteFile = async function(file) {
+  let request = new Request(`./api/files/${file.id}`, {
+    method: 'DELETE'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to delete file');
+  }
+};
+
 Repository.prototype.addTag = async function(file, tag) {
   let request = new Request(`./api/files/${file.id}/tags`, {
     method: 'POST', body: tag
@@ -122,5 +106,65 @@ Repository.prototype.addTag = async function(file, tag) {
   if (!response.ok) {
     throw new Error('failed to add tag');
   }
+};
+
+Repository.prototype.listInboxFiles = async function*() {
+  let request = new Request('./api/inbox/files', {
+    method: 'GET'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to fetch inbox files');
+  }
+
+  let files = await response.json();
+  for (let file of files) {
+    file.uri = `./api/files/${file.id}/raw`;
+    yield file;
+  }
+};
+
+Repository.prototype.deleteInboxFiles = async function() {
+  let request = new Request('./api/inbox/files', {
+    method: 'DELETE'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to delete inbox files');
+  }
+};
+
+Repository.prototype.scanInboxFile = async function() {
+  let request = new Request('./api/inbox/scan', {
+    method: 'POST'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to scan inbox file');
+  }
+
+  let file = await response.json();
+  file.uri = `./api/files/${file.id}/raw`;
+
+  return file;
+};
+
+Repository.prototype.convertInboxFiles = async function() {
+  let request = new Request('./api/inbox/convert', {
+    method: 'POST'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to convert inbox files');
+  }
+
+  let file = await response.json();
+  file.uri = `./api/files/${file.id}/raw`;
+
+  return file;
 };
 

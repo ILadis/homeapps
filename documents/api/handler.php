@@ -1,6 +1,6 @@
 <?php
 namespace Http\Handler;
-use Http, Persistence;
+use Http, Document;
 
 class UploadFile implements Http\Handler {
   private $repository;
@@ -58,15 +58,10 @@ class ListFiles implements Http\Handler {
   }
 
   public function handle($request, $response) {
-    $list = array();
-    $files = $this->repository->listFiles();
-
-    foreach ($files as $file) {
-      $list[] = $file;
-    }
+    $files = iterator_to_array($this->repository->listFiles());
 
     $response->setStatus(200);
-    $response->setBodyAsJson($list);
+    $response->setBodyAsJson($files);
     return true;
   }
 }
@@ -167,19 +162,115 @@ class AddTag implements Http\Handler {
 }
 
 class ScanImage implements Http\Handler {
-  private $scanner;
+  private $scanner, $repository;
 
-  public function __construct($scanner) {
+  public function __construct($scanner, $repository) {
     $this->scanner = $scanner;
+    $this->repository = $repository;
   }
 
   public function handle($request, $response) {
-    $response->setHeader('Content-Type', 'image/jpeg');
+    $this->scan($image, $size);
+
+    $file = [
+      'name' => 'scan.jpg',
+      'mime' => 'image/jpeg',
+      'size' => $size
+    ];
+
+    $this->repository->uploadFile($file, $image, true);
+
     $response->setStatus(200);
+    $response->setBodyAsJson($file);
 
-    $body = $response->getBody();
-    $this->scanner->scan($body);
+    return true;
+  }
 
+  private function scan(&$image, &$size) {
+    $image = tmpfile();
+    $this->scanner->scan($image);
+
+    $size = ftell($image);
+    fseek($image, 0);
+  }
+}
+
+class ListInbox implements Http\Handler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $files = iterator_to_array($this->repository->findFilesInInbox());
+
+    $response->setBodyAsJson($files);
+    $response->setStatus(200);
+    return true;
+  }
+}
+
+class ConvertInbox implements Http\Handler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $this->convert($document, $size);
+
+    $file = [
+      'name' => 'scan.pdf',
+      'mime' => 'application/pdf',
+      'size' => $size
+    ];
+
+    $this->repository->uploadFile($file, $document);
+
+    $response->setStatus(200);
+    $response->setBodyAsJson($file);
+
+    return true;
+  }
+
+  private function convert(&$document, &$size) {
+    $files = $this->repository->findFilesInInbox();
+    $builder = new Document\Builder();
+
+    foreach ($files as $file) {
+      if ($file['mime'] != 'image/jpeg') {
+        continue;
+      }
+
+      $data = $this->repository->fetchData($file);
+      // TODO determine actual image width/height
+      $image = Document\newImage($data, 2480, 3508);
+      $builder->nextPage()->useImage($image);
+    }
+
+    $document = tmpfile();
+
+    $writer = new Document\Writer($document);
+    $writer->write($builder->build());
+
+    $size = ftell($document);
+    fseek($document, 0);
+  }
+}
+
+class DeleteInbox implements Http\Handler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $this->repository->deleteFilesInInbox();
+
+    $response->setStatus(204);
     return true;
   }
 }

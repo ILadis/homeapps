@@ -7,6 +7,7 @@ set_error_handler(function($severity, $message, $file, $line) {
 require('io.php');
 require('http.php');
 require('handler.php');
+require('document.php');
 require('repository.php');
 require('devices.php');
 
@@ -24,15 +25,18 @@ $response = Http\newResponse();
 $router = new Http\Router();
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
-$router->add('POST', '/api/files', new Http\Handler\UploadFile($repository));
-$router->add('GET',  '/api/files', new Http\Handler\ListFiles($repository));
-$router->add('POST', '/api/files/[a-z0-9-]+', new Http\Handler\SaveFile($repository));
-$router->add('GET', '/api/files/[a-z0-9-]+', new Http\Handler\FindFile($repository));
-$router->add('DELETE', '/api/files/[a-z0-9-]+', new Http\Handler\DeleteFile($repository));
-$router->add('POST', '/api/files/[a-z0-9-]+/tags', new Http\Handler\AddTag($repository));
-$router->add('GET',  '/api/files/[a-z0-9-]+/raw', new Http\Handler\RawFile($repository));
+$router->add('POST',   '/api/inbox/scan', new Http\Handler\ScanImage($scanner, $repository));
+$router->add('POST',   '/api/inbox/convert', new Http\Handler\ConvertInbox($repository));
+$router->add('GET',    '/api/inbox/files', new Http\Handler\ListInbox($repository));
+$router->add('DELETE', '/api/inbox/files', new Http\Handler\DeleteInbox($repository));
 
-$router->add('POST', '/api/scan', new Http\Handler\ScanImage($scanner));
+$router->add('POST',   '/api/files', new Http\Handler\UploadFile($repository));
+$router->add('GET',    '/api/files', new Http\Handler\ListFiles($repository));
+$router->add('POST',   '/api/files/[a-z0-9-]+', new Http\Handler\SaveFile($repository));
+$router->add('GET',    '/api/files/[a-z0-9-]+', new Http\Handler\FindFile($repository));
+$router->add('DELETE', '/api/files/[a-z0-9-]+', new Http\Handler\DeleteFile($repository));
+$router->add('POST',   '/api/files/[a-z0-9-]+/tags', new Http\Handler\AddTag($repository));
+$router->add('GET',    '/api/files/[a-z0-9-]+/raw', new Http\Handler\RawFile($repository));
 
 foreach(array(
   '/icon.png',

@@ -18,11 +18,12 @@ class Repository {
   private function createTables() {
     $this->db->exec(''
       .'CREATE TABLE IF NOT EXISTS "files" ('
-      .'  "id"   TEXT PRIMARY KEY,'
-      .'  "name" TEXT NOT NULL,'
-      .'  "mime" TEXT NOT NULL,'
-      .'  "size" INTEGER NOT NULL,'
-      .'  "date" TEXT NOT NULL,'
+      .'  "id"    TEXT PRIMARY KEY,'
+      .'  "name"  TEXT NOT NULL,'
+      .'  "mime"  TEXT NOT NULL,'
+      .'  "size"  INTEGER NOT NULL,'
+      .'  "date"  TEXT NOT NULL,'
+      .'  "inbox" INTEGER NOT NULL,'
       .'  "data" BLOB)');
 
     $this->db->exec(''
@@ -33,20 +34,21 @@ class Repository {
       .'  FOREIGN KEY ("id") REFERENCES "files" ("id") ON DELETE CASCADE)');
   }
 
-  public function uploadFile(&$file, $data) {
+  public function uploadFile(&$file, $data, $inbox = false) {
     $stmt = $this->db->prepare(''
-      .'INSERT INTO "files" ("id", "name", "mime", "size", "date", "data") '
-      .'VALUES (:id, :name, :mime, :size, :date, zeroblob(:size))');
+      .'INSERT INTO "files" ("id", "name", "mime", "size", "date", "inbox", "data") '
+      .'VALUES (:id, :name, :mime, :size, :date, :inbox, zeroblob(:size))');
 
     $file['id']   = bin2hex(random_bytes(16));
     $file['date'] = date('c');
     $file['tags'] = array();
 
-    $stmt->bindValue(':id',   $file['id'],   SQLITE3_TEXT);
-    $stmt->bindValue(':name', $file['name'], SQLITE3_TEXT);
-    $stmt->bindValue(':mime', $file['mime'], SQLITE3_TEXT);
-    $stmt->bindValue(':size', $file['size'], SQLITE3_INTEGER);
-    $stmt->bindValue(':date', $file['date'], SQLITE3_TEXT);
+    $stmt->bindValue(':id',    $file['id'],    SQLITE3_TEXT);
+    $stmt->bindValue(':name',  $file['name'],  SQLITE3_TEXT);
+    $stmt->bindValue(':mime',  $file['mime'],  SQLITE3_TEXT);
+    $stmt->bindValue(':size',  $file['size'],  SQLITE3_INTEGER);
+    $stmt->bindValue(':date',  $file['date'],  SQLITE3_TEXT);
+    $stmt->bindValue(':inbox', $inbox ? 1 : 0, SQLITE3_INTEGER);
     $stmt->execute();
 
     $id = $this->db->lastInsertRowID();
@@ -74,10 +76,14 @@ class Repository {
     return true;
   }
 
-  public function listFiles() {
-    $result = $this->db->query(''
+  public function listFiles($inbox = false) {
+    $stmt = $this->db->prepare(''
       .'SELECT "id", "name", "mime", "size", "date" FROM "files" '
+      .'WHERE "inbox" = :inbox '
       .'ORDER BY datetime("date") ASC');
+
+    $stmt->bindValue(':inbox', $inbox ? 1 : 0, SQLITE3_INTEGER);
+    $result = $stmt->execute();
 
     while ($file = $result->fetchArray(SQLITE3_ASSOC)) {
       $file['tags'] = $this->fetchTags($file);
@@ -100,6 +106,15 @@ class Repository {
     return false;
   }
 
+  public function findFilesInInbox() {
+    $result = $this->db->query(''
+      .'SELECT "id", "name", "mime", "size", "date" FROM "files" WHERE "inbox"=1');
+
+    while ($file = $result->fetchArray(SQLITE3_ASSOC)) {
+      yield $file;
+    }
+  }
+
   public function deleteFileById($id) {
     $stmt = $this->db->prepare(''
       .'DELETE FROM "files" WHERE "id"=:id');
@@ -108,11 +123,15 @@ class Repository {
     $stmt->execute();
 
     $changes = $this->db->changes();
-    if (!$changes) {
-      return false;
-    }
+    return boolval($changes);
+  }
 
-    return true;
+    public function deleteFilesInInbox() {
+    $this->db->exec(''
+      .'DELETE FROM "files" WHERE "inbox"=1');
+
+    $changes = $this->db->changes();
+    return boolval($changes);
   }
 
   public function addTag(&$file, $tag) {
