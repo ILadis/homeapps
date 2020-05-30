@@ -3,11 +3,11 @@ namespace Http;
 use Closure;
 
 class Request {
-  protected $method, $path, $headers, $body;
+  protected $method, $uri, $headers, $body;
 
-  public function __construct(&$method, &$path, &$headers, &$body) {
+  public function __construct(&$method, &$uri, &$headers, &$body) {
     $this->method =& $method;
-    $this->path =& $path;
+    $this->uri =& $uri;
     $this->headers =& $headers;
     $this->body =& $body;
   }
@@ -16,8 +16,8 @@ class Request {
     return $this->method;
   }
 
-  public function getPath() {
-    return $this->path;
+  public function getUri() {
+    return $this->uri;
   }
 
   public function getHeader($name, $default = null) {
@@ -61,11 +61,11 @@ class Response {
 
 function newRequest() {
   $method = $_SERVER['REQUEST_METHOD'];
-  $path = $_SERVER['REQUEST_URI'];
+  $uri = Uri::parse($_SERVER['REQUEST_URI']);
   $headers = getallheaders();
   $body = fopen('php://input', 'r');
 
-  return new class($method, $path, $headers, $body)
+  return new class($method, $uri, $headers, $body)
     extends Request { use TextBody, JsonBody; };
 }
 
@@ -158,6 +158,36 @@ function serveFile($file) {
   };
 }
 
+class Uri {
+  public static function parse($uri) {
+    $parts = parse_url($uri);
+    if (!$parts) {
+      throw new Exception('could not parse malformed uri');
+    }
+
+    $path = $parts['path'] ?? '';
+    $query = $parts['query'] ?? '';
+    parse_str($query, $params);
+
+    return new Uri($path, $params);
+  }
+
+  private $path, $query;
+
+  public function __construct($path, $query) {
+    $this->path = $path;
+    $this->query = $query;
+  }
+
+  public function getPath() {
+    return $this->path;
+  }
+
+  public function getQueryParam($name, $default = null) {
+    return $this->query[$name] ?? $default;
+  }
+}
+
 class Router {
   private $routes, $base;
 
@@ -198,7 +228,7 @@ class Route {
 
   public function matches($base, $request) {
     return preg_match("|^{$this->method}$|i", $request->getMethod())
-      && preg_match("|^{$base}{$this->path}$|i", $request->getPath());
+      && preg_match("|^{$base}{$this->path}$|i", $request->getUri()->getPath());
   }
 
   public function activate($request, $response) {

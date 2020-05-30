@@ -79,7 +79,7 @@ class FindFile implements Http\Handler {
   }
 
   public function handle($request, $response) {
-    $id = basename($request->getPath());
+    $id = basename($request->getUri()->getPath());
     $file = $this->repository->findFileById($id);
 
     if (!$file) {
@@ -101,7 +101,7 @@ class RawFile implements Http\Handler {
   }
 
   public function handle($request, $response) {
-    $id = basename(dirname($request->getPath()));
+    $id = basename(dirname($request->getUri()->getPath()));
     $file = $this->repository->findFileById($id);
 
     if (!$file) {
@@ -129,7 +129,7 @@ class DeleteFile implements Http\Handler {
   }
 
   public function handle($request, $response) {
-    $id = basename($request->getPath());
+    $id = basename($request->getUri()->getPath());
     $deleted = $this->repository->deleteFileById($id);
 
     if (!$deleted) {
@@ -150,7 +150,7 @@ class AddTag implements Http\Handler {
   }
 
   public function handle($request, $response) {
-    $id = basename(dirname($request->getPath()));
+    $id = basename(dirname($request->getUri()->getPath()));
     $file = $this->repository->findFileById($id);
 
     if (!$file) {

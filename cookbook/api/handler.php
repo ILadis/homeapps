@@ -19,7 +19,7 @@ class CreateDocument implements Http\Handler {
     $document = $this->repository->createNew();
     $document->put($json);
 
-    $uri = $request->getPath() .'/'. $document->id();
+    $uri = $request->getUri()->getPath() .'/'. $document->id();
 
     $response->setStatus(201);
     $response->setBodyAsJson($document);
@@ -58,7 +58,7 @@ class FindDocument implements Http\Handler {
   }
 
   public function handle($request, $response) {
-    $id = basename($request->getPath());
+    $id = basename($request->getUri()->getPath());
     $document = $this->repository->findById($id);
 
     if (!$document) {
@@ -87,7 +87,7 @@ class SaveDocument implements Http\Handler {
       return false;
     }
 
-    $id = basename($request->getPath());
+    $id = basename($request->getUri()->getPath());
     $document = $this->repository->findById($id);
 
     if (!$document) {
@@ -111,7 +111,7 @@ class DeleteDocument implements Http\Handler {
   }
 
   public function handle($request, $response) {
-    $id = basename($request->getPath());
+    $id = basename($request->getUri()->getPath());
     $document = $this->repository->findById($id);
 
     if ($document) {
