@@ -166,15 +166,9 @@ form > div button {
 
 [is=file-list] > hr { margin: 26px 46px 0; flex-shrink: 0; }
 
-[is=file-list] > ul {
-  flex-grow: 1;
-  display: flex;
-  flex-flow: column nowrap;
-}
-
 [is=file-list] > ul li { padding: 0 46px; }
 [is=file-list] > ul li:hover { background: rgba(var(--divider-color), 0.3); }
-[is=file-list] > ul li:last-child { padding-bottom: 110px; }
+[is=file-list] > ul li:last-child { margin-bottom: 110px; }
 
 [is=file-list-item] {
   display: flex;
