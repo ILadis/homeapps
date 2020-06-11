@@ -7,9 +7,9 @@ set_error_handler(function($severity, $message, $file, $line) {
 require('io.php');
 require('http.php');
 require('handler.php');
+require('scanner.php');
 require('document.php');
 require('repository.php');
-require('devices.php');
 
 $root = realpath(__DIR__.'/..');
 $base = getenv('BASE');
