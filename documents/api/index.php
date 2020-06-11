@@ -5,6 +5,7 @@ set_error_handler(function($severity, $message, $file, $line) {
 });
 
 require('io.php');
+require('image.php');
 require('http.php');
 require('handler.php');
 require('scanner.php');

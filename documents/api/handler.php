@@ -1,6 +1,6 @@
 <?php
 namespace Http\Handler;
-use Http, Document;
+use Http, Image, Document;
 
 class UploadFile implements Http\Handler {
   private $repository;
@@ -39,6 +39,7 @@ class SaveFile implements Http\Handler {
   public function handle($request, $response) {
     $file = $request->getBodyAsJson();
     $saved = $this->repository->saveFile($file);
+
     if (!$saved) {
       $response->setStatus(404);
       return false;
@@ -170,7 +171,8 @@ class ScanImage implements Http\Handler {
   }
 
   public function handle($request, $response) {
-    $this->scan($image, $size);
+    $this->scan($image);
+    $this->enhance($image, $size);
 
     $file = [
       'name' => 'scan.jpg',
@@ -179,19 +181,30 @@ class ScanImage implements Http\Handler {
     ];
 
     $this->repository->uploadFile($file, $image, true);
+    // TODO introduce file properties and store image width/height there?
 
     $response->setStatus(200);
     $response->setBodyAsJson($file);
-
     return true;
   }
 
-  private function scan(&$image, &$size) {
+  private function scan(&$image) {
     $image = tmpfile();
     $this->scanner->scan($image);
+    fseek($image, 0);
+  }
+
+  private function enhance($image, &$size) {
+    Image\pipe(
+      Image\read($image),
+      Image\crop(183188194, 20),
+      Image\scale(0.3),
+      Image\write($image, true)
+    )();
 
     $size = ftell($image);
     fseek($image, 0);
+    ftruncate($image, $size);
   }
 }
 
@@ -231,7 +244,6 @@ class ConvertInbox implements Http\Handler {
 
     $response->setStatus(200);
     $response->setBodyAsJson($file);
-
     return true;
   }
 
