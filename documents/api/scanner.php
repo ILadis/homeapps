@@ -19,13 +19,6 @@ class Scanner {
         return false;
       }
 
-      $this->exchange($socket, 'Q', [], 75);
-      $this->exchange($socket, 'I', [
-        'R=300,300',
-        'M=CGRAY',
-        'D=SIN'
-      ], 27);
-
       $head = $this->exchange($socket, 'X', [
         'R=300,300',
         'M=CGRAY',
