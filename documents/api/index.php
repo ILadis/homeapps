@@ -5,19 +5,23 @@ set_error_handler(function($severity, $message, $file, $line) {
 });
 
 require('io.php');
+require('miio.php');
 require('image.php');
 require('http.php');
 require('handler.php');
+require('vacuum.php');
 require('scanner.php');
 require('document.php');
 require('repository.php');
 
 $root = realpath(__DIR__.'/..');
 $base = getenv('BASE');
+$token = getenv('TOKEN');
 
 $db = new SQLite3('./db.sqlite');
 $repository = Persistence\Repository::openNew($db);
 
+$vacuum = new Devices\Vacuum('192.168.178.10', 54321, hex2bin($token));
 $scanner = new Devices\Scanner('192.168.178.11', 54921);
 
 $request = Http\newRequest();
@@ -25,6 +29,10 @@ $response = Http\newResponse();
 
 $router = new Http\Router();
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
+
+$router->add('POST',   '/api/vacuum/clean', new Http\Handler\VacuumClean($vacuum));
+$router->add('POST',   '/api/vacuum/pause', new Http\Handler\VacuumPause($vacuum));
+$router->add('POST',   '/api/vacuum/charge', new Http\Handler\VacuumCharge($vacuum));
 
 $router->add('POST',   '/api/inbox/scan', new Http\Handler\ScanImage($scanner, $repository));
 $router->add('POST',   '/api/inbox/convert', new Http\Handler\ConvertInbox($repository));

@@ -68,4 +68,24 @@ class Socket extends Stream {
   }
 }
 
+class Datagram extends Stream {
+
+  public static function open($host, $port, $timeout = false) {
+    $fd = stream_socket_client("udp://{$host}:{$port}");
+    if (!$fd) {
+      throw new Exception("could not connect to {$host}:{$port}");
+    }
+
+    if ($timeout !== false) {
+      stream_set_timeout($fd, $timeout);
+    }
+
+    return new Datagram($fd);
+  }
+
+  private function __construct($fd) {
+    parent::__construct($fd);
+  }
+}
+
 ?>
