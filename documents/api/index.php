@@ -33,8 +33,9 @@ $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 $router->add('POST',   '/api/vacuum/clean', new Http\Handler\VacuumClean($vacuum));
 $router->add('POST',   '/api/vacuum/pause', new Http\Handler\VacuumPause($vacuum));
 $router->add('POST',   '/api/vacuum/charge', new Http\Handler\VacuumCharge($vacuum));
+$router->add('GET',    '/api/scanner/scan', new Http\Handler\ScanImage($scanner));
 
-$router->add('POST',   '/api/inbox/scan', new Http\Handler\ScanImage($scanner, $repository));
+$router->add('POST',   '/api/inbox/scan', new Http\Handler\ScanToInbox($scanner, $repository));
 $router->add('POST',   '/api/inbox/convert', new Http\Handler\ConvertInbox($repository));
 $router->add('GET',    '/api/inbox/files', new Http\Handler\ListInbox($repository));
 $router->add('DELETE', '/api/inbox/files', new Http\Handler\DeleteInbox($repository));

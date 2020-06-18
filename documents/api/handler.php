@@ -2,6 +2,46 @@
 namespace Http\Handler;
 use Http, Image, Document;
 
+class ScanImage implements Http\Handler {
+  private $scanner;
+
+  public function __construct($scanner) {
+    $this->scanner = $scanner;
+  }
+
+  public function handle($request, $response) {
+    $this->scan($image);
+    $this->enhance($image, $size);
+
+    $response->setStatus(200);
+    $response->setHeader('Content-Type', 'image/jpeg');
+
+    $body = $response->getBody();
+    stream_copy_to_stream($image, $body);
+
+    return true;
+  }
+
+  protected function scan(&$image) {
+    $image = tmpfile();
+    $this->scanner->scan($image);
+    fseek($image, 0);
+  }
+
+  protected function enhance($image, &$size) {
+    Image\pipe(
+      Image\read($image),
+      Image\crop(183188194, 20),
+      Image\scale(0.3),
+      Image\write($image, true)
+    )();
+
+    $size = ftell($image);
+    fseek($image, 0);
+    ftruncate($image, $size);
+  }
+}
+
 class VacuumClean implements Http\Handler {
   private $vacuum;
 
@@ -209,11 +249,11 @@ class AddTag implements Http\Handler {
   }
 }
 
-class ScanImage implements Http\Handler {
+class ScanToInbox extends ScanImage {
   private $scanner, $repository;
 
   public function __construct($scanner, $repository) {
-    $this->scanner = $scanner;
+    parent::__construct($scanner);
     $this->repository = $repository;
   }
 
@@ -233,25 +273,6 @@ class ScanImage implements Http\Handler {
     $response->setStatus(200);
     $response->setBodyAsJson($file);
     return true;
-  }
-
-  private function scan(&$image) {
-    $image = tmpfile();
-    $this->scanner->scan($image);
-    fseek($image, 0);
-  }
-
-  private function enhance($image, &$size) {
-    Image\pipe(
-      Image\read($image),
-      Image\crop(183188194, 20),
-      Image\scale(0.3),
-      Image\write($image, true)
-    )();
-
-    $size = ftell($image);
-    fseek($image, 0);
-    ftruncate($image, $size);
   }
 }
 
