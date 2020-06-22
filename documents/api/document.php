@@ -41,8 +41,8 @@ class Builder {
     $width = $image->value['/Width'] * $scale;
     $height = $image->value['/Height'] * $scale;
 
-    $contents = newObject([],
-      "q\n{$width} 0 0 {$height} 0 0 cm\n{$name} Do\nQ");
+    $do = "q\n{$width} 0 0 {$height} 0 0 cm\n{$name} Do\nQ";
+    $contents = newObject(['Length' => strlen($do)], $do);
 
     $image->value['/Name'] = $name;
 
@@ -63,12 +63,12 @@ function newObject($value, $stream = null) {
   return (object) ['value' => $value, 'stream' => $stream];
 }
 
-function newImage($stream, $width, $height) {
+function newImage($stream, $length, $width, $height) {
   return newObject([
     '/Type' => '/XObject',
     '/Subtype' => '/Image',
     '/Filter' => ['/DCTDecode'],
-    // TODO add /Length entry
+    '/Length' => $length,
     '/Width' => $width,
     '/Height' => $height,
     '/ColorSpace' => '/DeviceRGB',
@@ -182,11 +182,9 @@ class Writer extends Stream {
     $index = $this->lookupIndex($object, $refs);
     $id = $index + 1;
 
-    $this->writeData($id);
-    $this->writeData(' 0 ');
-
     if ($refs !== false) {
-      $this->writeData('R');
+      $this->writeData($id);
+      $this->writeData(' 0 R');
     }
 
     else {
@@ -194,7 +192,8 @@ class Writer extends Stream {
 
       $this->registerXref($object);
 
-      $this->writeData("obj\n");
+      $this->writeData($id);
+      $this->writeData(" 0 obj\n");
       $this->writeValue($object->value, $refs);
       if ($object->stream) {
         $this->writeData("\nstream\n");
@@ -216,16 +215,16 @@ class Writer extends Stream {
   private function writeTrailer() {
     $start = $this->offset;
     $root = $this->objects[0];
-    $size = count($this->objects);
+    $size = count($this->objects) + 1;
     $trailer = ['/Size' => $size, '/Root' => $root];
 
     $this->writeData("xref\n");
     $this->writeData("0 {$size}\n");
-    $this->writeData("0000000000 65535 f\n");
+    $this->writeData("0000000000 65535 f \n");
 
     foreach ($this->xref as $offset) {
       $offset = sprintf('%010d', $offset);
-      $this->writeData("{$offset} 00000 n\n");
+      $this->writeData("{$offset} 00000 n \n");
     }
 
     $this->writeData("trailer\n");
