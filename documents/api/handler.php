@@ -11,7 +11,7 @@ class ScanImage implements Http\Handler {
 
   public function handle($request, $response) {
     $this->scan($image);
-    $this->enhance($image, $size);
+    $this->enhance($image);
 
     $response->setStatus(200);
     $response->setHeader('Content-Type', 'image/jpeg');
@@ -28,11 +28,12 @@ class ScanImage implements Http\Handler {
     fseek($image, 0);
   }
 
-  protected function enhance($image, &$size) {
+  protected function enhance($image, &$size = false, &$width = false, &$height = false) {
     Image\pipe(
       Image\read($image),
       Image\crop(183188194, 20),
       Image\scale(0.3),
+      Image\dimensions($width, $height),
       Image\write($image, true)
     )();
 
@@ -259,7 +260,7 @@ class ScanToInbox extends ScanImage {
 
   public function handle($request, $response) {
     $this->scan($image);
-    $this->enhance($image, $size);
+    $this->enhance($image, $size, $width, $height);
 
     $file = [
       'name' => 'scan.jpg',
@@ -268,7 +269,8 @@ class ScanToInbox extends ScanImage {
     ];
 
     $this->repository->uploadFile($file, $image, true);
-    // TODO introduce file properties and store image width/height there?
+    $this->repository->setProperty($file, 'width', $width);
+    $this->repository->setProperty($file, 'height', $height);
 
     $response->setStatus(200);
     $response->setBodyAsJson($file);
@@ -324,9 +326,14 @@ class ConvertInbox implements Http\Handler {
         continue;
       }
 
+      $props = $this->repository->getProperty($file, 'width', 'height');
       $data = $this->repository->fetchData($file);
-      // TODO determine actual image width/height
-      $image = Document\newImage($data, 2480, 3508);
+
+      $size = intval($file['size']);
+      $width = intval($props['width']);
+      $height = intval($props['height']);
+
+      $image = Document\newImage($data, $size, $width, $height);
       $builder->nextPage()->useImage($image);
     }
 

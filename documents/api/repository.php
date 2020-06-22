@@ -16,6 +16,8 @@ class Repository {
   }
 
   private function createTables() {
+    $this->db->exec('PRAGMA foreign_keys = ON');
+
     $this->db->exec(''
       .'CREATE TABLE IF NOT EXISTS "files" ('
       .'  "id"    TEXT PRIMARY KEY,'
@@ -24,13 +26,21 @@ class Repository {
       .'  "size"  INTEGER NOT NULL,'
       .'  "date"  TEXT NOT NULL,'
       .'  "inbox" INTEGER NOT NULL,'
-      .'  "data" BLOB)');
+      .'  "data"  BLOB)');
 
     $this->db->exec(''
       .'CREATE TABLE IF NOT EXISTS "file_tags" ('
-      .'  "id"   TEXT NOT NULL,'
-      .'  "tag"  TEXT NOT NULL,'
+      .'  "id"    TEXT NOT NULL,'
+      .'  "tag"   TEXT NOT NULL,'
       .'  UNIQUE("id", "tag"),'
+      .'  FOREIGN KEY ("id") REFERENCES "files" ("id") ON DELETE CASCADE)');
+
+    $this->db->exec(''
+      .'CREATE TABLE IF NOT EXISTS "file_props" ('
+      .'  "id"    TEXT NOT NULL,'
+      .'  "key"   TEXT NOT NULL,'
+      .'  "value" TEXT NOT NULL,'
+      .'  UNIQUE("id", "key"),'
       .'  FOREIGN KEY ("id") REFERENCES "files" ("id") ON DELETE CASCADE)');
   }
 
@@ -169,6 +179,40 @@ class Repository {
     foreach ($tags as $tag) {
       $this->addTag($file, $tag);
     }
+  }
+
+  public function setProperty(&$file, $key, $value) {
+    $stmt = $this->db->prepare(''
+      .'INSERT OR REPLACE INTO "file_props" ("id", "key", "value") '
+      .'VALUES (:id, :key, :value)');
+
+    $stmt->bindValue(':id',    $file['id'], SQLITE3_TEXT);
+    $stmt->bindValue(':key',   $key,        SQLITE3_TEXT);
+    $stmt->bindValue(':value', $value,      SQLITE3_TEXT);
+    $stmt->execute();
+  }
+
+  public function getProperty(&$file, ...$keys) {
+    $params = implode(', ', array_fill(0, count($keys), '?'));
+    $stmt = $this->db->prepare(''
+      .'SELECT "key", "value" FROM "file_props" '
+      .'WHERE "id"=? AND "key" IN ('. $params .')');
+
+    $stmt->bindValue($index = 1, $file['id'], SQLITE3_TEXT);
+    foreach ($keys as $key) {
+      $stmt->bindValue(++$index, $key, SQLITE3_TEXT);
+    }
+
+    $result = $stmt->execute();
+    $props = array();
+
+    while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+      $key = $row['key'];
+      $value = $row['value'];
+      $props[$key] = $value;
+    }
+
+    return $props;
   }
 
   public function fetchData(&$file) {
