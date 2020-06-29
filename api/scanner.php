@@ -20,14 +20,14 @@ class Scanner {
       }
 
       $head = $this->exchange($socket, 'X', [
-        'R=300,300',
-        'M=CGRAY',
-        'C=JPEG',
-        'J=MID',
-        'B=50',
-        'N=50',
-        'A=0,0,2480,3508',
-        'D=SIN'
+        'R' => '300,300',
+        'M' => 'CGRAY',
+        'C' => 'JPEG',
+        'J' => 'MID',
+        'B' => '50',
+        'N' => '50',
+        'A' => '0,0,2480,3508',
+        'D' => 'SIN'
       ], 1);
 
       return $this->receive($socket, $head, $image);
@@ -40,8 +40,8 @@ class Scanner {
     $data  = "\x1b";
     $data .= $type."\n";
 
-    foreach ($params as $param) {
-      $data .= $param."\n";
+    foreach ($params as $key => $value) {
+      $data .= "{$key}={$value}\n";
     }
 
     $data .= "\x80";
