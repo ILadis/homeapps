@@ -90,6 +90,21 @@ class VacuumCharge implements Http\Handler {
   }
 }
 
+class VacuumStatus implements Http\Handler {
+  private $vacuum;
+
+  public function __construct($vacuum) {
+    $this->vacuum = $vacuum;
+  }
+
+  public function handle($request, $response) {
+    $status = $this->vacuum->status();
+    $response->setStatus(200);
+    $response->setBodyAsJson($status);
+    return true;
+  }
+}
+
 class UploadFile implements Http\Handler {
   private $repository;
 

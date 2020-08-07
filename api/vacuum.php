@@ -36,6 +36,11 @@ class Vacuum {
     $this->send($command);
   }
 
+  public function status() {
+    $command = Miio\newCommand('get_status');
+    return $this->send($command);
+  }
+
   private function send($command) {
     $socket = Datagram::open($this->host, $this->port, 3);
     $crypto = new Miio\Crypto($this->token);
@@ -55,7 +60,7 @@ class Vacuum {
       $data = $packet->getPayload();
       $data = $crypto->decrypt($data);
 
-      return $data;
+      return Miio\asResult($data);
     } finally {
       $socket->close();
     }

@@ -7,6 +7,15 @@ function newCommand($method, $params = array()) {
   return json_encode((object) $command);
 }
 
+function asResult($response) {
+  // removes trailing NULL-byte
+  $response = substr($response, 0, -1);
+  $response = json_decode($response, true);
+
+  $result = $response['result'] ?? false;
+  return $result;
+}
+
 class Packet {
 
   const HELLO = ''
