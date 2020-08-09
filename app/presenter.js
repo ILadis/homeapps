@@ -10,18 +10,17 @@ export function Presenter(shell, repo) {
 Presenter.prototype.showList = async function() {
   let { bottomBar, uploadList } = this.shell;
   let fileList = new Views.FileList();
+
   let files = new Set();
+  let search = new Search(files, function*(file) {
+    yield file.name;
+    for (let tag of file.tags) {
+      yield tag;
+    }
+  });
 
   let searchFiles = (query) => {
-    let search = new Search(files);
-    search.execute(query, function*(file) {
-      yield file.name;
-      for (let tag of file.tags) {
-        yield tag;
-      }
-    });
-
-    let iterator = search.values();
+    let iterator = search.execute(query) || files;
     showFiles(iterator);
   };
 
