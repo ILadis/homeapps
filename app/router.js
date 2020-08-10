@@ -68,11 +68,8 @@ Router.prototype.navigateTo = function(route, values) {
 
 function historyGoto(delta) {
   return new Promise(function(resolve) {
-    if (delta <= 0) resolve();
-    else {
-      addEventListener('popstate', resolve, { once: true });
-      history.go(delta);
-    }
+    addEventListener('popstate', resolve, { once: true });
+    history.go(delta);
   });
 }
 

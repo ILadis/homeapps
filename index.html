@@ -23,8 +23,13 @@
   let index = router.register('list', [], () =>
     presenter.showList());
 
-  presenter.onListShown = () =>
-    router.navigateTo(index);
+  presenter.onListShown = () => {
+    if (router.referer(inbox, details)) {
+      router.gobackTo(index);
+    } else {
+      router.navigateTo(index);
+    }
+  };
 
   let inbox = router.register('inbox', [], () =>
     presenter.showInbox());
@@ -45,7 +50,7 @@
     router.navigateTo(viewer, { id });
 
   if ('serviceWorker' in navigator) {
-//  navigator.serviceWorker.register('./service-worker.js');
+    navigator.serviceWorker.register('./service-worker.js');
   }
 
   window.onhashchange =
