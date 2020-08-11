@@ -89,6 +89,7 @@ class Writer extends Stream {
     if ($index === false) {
       $index = count($this->objects);
       $this->objects[] = $object;
+      $this->xref[] = 0;
       if (is_array($refs)) $refs[] = $object;
     }
 
