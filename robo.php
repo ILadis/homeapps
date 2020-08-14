@@ -22,11 +22,10 @@ $response = Http\newResponse();
 $router = new Http\Router();
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
-$router->add('POST',   '/api/vacuum/clean', new Http\Handler\VacuumClean($vacuum));
-$router->add('POST',   '/api/vacuum/pause', new Http\Handler\VacuumPause($vacuum));
-$router->add('POST',   '/api/vacuum/charge', new Http\Handler\VacuumCharge($vacuum));
-$router->add('GET',    '/api/vacuum/status', new Http\Handler\VacuumStatus($vacuum));
-$router->add('GET',    '/api/scanner/scan', new Http\Handler\ScanImage($scanner));
+$router->add('POST', '/api/vacuum/clean', new Http\Handler\VacuumClean($vacuum));
+$router->add('POST', '/api/vacuum/pause', new Http\Handler\VacuumPause($vacuum));
+$router->add('POST', '/api/vacuum/charge', new Http\Handler\VacuumCharge($vacuum));
+$router->add('GET',  '/api/vacuum/status', new Http\Handler\VacuumStatus($vacuum));
 
 foreach(array(
   '/icon.png' => 'app/robo/icon.png',
@@ -35,9 +34,8 @@ foreach(array(
   '/manifest.webmanifest' => 'app/robo/manifest.webmanifest',
 
   '/app/dom.js' => 'app/dom.js',
-  '/app/router.js' => 'app/router.js',
   '/app/presenter.js' => 'app/robo/presenter.js',
-  '/app/repository.js' => 'app/robo/client.js',
+  '/app/client.js' => 'app/robo/client.js',
   '/app/views.js' => 'app/robo/views.js',
 
   '/app/styles.css' => 'app/robo/styles.css',

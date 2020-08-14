@@ -1,0 +1,14 @@
+{
+  "lang": "de",
+  "name": "Roborock",
+  "short_name": "Roborock",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#41ab7a",
+  "background_color": "#fbfbfb",
+  "icons": [{
+    "src": "./icon.png",
+    "sizes": "any",
+    "type": "image/png"
+  }]
+}

@@ -11,7 +11,6 @@ export const Shell = define('app-shell', 'div', html`
 <div is="bottom-bar"></div>
 <div is="upload-list"></div>`, function() {
   this.contents = new Set();
-
   this.bottomBar = this.querySelector('[is=bottom-bar]');
   this.uploadList = this.querySelector('[is=upload-list]');
 });
