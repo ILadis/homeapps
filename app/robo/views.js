@@ -56,16 +56,17 @@ TopBar.prototype.toggleSpin = function(on) {
   }
 };
 
-TopBar.prototype.addStatus = function(key, value) {
+TopBar.prototype.addStatus = function(key) {
   let dt = document.createElement('dt');
   dt.textContent = key;
 
   let dd = document.createElement('dd');
-  dd.textContent = value;
 
   let dl = this.querySelector('dl');
   dl.appendChild(dt);
   dl.appendChild(dd);
+
+  return { set: (value) => dd.textContent = value }
 }
 
 export const RoomSelect = define('room-select', 'div', html`
@@ -77,28 +78,31 @@ export const RoomSelect = define('room-select', 'div', html`
   </div>
 </form>`, function() {
   let form = this.querySelector('form');
-  // TODO determine checked rooms
   form.onsubmit = (event) => {
     event.preventDefault();
-    this.onSubmitted();
+    let data = new FormData(form);
+    let values = Array.from(data.values());
+    this.onSubmitted(values);
   };
 });
 
-RoomSelect.prototype.addRoom = function(id, name) {
+RoomSelect.prototype.addRoom = function(key, name, value) {
   let input = document.createElement('input');
+  input.id =  key;
+  input.name = key;
+  input.value = value;
+  input.type = 'checkbox';
   input.className = 'chip';
-  input.setAttribute('id', id);
-  input.setAttribute('type', 'checkbox');
 
   let label = document.createElement('label');
+  label.setAttribute('for', key);
   label.textContent = name;
-  label.setAttribute('for', id);
 
   let div = this.querySelector('div');
   div.appendChild(input);
   div.appendChild(label);
 };
 
-RoomSelect.prototype.onSubmitted = function() {
+RoomSelect.prototype.onSubmitted = function(rooms) {
 };
 
