@@ -39,10 +39,10 @@ Presenter.prototype.showIndex = function() {
   refreshStatus();
 
   let select = new Views.RoomSelect();
-  select.addRoom('living-room', 'Wohnzimmer', '16');
-  select.addRoom('bed-room', 'Schlafzimmer', '17');
-  select.addRoom('kitchen', 'Küche', '1');
-  select.addRoom('bath-room', 'Bad', '2');
+  select.addRoom('living-room', 'Wohnzimmer', '17');
+  select.addRoom('bed-room', 'Schlafzimmer', '2');
+  select.addRoom('kitchen', 'Küche', '16');
+  select.addRoom('bath-room', 'Bad', '1');
 
   select.onSubmitted = startClean;
 

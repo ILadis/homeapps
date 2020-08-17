@@ -38,7 +38,7 @@ class Vacuum {
 
   public function status() {
     $command = Miio\newCommand('get_status');
-    return $this->send($command);
+    return current($this->send($command));
   }
 
   private function send($command) {

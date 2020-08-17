@@ -5,8 +5,8 @@ set_error_handler(function($severity, $message, $file, $line) {
 });
 
 require('api/io.php');
+require('api/miio.php');
 require('api/http.php');
-require('api/robo/miio.php');
 require('api/robo/vacuum.php');
 require('api/robo/handler.php');
 
