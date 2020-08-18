@@ -47,11 +47,11 @@ export const TopBar = define('top-bar', 'div', html`
 </svg>
 <dl></dl>`);
 
-TopBar.prototype.toggleSpin = function(on) {
+TopBar.prototype.enableBrush = function(enable) {
   let svg = this.querySelector('.brush');
   svg.classList.add('spin');
 
-  if (!on) {
+  if (!enable) {
     svg.classList.remove('spin');
   }
 };
