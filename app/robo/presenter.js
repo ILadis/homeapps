@@ -29,16 +29,16 @@ Presenter.prototype.showIndex = function() {
   let lastClean = topBar.addStatus('Letzte Reinigung');
 
   let showStatus = (status) => {
-    let state = labels.get(status['state']) || 'Unbekannt';
-    state.set(state);
+    let label = labels.get(status['state']) || 'Unbekannt';
+    state.set(label);
 
     let battery = status['battery'] || 0;
     power.set(battery + '%');
 
     // TODO show last clean date
 
-    let cleaning = status['in_cleaning'] != 1;
-    tobBar.enableBrush(cleaning);
+    let cleaning = status['in_cleaning'] != 0;
+    topBar.enableBrush(cleaning);
   };
 
   let refreshStatus = async () => {
