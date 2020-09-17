@@ -2,7 +2,8 @@
 import { html, define } from './dom.js';
 
 export const Shell = define('app-shell', 'div', html`
-<div is="top-bar"></div>`, function() {
+<div is="top-bar"></div>
+<div is="bottom-sheet"></div>`, function() {
   this.contents = new Set();
   this.topBar = this.querySelector('[is=top-bar]')
 });
@@ -105,4 +106,22 @@ RoomSelect.prototype.addRoom = function(key, name, value) {
 
 RoomSelect.prototype.onSubmitted = function(rooms) {
 };
+
+export const Sheet = define('bottom-sheet', 'div', html`
+<button>
+  <svg viewBox="0 0 24 24"><use href="#charge"></use></svg>
+  Aufladen
+</button>
+<button>
+  <svg viewBox="0 0 24 24"><use href="#clean"></use></svg>
+  Reinigen
+</button>
+<button>
+  <svg viewBox="0 0 24 24"><use href="#pause"></use></svg>
+  Pausieren
+</button>
+<button>
+  <svg viewBox="0 0 24 24"><use href="#resume"></use></svg>
+  Fortsetzen
+</button>`);
 

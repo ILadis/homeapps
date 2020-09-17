@@ -66,11 +66,13 @@ form > div {
   flex-wrap: wrap;
 }
 
-form > div button:hover { background: rgba(var(--primary-color), 0.9); }
+form > div button:hover { background: rgba(var(--primary-color), 0.95); }
+form > div button:active { background: rgba(var(--primary-color), 0.8); }
+
 form > div button {
   padding: 8px 24px;
   font-size: 17px;
-  font-weight: 400;
+  font-weight: 350;
   text-transform: uppercase;
   color: rgb(var(--contrast-text));
   border: none;
@@ -98,19 +100,19 @@ input[type=checkbox]:checked.chip + label {
   color: rgb(var(--primary-color));
 }
 
-[is="top-bar"] {
+[is=top-bar] {
   margin-bottom: 24px;
   padding: 24px 0 1px;
   background: rgb(var(--primary-color));
   box-shadow: 0 1px 2px 0 rgba(var(--shadow-color), 0.4);
 }
 
-[is="top-bar"] > h1 {
+[is=top-bar] > h1 {
   margin: 0 46px 120px;
   color: rgb(var(--contrast-text));
 }
 
-[is="top-bar"] > svg.vacuum {
+[is=top-bar] > svg.vacuum {
   position: absolute;
   left: 50%;
   margin: -120px 0 0 -60px;
@@ -119,11 +121,11 @@ input[type=checkbox]:checked.chip + label {
   z-index: 2;
 }
 
-[is="top-bar"] > svg.vacuum line { stroke: #ebebeb; }
-[is="top-bar"] > svg.vacuum circle:nth-of-type(even) { fill: #ffffff; }
-[is="top-bar"] > svg.vacuum circle:nth-of-type(odd) { fill: #ebebeb; }
+[is=top-bar] > svg.vacuum line { stroke: #ebebeb; }
+[is=top-bar] > svg.vacuum circle:nth-of-type(even) { fill: #ffffff; }
+[is=top-bar] > svg.vacuum circle:nth-of-type(odd) { fill: #ebebeb; }
 
-[is="top-bar"] > svg.brush {
+[is=top-bar] > svg.brush {
   position: absolute;
   left: 50%;
   margin: -108px 0 0 12px;
@@ -132,23 +134,23 @@ input[type=checkbox]:checked.chip + label {
   z-index: 1;
 }
 
-[is="top-bar"] > svg.brush.spin {
+[is=top-bar] > svg.brush.spin {
   transform-box: border-box;
   transform-origin: center;
   animation: spin 1s linear infinite;
 }
 
-[is="top-bar"] > svg.brush line { stroke: #ebebeb; }
+[is=top-bar] > svg.brush line { stroke: #ebebeb; }
 
-[is="top-bar"] > dl {
+[is=top-bar] > dl {
   margin: 12px 24px;
   padding: 6px;
   border-radius: 2px;
   background: rgba(var(--contrast-text), 0.1);
 }
 
-[is="top-bar"] > dl dt,
-[is="top-bar"] > dl dd {
+[is=top-bar] > dl dt,
+[is=top-bar] > dl dd {
   width: 50%;
   padding: 3px;
   white-space: nowrap;
@@ -162,5 +164,38 @@ input[type=checkbox]:checked.chip + label {
 [is=room-select] > form button {
   width: 90%;
   margin: 24px auto 0;
+}
+
+[is=bottom-sheet] {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 8px;
+  background: rgb(var(--contrast-text));
+  border-top: 1px solid rgb(var(--divider-color));
+  box-shadow: 0 1px 4px 0 rgba(var(--shadow-color), 0.2);
+  display: flex;
+  justify-content: space-evenly;
+}
+
+[is=bottom-sheet] > button:hover { color: rgba(var(--primary-text), 0.65); }
+[is=bottom-sheet] > button:active { color: rgba(var(--primary-text), 0.5); }
+
+[is=bottom-sheet] > button {
+  text-align: center;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(var(--primary-text), 0.8);
+}
+
+[is=bottom-sheet] > button:hover svg { stroke: rgba(var(--primary-text), 0.65); }
+[is=bottom-sheet] > button:active svg { stroke: rgba(var(--primary-text), 0.5); }
+
+[is=bottom-sheet] > button svg {
+  width: 38px;
+  margin: 0 auto 2px;
+  display: block;
+  stroke: rgba(var(--primary-text), 0.8);
 }
 
