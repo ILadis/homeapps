@@ -73,12 +73,15 @@ form > div button {
   padding: 8px 24px;
   font-size: 17px;
   font-weight: 350;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   text-transform: uppercase;
   color: rgb(var(--contrast-text));
   border: none;
   border-radius: 6px;
   background: rgb(var(--primary-color));
   box-shadow: 0 1px 2px 0 rgba(var(--shadow-color), 0.4);
+  overflow: hidden;
 }
 
 input[type=checkbox].chip + label, .chip {
@@ -144,18 +147,19 @@ input[type=checkbox]:checked.chip + label {
 
 [is=top-bar] > dl {
   margin: 12px 24px;
-  padding: 6px;
+  padding: 9px;
   border-radius: 2px;
+  font-size: 0;
   background: rgba(var(--contrast-text), 0.1);
 }
 
 [is=top-bar] > dl dt,
 [is=top-bar] > dl dd {
   width: 50%;
-  padding: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 15px;
   color: rgb(var(--contrast-text));
   box-sizing: border-box;
   display: inline-block;
@@ -177,13 +181,18 @@ input[type=checkbox]:checked.chip + label {
   justify-content: space-evenly;
 }
 
-[is=bottom-sheet] > button:hover { color: rgba(var(--primary-text), 0.65); }
-[is=bottom-sheet] > button:active { color: rgba(var(--primary-text), 0.5); }
-
 [is=bottom-sheet] > button {
+  width: 82px;
   text-align: center;
   background: transparent;
   border: none;
+}
+
+[is=bottom-sheet] > button:hover span { color: rgba(var(--primary-text), 0.65); }
+[is=bottom-sheet] > button:active span { color: rgba(var(--primary-text), 0.5); }
+[is=bottom-sheet] > button:disabled span { color: rgba(var(--primary-text), 0.2); }
+
+[is=bottom-sheet] > button span {
   font-size: 13px;
   font-weight: 500;
   color: rgba(var(--primary-text), 0.8);
@@ -191,6 +200,7 @@ input[type=checkbox]:checked.chip + label {
 
 [is=bottom-sheet] > button:hover svg { stroke: rgba(var(--primary-text), 0.65); }
 [is=bottom-sheet] > button:active svg { stroke: rgba(var(--primary-text), 0.5); }
+[is=bottom-sheet] > button:disabled svg { stroke: rgba(var(--primary-text), 0.2); }
 
 [is=bottom-sheet] > button svg {
   width: 38px;

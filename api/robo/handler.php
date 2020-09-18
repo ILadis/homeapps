@@ -10,11 +10,8 @@ class VacuumClean implements Http\Handler {
   }
 
   public function handle($request, $response) {
-    $segments = $request->getBodyAsJson();
-    if (is_array($segments)) {
-      $segments = array_map('intval', $segments);
-    }
-
+    $segments = (array) $request->getBodyAsJson();
+    $segments = array_map('intval', $segments);
     $this->vacuum->clean($segments);
     $response->setStatus(200);
     return true;
@@ -30,6 +27,20 @@ class VacuumPause implements Http\Handler {
 
   public function handle($request, $response) {
     $this->vacuum->pause();
+    $response->setStatus(200);
+    return true;
+  }
+}
+
+class VacuumResume implements Http\Handler {
+  private $vacuum;
+
+  public function __construct($vacuum) {
+    $this->vacuum = $vacuum;
+  }
+
+  public function handle($request, $response) {
+    $this->vacuum->resume();
     $response->setStatus(200);
     return true;
   }

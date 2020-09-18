@@ -5,7 +5,8 @@ export const Shell = define('app-shell', 'div', html`
 <div is="top-bar"></div>
 <div is="bottom-sheet"></div>`, function() {
   this.contents = new Set();
-  this.topBar = this.querySelector('[is=top-bar]')
+  this.topBar = this.querySelector('[is=top-bar]');
+  this.bottomSheet = this.querySelector('[is=bottom-sheet]');
 });
 
 Shell.prototype.setTitle = function(title) {
@@ -24,7 +25,7 @@ Shell.prototype.setContent = function(...contents) {
   }
 };
 
-export const TopBar = define('top-bar', 'div', html`
+export const Bar = define('top-bar', 'div', html`
 <h1>Roborock</h1>
 <svg viewBox="0 0 120 120" class="vacuum">
   <defs>
@@ -48,7 +49,7 @@ export const TopBar = define('top-bar', 'div', html`
 </svg>
 <dl></dl>`);
 
-TopBar.prototype.enableBrush = function(enable) {
+Bar.prototype.enableBrush = function(enable) {
   let svg = this.querySelector('.brush');
   svg.classList.add('spin');
 
@@ -57,18 +58,17 @@ TopBar.prototype.enableBrush = function(enable) {
   }
 };
 
-TopBar.prototype.addStatus = function(key) {
+Bar.prototype.addStatus = function(key) {
+  let dd = document.createElement('dd');
   let dt = document.createElement('dt');
   dt.textContent = key;
-
-  let dd = document.createElement('dd');
 
   let dl = this.querySelector('dl');
   dl.appendChild(dt);
   dl.appendChild(dd);
 
   return { set: (value) => dd.textContent = value }
-}
+};
 
 export const RoomSelect = define('room-select', 'div', html`
 <form>
@@ -87,6 +87,9 @@ export const RoomSelect = define('room-select', 'div', html`
   };
 });
 
+RoomSelect.prototype.onSubmitted = function(rooms) {
+};
+
 RoomSelect.prototype.addRoom = function(key, name, value) {
   let input = document.createElement('input');
   input.id =  key;
@@ -104,24 +107,37 @@ RoomSelect.prototype.addRoom = function(key, name, value) {
   div.appendChild(label);
 };
 
-RoomSelect.prototype.onSubmitted = function(rooms) {
+export const Sheet = define('bottom-sheet', 'div', html``);
+
+Sheet.prototype.addButton = function() {
+  let view = new SheetButton();
+  this.appendChild(view);
+  return view;
 };
 
-export const Sheet = define('bottom-sheet', 'div', html`
-<button>
-  <svg viewBox="0 0 24 24"><use href="#charge"></use></svg>
-  Aufladen
-</button>
-<button>
-  <svg viewBox="0 0 24 24"><use href="#clean"></use></svg>
-  Reinigen
-</button>
-<button>
-  <svg viewBox="0 0 24 24"><use href="#pause"></use></svg>
-  Pausieren
-</button>
-<button>
-  <svg viewBox="0 0 24 24"><use href="#resume"></use></svg>
-  Fortsetzen
-</button>`);
+export const SheetButton = define('sheet-button', 'button', html`
+<svg viewBox="0 0 24 24"><use></use></svg>
+<span></span>`, function() {
+  this.onclick = () => this.onClicked();
+});
+
+SheetButton.prototype.onClicked = function() {
+};
+
+SheetButton.prototype.setLabel = function(label) {
+  let span = this.querySelector('span');
+  span.textContent = label
+  return this;
+};
+
+SheetButton.prototype.setIcon = function(icon) {
+  let use = this.querySelector('use');
+  use.setAttribute('href', '#' + icon);
+  return this;
+};
+
+SheetButton.prototype.setEnabled = function(enabled) {
+  this.disabled = !enabled;
+  return this;
+};
 

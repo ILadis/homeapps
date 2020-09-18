@@ -11,12 +11,8 @@ class Vacuum {
     $this->token = $token;
   }
 
-  public function clean($segments = false) {
-    if (is_array($segments)) {
-      $command = Miio\newCommand('app_segment_clean', $segments);
-    } else {
-      $command = Miio\newCommand('app_start');
-    }
+  public function clean($segments) {
+    $command = Miio\newCommand('app_segment_clean', $segments);
     $this->send($command);
   }
 
@@ -26,7 +22,6 @@ class Vacuum {
   }
 
   public function resume() {
-    // TODO get_status.in_cleaning and do either resume_segment_clean or app_start
     $command = Miio\newCommand('resume_segment_clean');
     $this->send($command);
   }

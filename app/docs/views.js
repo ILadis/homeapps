@@ -77,7 +77,7 @@ FileList.prototype.focusSearch = function() {
 };
 
 FileList.prototype.addItem = function() {
-  let view = new FileList.Item();
+  let view = new FileListItem();
 
   let ul = this.querySelector('ul');
   ul.insertBefore(view, ul.firstChild);
@@ -93,7 +93,7 @@ FileList.prototype.removeItem = function(view) {
   this.items.delete(view);
 };
 
-FileList.Item = define('file-list-item', 'li', html`
+export const FileListItem = define('file-list-item', 'li', html`
 <h1></h1>
 <h2></h2>
 <h2></h2>
@@ -102,22 +102,22 @@ FileList.Item = define('file-list-item', 'li', html`
   this.onclick = () => this.onClicked();
 });
 
-FileList.Item.prototype.onClicked = function() {
+FileListItem.prototype.onClicked = function() {
 };
 
-FileList.Item.prototype.setName = function(name) {
+FileListItem.prototype.setName = function(name) {
   let h1 = this.querySelector('h1');
   h1.textContent = name;
   return this;
 };
 
-FileList.Item.prototype.setSize = function(size) {
+FileListItem.prototype.setSize = function(size) {
   let h2 = this.querySelector('h2:first-of-type');
   h2.textContent = size;
   return this;
 };
 
-FileList.Item.prototype.setDate = function(date) {
+FileListItem.prototype.setDate = function(date) {
   let h2 = this.querySelector('h2:last-of-type');
 
   var date = DateFormat.format(new Date(date));
@@ -126,7 +126,7 @@ FileList.Item.prototype.setDate = function(date) {
   return this;
 };
 
-FileList.Item.prototype.addTag = function() {
+FileListItem.prototype.addTag = function() {
   let hr = this.querySelector('hr');
 
   let view = new Tag();
@@ -136,7 +136,7 @@ FileList.Item.prototype.addTag = function() {
   return view;
 };
 
-FileList.Item.prototype.removeTag = function(view) {
+FileListItem.prototype.removeTag = function(view) {
   this.removeChild(view);
   this.tags.delete(view);
 };
@@ -281,7 +281,7 @@ FileScan.prototype.onScanSubmitted = function() {
 };
 
 FileScan.prototype.addItem = function() {
-  let view = new FileScan.Item();
+  let view = new FileScanItem();
 
   let ul = this.querySelector('ul');
   ul.appendChild(view);
@@ -297,16 +297,16 @@ FileScan.prototype.removeItem = function(view) {
   this.items.delete(view);
 };
 
-FileScan.Item = define('file-scan-item', 'li', html`
+export const FileScanItem = define('file-scan-item', 'li', html`
 <img>`);
 
-FileScan.Item.prototype.setImage = function(src) {
+FileScanItem.prototype.setImage = function(src) {
   let img = this.querySelector('img');
   img.src = src;
   return this;
 };
 
-FileScan.Item.prototype.scrollTo = function() {
+FileScanItem.prototype.scrollTo = function() {
   let options = { behavior: 'smooth' };
   let scroll = () => this.scrollIntoView(options);
   setTimeout(scroll, 100);
@@ -322,7 +322,7 @@ UploadList.prototype.addItem = function() {
   let [hr, ul] = this.querySelectorAll('hr, ul');
   hr.hidden = false;
 
-  let view = new UploadList.Item();
+  let view = new UploadListItem();
   ul.appendChild(view);
 
   this.items.add(view);
@@ -350,19 +350,19 @@ UploadList.prototype.pullUp = function() {
   }
 };
 
-UploadList.Item = define('upload-list-item', 'li', html`
+export const UploadListItem = define('upload-list-item', 'li', html`
 <h1></h1>
 <h2></h2>
 <div><span></span></div>
 <hr>`);
 
-UploadList.Item.prototype.setName = function(name) {
+UploadListItem.prototype.setName = function(name) {
   let h1 = this.querySelector('h1');
   h1.textContent = name;
   return this;
 };
 
-UploadList.Item.prototype.setProgress = function(percent) {
+UploadListItem.prototype.setProgress = function(percent) {
   var percent = Math.round(percent) + '%';
 
   let [h2, span] = this.querySelectorAll('h2, span');

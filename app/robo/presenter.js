@@ -21,24 +21,53 @@ const labels = new Map([
   [100, 'Voll aufgeladen']
 ]);
 
+function mapStatus(status) {
+  let label = labels.get(status['state']) || 'Unbekannt';
+  let battery = status['battery'] || 0;
+  let cleaning = status['in_cleaning'] != 0;
+  let charging = status['state'] == 8;
+  let paused = [2, 3, 10].includes(status['state']);
+
+  return { label, battery, cleaning, charging, paused };
+}
+
 Presenter.prototype.showIndex = function() {
-  let { topBar } = this.shell;
+  let { topBar, bottomSheet } = this.shell;
 
   let state = topBar.addStatus('Status');
   let power = topBar.addStatus('Ladezustand');
   let lastClean = topBar.addStatus('Letzte Reinigung');
 
-  let showStatus = (status) => {
-    let label = labels.get(status['state']) || 'Unbekannt';
-    state.set(label);
+  let charge = bottomSheet.addButton()
+    .setLabel('Aufladen')
+    .setIcon('charge');
 
-    let battery = status['battery'] || 0;
+  let pause = bottomSheet.addButton()
+    .setLabel('Anhalten')
+    .setIcon('pause')
+    .setEnabled(false);
+
+  let showStatus = (status) => {
+    let {
+      label, battery,
+      cleaning, charging,
+      paused
+    } = mapStatus(status);
+
+    state.set(label);
     power.set(battery + '%');
 
-    // TODO show last clean date
+    topBar.enableBrush(cleaning && !paused);
 
-    let cleaning = status['in_cleaning'] != 0;
-    topBar.enableBrush(cleaning);
+    pause.setLabel(paused ? 'Forsetzen' : 'Anhalten');
+    pause.setIcon(paused ? 'resume' : 'pause');
+
+    pause.setEnabled(cleaning || paused);
+    charge.setEnabled(!charging);
+
+    pause.onClicked = () => paused
+      ? this.client.resume()
+      : this.client.pause();
   };
 
   let refreshStatus = async () => {
@@ -50,10 +79,6 @@ Presenter.prototype.showIndex = function() {
     }
   };
 
-  let startClean = (rooms) => {
-    this.client.clean(rooms);
-  };
-
   state.set('Verbindung herstellen');
   refreshStatus();
 
@@ -63,7 +88,8 @@ Presenter.prototype.showIndex = function() {
   select.addRoom('kitchen', 'Küche', '16');
   select.addRoom('bath-room', 'Bad', '1');
 
-  select.onSubmitted = startClean;
+  select.onSubmitted = (rooms) => this.client.clean(rooms);
+  charge.onClicked = () => this.client.charge();
 
   this.shell.setContent(select);
 };

@@ -25,6 +25,17 @@ Client.prototype.pause = async function() {
   }
 };
 
+Client.prototype.resume = async function() {
+  let request = new Request(`./api/vacuum/resume`, {
+    method: 'POST'
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to send command');
+  }
+};
+
 Client.prototype.charge = async function() {
   let request = new Request(`./api/vacuum/charge`, {
     method: 'POST'
