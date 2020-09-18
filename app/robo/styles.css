@@ -156,6 +156,7 @@ input[type=checkbox]:checked.chip + label {
 [is=top-bar] > dl dt,
 [is=top-bar] > dl dd {
   width: 50%;
+  padding: 3px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

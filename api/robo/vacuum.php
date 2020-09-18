@@ -33,7 +33,21 @@ class Vacuum {
 
   public function status() {
     $command = Miio\newCommand('get_status');
-    return current($this->send($command));
+    $status = current($this->send($command));
+
+    $command = Miio\newCommand('get_clean_summary');
+    $summary = $this->send($command);
+
+    $record = current($summary[3]);
+    if ($record) {
+      $command = Miio\newCommand('get_clean_record', [$record]);
+      $summary = $this->send($command);
+
+      $lastClean = current($summary);
+      $status['last_clean'] = $lastClean;
+    }
+
+    return $status;
   }
 
   private function send($command) {

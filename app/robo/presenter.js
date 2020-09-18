@@ -21,14 +21,20 @@ const labels = new Map([
   [100, 'Voll aufgeladen']
 ]);
 
+const dateFormat = new Intl.DateTimeFormat('de-DE', {
+  day: 'numeric', month: 'long',
+  hour: 'numeric', minute: 'numeric'
+});
+
 function mapStatus(status) {
   let label = labels.get(status['state']) || 'Unbekannt';
   let battery = status['battery'] || 0;
   let cleaning = status['in_cleaning'] != 0;
   let charging = status['state'] == 8;
   let paused = [2, 3, 10].includes(status['state']);
+  let cleanDate = status['last_clean'] && new Date(status['last_clean'][0] * 1000);
 
-  return { label, battery, cleaning, charging, paused };
+  return { label, battery, cleaning, charging, paused, cleanDate };
 }
 
 Presenter.prototype.showIndex = function() {
@@ -51,11 +57,15 @@ Presenter.prototype.showIndex = function() {
     let {
       label, battery,
       cleaning, charging,
-      paused
+      paused, cleanDate
     } = mapStatus(status);
 
     state.set(label);
     power.set(battery + '%');
+
+    if (cleanDate) {
+      lastClean.set(dateFormat.format(cleanDate) + ' Uhr');
+    }
 
     topBar.enableBrush(cleaning && !paused);
 
