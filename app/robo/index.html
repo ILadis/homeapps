@@ -19,7 +19,7 @@
   const presenter = new Presenter(shell, client);
 
   if ('serviceWorker' in navigator) {
-//  navigator.serviceWorker.register('./service-worker.js');
+    navigator.serviceWorker.register('./service-worker.js');
   }
 
   window.onload = () => {
