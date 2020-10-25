@@ -25,6 +25,35 @@ Shell.prototype.setContent = function(...contents) {
   }
 };
 
+export const RippleButton = define('ripple-button', 'button', html`
+`, function() {
+  this.onclick = (event) => this.createRipple(event);
+});
+
+RippleButton.prototype.createRipple = function(event) {
+  let rect = this.getBoundingClientRect();
+
+  let diameter = Math.max(rect.width, rect.height);
+  let radius = diameter / 2;
+
+  let left = event.clientX - rect.left - radius;
+  let top = event.clientY - rect.top - radius;
+
+  var span = this.querySelector('.ripple');
+  if (span) {
+    span.remove();
+  }
+
+  var span = document.createElement('span');
+  span.style.width =
+  span.style.height = diameter + 'px';
+  span.style.left = left + 'px';
+  span.style.top = top + 'px';
+  span.className = 'ripple';
+
+  this.appendChild(span);
+};
+
 export const Bar = define('top-bar', 'div', html`
 <h1>Roborock</h1>
 <svg viewBox="0 0 120 120" class="vacuum">
@@ -75,7 +104,7 @@ export const RoomSelect = define('room-select', 'div', html`
   <h2>Raumwahl</h2>
   <div></div>
   <div>
-    <button>Reinigung starten</button>
+    <button is="ripple-button">Reinigung starten</button>
   </div>
 </form>`, function() {
   let form = this.querySelector('form');
