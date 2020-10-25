@@ -27,7 +27,7 @@ Shell.prototype.setContent = function(...contents) {
 
 export const RippleButton = define('ripple-button', 'button', html`
 `, function() {
-  this.onclick = (event) => this.createRipple(event);
+  this.addEventListener('click', (event) => this.createRipple(event));
 });
 
 RippleButton.prototype.createRipple = function(event) {
@@ -50,6 +50,8 @@ RippleButton.prototype.createRipple = function(event) {
   span.style.left = left + 'px';
   span.style.top = top + 'px';
   span.className = 'ripple';
+
+  span.onanimationend = () => span.remove();
 
   this.appendChild(span);
 };

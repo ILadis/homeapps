@@ -44,6 +44,12 @@ export function normalize(node) {
   return node;
 }
 
+export function sleep(millis) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, millis);
+  });
+}
+
 export function resizeHandler() {
   return (event) => {
     let target = event.target;

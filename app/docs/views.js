@@ -1,5 +1,5 @@
 
-import { html, define, submitHandler } from './dom.js';
+import { html, define, sleep, submitHandler } from './dom.js';
 
 const DateFormat = new Intl.DateTimeFormat('de-DE', {
   year: 'numeric',
@@ -29,6 +29,37 @@ Shell.prototype.setContent = function(...contents) {
     this.prepend(content);
     this.contents.add(content);
   }
+};
+
+export const RippleButton = define('ripple-button', 'button', html`
+`, function() {
+  this.addEventListener('click', (event) => this.createRipple(event));
+});
+
+RippleButton.prototype.createRipple = function(event) {
+  let rect = this.getBoundingClientRect();
+
+  let diameter = Math.max(rect.width, rect.height);
+  let radius = diameter / 2;
+
+  let left = event.clientX - rect.left - radius;
+  let top = event.clientY - rect.top - radius;
+
+  var span = this.querySelector('.ripple');
+  if (span) {
+    span.remove();
+  }
+
+  var span = document.createElement('span');
+  span.style.width =
+  span.style.height = diameter + 'px';
+  span.style.left = left + 'px';
+  span.style.top = top + 'px';
+  span.className = 'ripple';
+
+  span.onanimationend = () => span.remove();
+
+  this.appendChild(span);
 };
 
 export const Tag = define('app-tag', 'span', html``, function() {
@@ -375,11 +406,15 @@ UploadListItem.prototype.setProgress = function(percent) {
 export const BottomBar = define('bottom-bar', 'div', html`
 <form>
   <input type="file" multiple>
-  <svg viewBox="0 0 24 24"><use></use></svg>
+  <button is="ripple-button">
+    <svg viewBox="0 0 24 24"><use></use></svg>
+  </button>
 </form>
 <nav></nav>
 <template id="action">
-  <svg viewBox="0 0 24 24"><use></use></svg>
+  <button is="ripple-button">
+    <svg viewBox="0 0 24 24"><use></use></svg>
+  </button>
 </template>`);
 
 BottomBar.prototype.setFloatingAction = function(icon, handler, files) {
@@ -392,9 +427,17 @@ BottomBar.prototype.setFloatingAction = function(icon, handler, files) {
     handler(files);
   };
 
-  let [svg, use] = form.querySelectorAll('svg, use');
-  svg.onclick = () => files ? input.click() : handler();
+  let [button, use] = form.querySelectorAll('button, use');
   use.setAttribute('href', '#' + icon);
+
+  button.onclick = async (event) => {
+    event.preventDefault();
+    if (files) {
+      await sleep(200);
+      input.click();
+    }
+    else handler();
+  };
 
   return this;
 };
@@ -405,9 +448,13 @@ BottomBar.prototype.addAction = function(icon, handler) {
 
   let node = template.content.cloneNode(true);
 
-  let [svg, use] = node.querySelectorAll('svg, use');
-  svg.onclick = handler;
+  let [button, use] = node.querySelectorAll('button, use');
   use.setAttribute('href', '#' + icon);
+
+  button.onclick = async () => {
+    await sleep(200);
+    handler();
+  };
 
   nav.appendChild(node);
 
@@ -418,9 +465,9 @@ BottomBar.prototype.clearActions = function() {
   let form = this.querySelector('form');
   form.hidden = true;
 
-  let svgs = this.querySelectorAll('nav svg');
-  for (let svg of svgs) {
-    svg.remove();
+  let nodes = this.querySelectorAll('nav > *');
+  for (let node of nodes) {
+    node.remove();
   }
 };
 

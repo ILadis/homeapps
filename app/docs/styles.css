@@ -1,11 +1,17 @@
 
 :root {
   --primary-color: 69, 90, 100;
-  --accent-color: #fdd835;
+  --accent-color: 253, 216, 53;
+  --background-color: 251, 251, 251;
   --divider-color: 230, 230, 230;
   --shadow-color: 62, 62, 62;
-  --primary-text: #212121;
-  --secondary-text: #757575;
+  --primary-text: 33, 33, 33;
+  --secondary-text: 117, 117, 117;
+  --contrast-text: 255, 255, 255;
+}
+
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
 }
 
 * {
@@ -16,8 +22,8 @@
 
 body {
   font: 12px sans-serif;
-  color: var(--primary-text);
-  background: #fbfbfb;
+  color: rgb(var(--primary-text));
+  background: rgb(var(--background-color));
 }
 
 [hidden], body > svg {
@@ -33,7 +39,7 @@ h1 {
 h2 {
   font-size: 12px;
   font-weight: 400;
-  color: var(--secondary-text);
+  color: rgb(var(--secondary-text));
 }
 
 hr {
@@ -51,9 +57,23 @@ ul {
 input[type=text],
 input[type=date] {
   font: 14px sans-serif;
-  color: var(--primary-text);
+  color: rgb(var(--primary-text));
   border: none;
   background: transparent;
+}
+
+button {
+  position: relative;
+  overflow: hidden;
+}
+
+button > span.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 600ms linear;
+  background-color: rgba(var(--contrast-text), 0.7);
+  pointer-events: none;
 }
 
 form:last-child > :last-child { margin-bottom: 110px; }
@@ -77,7 +97,7 @@ form > div label {
   margin-top: 24px;
   width: 100%;
   font-size: 14px;
-  color: var(--secondary-text);
+  color: rgb(var(--secondary-text));
 }
 
 form > div input[type=text],
@@ -100,9 +120,13 @@ form > div .chip + input[type=text] {
 }
 
 form > div button:hover { background: rgba(var(--primary-color), 0.9); }
+form > div button:active { background: rgba(var(--primary-color), 0.8); }
+
 form > div button {
   padding: 6px 24px;
   font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   text-transform: uppercase;
   color: #fff;
   border: none;
@@ -126,6 +150,11 @@ form > div button {
   box-sizing: border-box;
 }
 
+[is=app-shell] {
+  position: relative;
+  min-height: 100vh;
+}
+
 [is=app-shell] > *:first-child {
   position: fixed;
   width: 100%;
@@ -142,7 +171,7 @@ form > div button {
 }
 
 [is=file-list]  +
-[is=bottom-bar] > nav svg:nth-child(3) { margin-left: auto; }
+[is=bottom-bar] > nav > *:nth-child(3) { margin-left: auto; }
 
 [is=file-list] > form { padding: 24px 26px; flex-shrink: 0; }
 
@@ -195,7 +224,7 @@ form > div button {
 [is=file-details] > form { flex-grow: 1; }
 
 [is=file-details] +
-[is=bottom-bar]   > nav svg:nth-child(2) { margin-left: auto; }
+[is=bottom-bar]   > nav > *:nth-child(2) { margin-left: auto; }
 
 [is=pdf-file-viewer] > ul li { margin: 10px; }
 [is=pdf-file-viewer] > ul li:last-child { margin-bottom: 60px; }
@@ -207,7 +236,7 @@ form > div button {
 }
 
 [is=file-scan]  +
-[is=bottom-bar] > nav svg:nth-child(2) { margin-left: auto; }
+[is=bottom-bar] > nav > *:nth-child(2) { margin-left: auto; }
 
 [is=file-scan] > form { flex-shrink: 0; }
 [is=file-scan] > ul { margin: 0 46px 60px; }
@@ -264,10 +293,12 @@ form > div button {
   position: fixed;
   bottom: 0;
   width: 100%;
+  height: 60px;
 }
 
 [is=bottom-bar] > form input { display: none; }
-[is=bottom-bar] > form svg {
+
+[is=bottom-bar] > form button {
   position: absolute;
   bottom: 27px; left: 50%;
   padding: 12px;
@@ -276,20 +307,32 @@ form > div button {
   border: none;
   border-radius: 50%;
   box-shadow: 0 2px 4px 1px rgb(var(--shadow-color));
-  background: var(--accent-color);
+  background: rgb(var(--accent-color));
   transform: translateX(-50%);
+  box-sizing: content-box;
+}
+
+[is=bottom-bar] > form button svg {
+  width: 100%;
+  height: 100%;
   fill: #fff;
 }
 
 [is=bottom-bar] > nav {
-  height: 35px;
-  padding: 13px 10px;
+  height: 100%;
   box-shadow: 0 2px 6px 1px rgb(var(--shadow-color));
   background: rgb(var(--primary-color));
   display: flex;
 }
 
-[is=bottom-bar] > nav svg {
+[is=bottom-bar] > nav button {
+  padding: 10px 5px;
+  height: 100%;
+  border: none;
+  background: transparent;
+}
+
+[is=bottom-bar] > nav button svg {
   margin: 0 14px;
   height: 100%;
   fill: #fff;

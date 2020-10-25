@@ -56,6 +56,20 @@ hr {
   background: rgb(var(--divider-color));
 }
 
+button {
+  position: relative;
+  overflow: hidden;
+}
+
+button > span.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 600ms linear;
+  background-color: rgba(var(--contrast-text), 0.7);
+  pointer-events: none;
+}
+
 form {
   overflow: scroll;
   scrollbar-width: none;
@@ -74,7 +88,6 @@ form > div button:hover { background: rgba(var(--primary-color), 0.95); }
 form > div button:active { background: rgba(var(--primary-color), 0.8); }
 
 form > div button {
-  position: relative;
   padding: 8px 24px;
   font-size: 17px;
   font-weight: 350;
@@ -86,16 +99,6 @@ form > div button {
   border-radius: 6px;
   background: rgb(var(--primary-color));
   box-shadow: 0 1px 2px 0 rgba(var(--shadow-color), 0.4);
-  overflow: hidden;
-}
-
-form > div button span.ripple {
-  position: absolute;
-  border-radius: 50%;
-  transform: scale(0);
-  animation: ripple 600ms linear;
-  background-color: rgba(var(--contrast-text), 0.7);
-  pointer-events: none;
 }
 
 input[type=checkbox].chip + label, .chip {
