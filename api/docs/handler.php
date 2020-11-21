@@ -1,6 +1,6 @@
 <?php
 namespace Http\Handler;
-use Http, Image, Document;
+use IO, Http, Image, Document;
 
 class ScanImage implements Http\Handler {
   private $scanner;
@@ -270,7 +270,7 @@ class ConvertInbox implements Http\Handler {
     return true;
   }
 
-  private function convert(&$document, &$size) {
+  private function convert(&$file, &$size) {
     $files = $this->repository->findFilesInInbox();
     $builder = new Document\Builder();
 
@@ -290,13 +290,14 @@ class ConvertInbox implements Http\Handler {
       $builder->nextPage()->useImage($image);
     }
 
-    $document = tmpfile();
+    $file = tmpfile();
+    $stream = IO\Stream::from($file);
 
-    $writer = new Document\Writer($document);
+    $writer = new Document\Writer($stream);
     $writer->write($builder->build());
 
-    $size = ftell($document);
-    fseek($document, 0);
+    $size = ftell($file);
+    fseek($file, 0);
   }
 }
 

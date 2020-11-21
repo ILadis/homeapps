@@ -8,16 +8,20 @@ class Stream {
     return new Stream($fd);
   }
 
-  private $fd;
+  protected $fd;
 
   protected function __construct($fd) {
     $this->fd = $fd;
   }
 
+  protected function recv($length) {
+    return fread($this->fd, $length);
+  }
+
   public function read($length, $exact = true) {
     $data = '';
     do {
-      $chunk = fread($this->fd, $length);
+      $chunk = $this->recv($length);
       $len = strlen($chunk);
 
       if ($len == 0) {
@@ -31,10 +35,14 @@ class Stream {
     return $data;
   }
 
+  protected function send($data) {
+    return fwrite($this->fd, $data);
+  }
+
   public function write($data, $exact = true) {
     $length = 0;
     do {
-      $len = fwrite($this->fd, $data);
+      $len = $this->send($data);
       $length += $len;
 
       if ($len == 0) {
@@ -85,6 +93,45 @@ class Datagram extends Stream {
 
   private function __construct($fd) {
     parent::__construct($fd);
+  }
+}
+
+class UnixDatagram extends Stream {
+
+  public static function open($file) {
+    $fd = socket_create(AF_UNIX, SOCK_DGRAM, 0);
+    if (!socket_connect($fd, $file)) {
+      throw new Exception("could not open {$file}");
+    }
+
+    $file = tempnam(sys_get_temp_dir(), 'socket.');
+    unlink($file);
+
+    if (!socket_bind($fd, $file)) {
+      throw new Exception("could not open {$file}");
+    }
+
+    return new UnixDatagram($fd, $file);
+  }
+
+  private $file;
+
+  private function __construct($fd, $file) {
+    parent::__construct($fd);
+    $this->file = $file;
+  }
+
+  protected function recv($length) {
+    return socket_read($this->fd, $length);
+  }
+
+  protected function send($data) {
+    return socket_write($this->fd, $data);
+  }
+
+  public function close() {
+    socket_close($this->fd);
+    unlink($this->file);
   }
 }
 

@@ -3,27 +3,13 @@ import { html, define } from './dom.js';
 
 export const Shell = define('app-shell', 'div', html`
 <div is="top-bar"></div>
-<div is="bottom-sheet"></div>`, function() {
+<div is="bottom-sheet"></div>
+<div is="room-select"></div>`, function() {
   this.contents = new Set();
   this.topBar = this.querySelector('[is=top-bar]');
   this.bottomSheet = this.querySelector('[is=bottom-sheet]');
+  this.roomSelect = this.querySelector('[is=room-select]');
 });
-
-Shell.prototype.setTitle = function(title) {
-  document.title = title;
-};
-
-Shell.prototype.setContent = function(...contents) {
-  for (var content of this.contents) {
-    content.remove();
-  }
-
-  this.contents.clear();
-  for (var content of contents) {
-    this.appendChild(content);
-    this.contents.add(content);
-  }
-};
 
 export const RippleButton = define('ripple-button', 'button', html`
 `, function() {
@@ -98,7 +84,7 @@ Bar.prototype.addStatus = function(key) {
   dl.appendChild(dt);
   dl.appendChild(dd);
 
-  return { set: (value) => dd.textContent = value }
+  return { set: (value) => dd.textContent = value };
 };
 
 export const RoomSelect = define('room-select', 'div', html`

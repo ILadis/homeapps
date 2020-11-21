@@ -1,6 +1,4 @@
 
-import * as Views from './views.js';
-
 export function Presenter(shell, client) {
   this.shell = shell;
   this.client = client;
@@ -38,7 +36,7 @@ function mapStatus(status) {
 }
 
 Presenter.prototype.showIndex = function() {
-  let { topBar, bottomSheet } = this.shell;
+  let { topBar, bottomSheet, roomSelect } = this.shell;
 
   let state = topBar.addStatus('Status');
   let power = topBar.addStatus('Ladezustand');
@@ -46,7 +44,8 @@ Presenter.prototype.showIndex = function() {
 
   let charge = bottomSheet.addButton()
     .setLabel('Aufladen')
-    .setIcon('charge');
+    .setIcon('charge')
+    .setEnabled(false);
 
   let pause = bottomSheet.addButton()
     .setLabel('Anhalten')
@@ -92,15 +91,12 @@ Presenter.prototype.showIndex = function() {
   state.set('Verbindung herstellen');
   refreshStatus();
 
-  let select = new Views.RoomSelect();
-  select.addRoom('living-room', 'Wohnzimmer', '17');
-  select.addRoom('bed-room', 'Schlafzimmer', '2');
-  select.addRoom('kitchen', 'Küche', '16');
-  select.addRoom('bath-room', 'Bad', '1');
+  roomSelect.addRoom('living-room', 'Wohnzimmer', '17');
+  roomSelect.addRoom('bed-room', 'Schlafzimmer', '2');
+  roomSelect.addRoom('kitchen', 'Küche', '16');
+  roomSelect.addRoom('bath-room', 'Bad', '1');
 
-  select.onSubmitted = (rooms) => this.client.clean(rooms);
+  roomSelect.onSubmitted = (rooms) => this.client.clean(rooms);
   charge.onClicked = () => this.client.charge();
-
-  this.shell.setContent(select);
 };
 

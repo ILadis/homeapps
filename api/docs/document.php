@@ -1,6 +1,6 @@
 <?php
 namespace Document;
-use ArrayIterator, Exception, IO\Stream;
+use ArrayIterator, Exception;
 
 class Builder {
   private $root, $pages, $current;
@@ -76,11 +76,13 @@ function newImage($stream, $length, $width, $height) {
   ], $stream);
 }
 
-class Writer extends Stream {
-  private $offset = 0, $objects = array(), $xref = array();
+class Writer {
+  private $stream;
+  private $offset = 0;
+  private $objects = array(), $xref = array();
 
-  public function __construct($fd) {
-    parent::__construct($fd);
+  public function __construct($stream) {
+    $this->stream = $stream;
   }
 
   private function lookupIndex($object, &$refs = false) {
@@ -101,10 +103,6 @@ class Writer extends Stream {
     $this->xref[$index] = $this->offset;
   }
 
-  public function read($length, $exact = true) {
-    throw new Exception('unsupported operation');
-  }
-
   public function write($object, $exact = true) {
     $this->writeHeader();
     $this->writeValue($object);
@@ -117,7 +115,7 @@ class Writer extends Stream {
   }
 
   private function writeData($data) {
-    $length = parent::write($data);
+    $length = $this->stream->write($data);
     $this->offset += $length;
     return $length;
   }

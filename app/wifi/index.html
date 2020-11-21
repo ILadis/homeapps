@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <title>Gäste WLAN</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0d47a1">
+  <link href="./favicon.ico" rel="icon">
+  <link href="./app/styles.css" rel="stylesheet">
+  <script type="module">
+  import { Presenter } from './app/presenter.js';
+  import { Client } from './app/client.js';
+  import { Shell } from './app/views.js';
+
+  const client = new Client();
+  const shell = new Shell();
+
+  const presenter = new Presenter(shell, client);
+
+  window.onload = () => {
+    document.body.prepend(shell);
+    presenter.showIndex();
+  };
+
+  document.onselectstart = () => false;
+  </script>
+</head>
+<body>
+  <svg width="0" height="0">
+    <symbol id="wifi" viewBox="0 0 24 24" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="12" y1="18" x2="12.01" y2="18"></line>
+      <path d="M9.172 15.172a4 4 0 0 1 5.656 0"></path>
+      <path d="M6.343 12.343a8 8 0 0 1 11.314 0"></path>
+      <path d="M3.515 9.515c4.686-4.687 12.284-4.687 17 0"></path>
+    </symbol>
+  </svg>
+</body>
+</html>
