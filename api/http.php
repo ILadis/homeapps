@@ -158,6 +158,18 @@ function serveFile($file) {
   };
 }
 
+function serveBase64Encoded($data, $mime) {
+  return function($request, $response) use ($data, $mime) {
+    $body = base64_decode($data);
+    $size = strlen($body);
+
+    $response->setStatus(200);
+    $response->setHeader('Content-Type', $mime);
+    $response->setHeader('Content-Length', $size);
+    fwrite($response->getBody(), $body);
+  };
+}
+
 class Uri {
   public static function parse($uri) {
     $parts = parse_url($uri);
