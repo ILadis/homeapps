@@ -7,17 +7,17 @@ export const Shell = define('app-shell', 'div', html`
 });
 
 export const Bar = define('top-bar', 'div', html`
-<input type="checkbox" id="wifi-toggle">
-<label for="wifi-toggle" class="toggle"></label>
-<h1>Gäste WLAN</h1>
-<svg viewBox="0 0 40 40" class="ripple">
-  <circle cx="20" cy="20" r="20"></circle>
-  <circle cx="20" cy="20" r="16"></circle>
-  <circle cx="20" cy="20" r="12"></circle>
-</svg>
-<svg viewBox="0 0 24 24" class="wifi">
-  <use href="#wifi"></use>
-</svg>
+<header>
+  <svg viewBox="0 0 24 24" class="wifi">
+    <use href="#wifi"></use>
+  </svg>
+  <h1>Gäste WLAN</h1>
+  <input type="checkbox" id="wifi-toggle">
+  <label for="wifi-toggle" class="toggle"></label>
+</header>
+<figure>
+  <img src="app/qrcode.png">
+</figure>
 <dl></dl>`, function() {
   let input = this.querySelector('input');
   input.onclick = () => this.onToggleClicked(input.checked);

@@ -10,8 +10,13 @@ Presenter.prototype.showIndex = async function() {
   let { topBar } = this.shell;
 
   let ssid = topBar.addStatus('SSID');
+  ssid.set('unbekannt');
+
   let active = topBar.addStatus('Status');
+  active.set('unbekannt');
+
   let numStations = topBar.addStatus('Verbundene Geräte');
+  numStations.set('unbekannt');
 
   let toggleStatus = async (enabled) => {
     try {

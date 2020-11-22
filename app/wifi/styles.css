@@ -1,21 +1,21 @@
 
 :root {
   --primary-color: 84, 114, 211;
-  --accent-color: 255, 238, 88;
-  --background-color: 251, 251, 251;
+  --accent-color: 102, 187, 106;
+  --background-color: 245, 245, 245;
   --divider-color: 230, 230, 230;
   --shadow-color: 62, 62, 62;
-  --primary-text: 33, 33, 33;
+  --primary-text: 20, 36, 43;
   --secondary-text: 117, 117, 117;
   --contrast-text: 255, 255, 255;
 }
 
 @keyframes fade {
-  0% { fill-opacity: 0.06; }
-  10% { fill-opacity: 0.06; }
-  50% { fill-opacity: 0.14; }
-  90% { fill-opacity: 0.06; }
-  100% { fill-opacity: 0.06; }
+    0% { stroke-opacity: 0.3; }
+   10% { stroke-opacity: 0.3; }
+   50% { stroke-opacity: 1.0; }
+   90% { stroke-opacity: 0.3; }
+  100% { stroke-opacity: 0.3; }
 }
 
 * {
@@ -59,109 +59,124 @@ hr {
 input + label.toggle {
   position: relative;
   display: inline-block;
-  transition: opacity 0.3s 0.1s, transform 0.2s 0.1s;
 }
 
 input + label.toggle::before {
   content: '';
   margin: 5px 0 5px 10px;
-  width: 36px;
-  height: 14px;
-  border-radius: 7px;
-  background-color: rgba(var(--contrast-text), 0.38);
-  transition: background-color 0.2s, opacity 0.2s;
+  width: 46px;
+  height: 18px;
+  border-radius: 9px;
+  background: rgba(var(--secondary-text), 0.2);
+  transition: background 0.2s;
   display: block;
 }
 
 input + label.toggle::after {
   content: '';
   position: absolute;
-  top: 2px; right: 16px;
-  width: 20px;
-  height: 20px;
+  top: 1px; right: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background-color: rgb(var(--contrast-text));
-  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  transition: background-color 0.2s, transform 0.2s;
+  background: rgb(var(--secondary-text));
+  box-shadow: 0 0 6px 0 rgba(var(--shadow-color), 0.2);
+  transition: background 0.2s, right 0.2s;
   display: block;
   cursor: pointer;
 }
 
 input:checked + label.toggle::before {
-    background-color: rgba(var(--accent-color), 0.6);
+  background: rgba(var(--accent-color), 0.6);
 }
 
 input:checked + label.toggle::after {
-    background-color: rgb(var(--accent-color));
-    transform: translateX(16px);
+  right: -2px;
+  background: rgb(var(--accent-color));
 }
 
 [is=app-shell] {
   position: relative;
   min-height: 100vh;
-  padding-bottom: 75px;
-  box-sizing: border-box;
 }
 
 [is=top-bar] {
-  margin-bottom: 24px;
-  padding: 24px 0 1px;
-  background: rgb(var(--primary-color));
-  box-shadow: 0 1px 2px 0 rgba(var(--shadow-color), 0.4);
+  height: 100vh;
 }
 
-[is=top-bar] > h1 {
-  margin: 0 46px 160px;
-  color: rgb(var(--contrast-text));
+[is=top-bar] > header {
+  padding: 24px 0;
+  display: flex;
+  align-items: center;
 }
 
-[is=top-bar] > svg.ripple {
-  position: absolute;
-  left: 50%;
-  margin: -160px 0 0 -70px;
-  width: 140px;
-  display: block;
-  z-index: 1;
+[is=top-bar] > header svg.wifi {
+  width: 36px; height: 36px;
+  margin: 0 18px 0 24px;
+  flex-shrink: 0;
 }
 
-[is=top-bar] > svg.ripple * {
+[is=top-bar] > header svg.wifi * {
+  stroke: rgb(var(--primary-text));
+  stroke-opacity: 0;
   animation: fade 3s linear alternate infinite;
-  fill: #90CAF9;
 }
 
-[is=top-bar] > svg.wifi * { stroke: #fff; }
-[is=top-bar] > svg.wifi {
-  position: absolute;
-  left: 50%;
-  margin: -120px 0 0 -30px;
-  width: 60px;
-  display: block;
-  z-index: 2;
+[is=top-bar] > header h1 {
+  width: 100%;
+  color: rgb(var(--primary-text));
 }
 
-[is=top-bar] > input { display: none; }
-[is=top-bar] > input + label {
-  float: right;
-  margin: 5px 24px 0 0;
+[is=top-bar] > header input { display: none; }
+[is=top-bar] > header input + label {
+  margin: 0 24px 0 18px;
+  flex-shrink: 0;
+}
+
+[is=top-bar] > figure {
+  width: 60%;
+  max-width: 250px;
+  margin: 24px auto 48px;
+  border-radius: 10%;
+  font-size: 0;
+  box-shadow: 0 0 6px 0 rgba(var(--shadow-color), 0.2);
+  overflow: hidden;
+}
+
+[is=top-bar] > figure img {
+  width: 100%;
+  height: 100%;
 }
 
 [is=top-bar] > dl {
-  margin: 12px 24px;
-  padding: 9px;
-  border-radius: 2px;
+  margin: 12px 42px;
+  padding: 16px 12px;
   font-size: 0;
-  background: rgba(var(--contrast-text), 0.1);
+  border-radius: 4px;
+  background: rgb(var(--contrast-text));
+  box-shadow: 0 1px 2px 0 rgba(var(--shadow-color), 0.4)
+}
+
+[is=top-bar] > dl dt {
+  font-size: 18px;
+  font-weight: 300;
+  color: rgb(var(--primary-text));
+}
+
+[is=top-bar] > dl dd {
+  font-size: 15px;
+  font-weight: 300;
+  color: rgb(var(--secondary-text));
+}
+
+[is=top-bar] > dl dd + dt {
+  margin-top: 18px;
 }
 
 [is=top-bar] > dl dt,
 [is=top-bar] > dl dd {
-  width: 50%;
-  padding: 3px 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 15px;
-  color: rgb(var(--contrast-text));
-  box-sizing: border-box;
-  display: inline-block;
+
 }

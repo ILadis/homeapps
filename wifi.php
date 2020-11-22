@@ -11,6 +11,7 @@ require('api/wifi/handler.php');
 
 $root = realpath(__DIR__);
 $base = getenv('BASE');
+$qrcode = getenv('QRCODE');
 
 $hostapd = new Hostapd\Client('/var/run/hostapd/wlan0');
 
@@ -24,6 +25,7 @@ $router->add('POST', '/api/wifi/enable', new Http\Handler\HostapdEnable($hostapd
 $router->add('POST', '/api/wifi/disable', new Http\Handler\HostapdDisable($hostapd));
 $router->add('GET',  '/api/wifi/status', new Http\Handler\HostapdStatus($hostapd));
 $router->add('GET',  '/api/wifi/stations', new Http\Handler\HostapdStations($hostapd));
+$router->add('GET',  '/app/qrcode.png', Http\serveBase64Encoded($qrcode, 'image/png'));
 
 foreach(array(
   '/index.html' => 'app/wifi/index.html',
