@@ -2,9 +2,9 @@
 *Homeapps* is a collection of custom web apps I run on my local network through a [Raspberry Pi](https://www.raspberrypi.org/).
 
 <p align="middle">
-  <img src="https://user-images.githubusercontent.com/7196536/101411268-f938a180-38e0-11eb-9c88-274496c53a5f.png" width="300px" hspace="10px">
-  <img src="https://user-images.githubusercontent.com/7196536/101411288-035aa000-38e1-11eb-9015-121aa6809dd0.png" width="300px" hspace="10px">
-  <img src="https://user-images.githubusercontent.com/7196536/101411299-0786bd80-38e1-11eb-8f89-242e232a1636.png" width="300px" hspace="10px">
+  <img src="https://user-images.githubusercontent.com/7196536/101411268-f938a180-38e0-11eb-9c88-274496c53a5f.png" width="30%" hspace="1%">
+  <img src="https://user-images.githubusercontent.com/7196536/101411288-035aa000-38e1-11eb-9015-121aa6809dd0.png" width="30%" hspace="1%">
+  <img src="https://user-images.githubusercontent.com/7196536/101411299-0786bd80-38e1-11eb-8f89-242e232a1636.png" width="30%" hspace="1%">
 </p>
 
 All web apps can be deployed independently and only require a recent version of [PHP](https://www.php.net/) to run. [Configuration](#configuration) is done using environment variables.
