@@ -13,8 +13,9 @@ require('api/robo/handler.php');
 $root = realpath(__DIR__);
 $base = getenv('BASE');
 $token = getenv('TOKEN');
+$host = getenv('DEVICE');
 
-$vacuum = new Devices\Vacuum('192.168.178.10', 54321, hex2bin($token));
+$vacuum = new Devices\Vacuum($host, 54321, hex2bin($token));
 
 $request = Http\newRequest();
 $response = Http\newResponse();

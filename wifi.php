@@ -12,8 +12,9 @@ require('api/wifi/handler.php');
 $root = realpath(__DIR__);
 $base = getenv('BASE');
 $qrcode = getenv('QRCODE');
+$iface = getenv('IFACE');
 
-$hostapd = new Hostapd\Client('/var/run/hostapd/wlan0');
+$hostapd = new Hostapd\Client($iface);
 
 $request = Http\newRequest();
 $response = Http\newResponse();

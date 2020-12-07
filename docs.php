@@ -14,11 +14,11 @@ require('api/docs/handler.php');
 
 $root = realpath(__DIR__);
 $base = getenv('BASE');
+$host = getenv('DEVICE');
 
 $db = new SQLite3('db.sqlite');
 $repository = Persistence\Repository::openNew($db);
-
-$scanner = new Devices\Scanner('192.168.178.11', 54921);
+$scanner = new Devices\Scanner($host, 54921);
 
 $request = Http\newRequest();
 $response = Http\newResponse();
