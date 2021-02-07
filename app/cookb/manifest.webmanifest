@@ -1,0 +1,14 @@
+{
+  "lang": "de",
+  "name": "Kochbuch",
+  "short_name": "Kochbuch",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#f9f8f5",
+  "background_color": "#f9f8f5",
+  "icons": [{
+    "src": "./icon.png",
+    "sizes": "any",
+    "type": "image/png"
+  }]
+}
