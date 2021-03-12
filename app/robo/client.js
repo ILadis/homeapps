@@ -2,16 +2,22 @@
 export function Client() {
 }
 
-Client.prototype.clean = async function(rooms) {
-  let body = JSON.stringify(rooms);
-  let request = new Request(`./api/vacuum/clean`, {
+Client.prototype.segmentClean = async function(segments) {
+  let body = JSON.stringify(segments);
+  let request = new Request(`./api/vacuum/clean/segment`, {
     method: 'POST', body
   });
 
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw new Error('failed to send command');
-  }
+  await exchange(request);
+};
+
+Client.prototype.zoneClean = async function(zones) {
+  let body = JSON.stringify(zones);
+  let request = new Request(`./api/vacuum/clean/zone`, {
+    method: 'POST', body
+  });
+
+  await exchange(request);
 };
 
 Client.prototype.pause = async function() {
@@ -19,10 +25,7 @@ Client.prototype.pause = async function() {
     method: 'POST'
   });
 
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw new Error('failed to send command');
-  }
+  await exchange(request);
 };
 
 Client.prototype.resume = async function() {
@@ -30,10 +33,7 @@ Client.prototype.resume = async function() {
     method: 'POST'
   });
 
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw new Error('failed to send command');
-  }
+  await exchange(request);
 };
 
 Client.prototype.charge = async function() {
@@ -41,10 +41,7 @@ Client.prototype.charge = async function() {
     method: 'POST'
   });
 
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw new Error('failed to send command');
-  }
+  await exchange(request);
 };
 
 Client.prototype.status = async function() {
@@ -52,12 +49,16 @@ Client.prototype.status = async function() {
     method: 'GET'
   });
 
-  let response = await fetch(request);
-  if (!response.ok) {
-    throw new Error('failed to send command');
-  }
+  let response = await exchange(request);
 
   let status = await response.json();
   return status;
 };
 
+async function exchange(request) {
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to send command');
+  }
+  return response;
+}

@@ -23,7 +23,8 @@ $response = Http\newResponse();
 $router = new Http\Router();
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
-$router->add('POST', '/api/vacuum/clean', new Http\Handler\VacuumClean($vacuum));
+$router->add('POST', '/api/vacuum/clean/segment', new Http\Handler\VacuumSegmentClean($vacuum));
+$router->add('POST', '/api/vacuum/clean/zone', new Http\Handler\VacuumZoneClean($vacuum));
 $router->add('POST', '/api/vacuum/pause', new Http\Handler\VacuumPause($vacuum));
 $router->add('POST', '/api/vacuum/resume', new Http\Handler\VacuumResume($vacuum));
 $router->add('POST', '/api/vacuum/charge', new Http\Handler\VacuumCharge($vacuum));

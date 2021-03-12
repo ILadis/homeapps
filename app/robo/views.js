@@ -4,15 +4,17 @@ import { html, define } from './dom.js';
 export const Shell = define('app-shell', 'div', html`
 <div is="top-bar"></div>
 <div is="bottom-sheet"></div>
-<div is="room-select"></div>`, function() {
-  this.contents = new Set();
+<div is="clean-select"></div>
+<div is="clean-select"></div>`, function() {
   this.topBar = this.querySelector('[is=top-bar]');
   this.bottomSheet = this.querySelector('[is=bottom-sheet]');
-  this.roomSelect = this.querySelector('[is=room-select]');
+
+  let selects = this.querySelectorAll('[is=clean-select]');
+  this.roomSelect = selects[0];
+  this.zoneSelect = selects[1];
 });
 
-export const RippleButton = define('ripple-button', 'button', html`
-`, function() {
+export const RippleButton = define('ripple-button', 'button', html``, function() {
   this.addEventListener('click', (event) => this.createRipple(event));
 });
 
@@ -68,10 +70,11 @@ export const Bar = define('top-bar', 'div', html`
 
 Bar.prototype.enableBrush = function(enable) {
   let svg = this.querySelector('.brush');
-  svg.classList.add('spin');
 
   if (!enable) {
     svg.classList.remove('spin');
+  } else {
+    svg.classList.add('spin');
   }
 };
 
@@ -87,9 +90,9 @@ Bar.prototype.addStatus = function(key) {
   return { set: (value) => dd.textContent = value };
 };
 
-export const RoomSelect = define('room-select', 'div', html`
+export const CleanSelect = define('clean-select', 'div', html`
 <form>
-  <h2>Raumwahl</h2>
+  <h2></h2>
   <div></div>
   <div>
     <button is="ripple-button">Reinigung starten</button>
@@ -98,16 +101,25 @@ export const RoomSelect = define('room-select', 'div', html`
   let form = this.querySelector('form');
   form.onsubmit = (event) => {
     event.preventDefault();
+
     let data = new FormData(form);
     let values = Array.from(data.values());
-    this.onSubmitted(values);
+
+    if (values.length) {
+      this.onSubmitted(values);
+    }
   };
 });
 
-RoomSelect.prototype.onSubmitted = function(rooms) {
+CleanSelect.prototype.onSubmitted = function(values) {
 };
 
-RoomSelect.prototype.addRoom = function(key, name, value) {
+CleanSelect.prototype.setTitle = function(title) {
+  let h2 = this.querySelector('h2');
+  h2.textContent = title;
+};
+
+CleanSelect.prototype.addOption = function(key, name, value) {
   let input = document.createElement('input');
   input.id =  key;
   input.name = key;

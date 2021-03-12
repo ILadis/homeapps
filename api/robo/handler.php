@@ -2,7 +2,7 @@
 namespace Http\Handler;
 use Http;
 
-class VacuumClean implements Http\Handler {
+class VacuumSegmentClean implements Http\Handler {
   private $vacuum;
 
   public function __construct($vacuum) {
@@ -12,7 +12,23 @@ class VacuumClean implements Http\Handler {
   public function handle($request, $response) {
     $segments = (array) $request->getBodyAsJson();
     $segments = array_map('intval', $segments);
-    $this->vacuum->clean($segments);
+    $this->vacuum->segmentClean($segments);
+    $response->setStatus(200);
+    return true;
+  }
+}
+
+class VacuumZoneClean implements Http\Handler {
+  private $vacuum;
+
+  public function __construct($vacuum) {
+    $this->vacuum = $vacuum;
+  }
+
+  public function handle($request, $response) {
+    $zones = (array) $request->getBodyAsJson();
+    $zones = array_map('intval', $zones);
+    $this->vacuum->zoneClean($zones);
     $response->setStatus(200);
     return true;
   }

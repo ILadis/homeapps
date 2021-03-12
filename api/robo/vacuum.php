@@ -11,8 +11,13 @@ class Vacuum {
     $this->token = $token;
   }
 
-  public function clean($segments) {
+  public function segmentClean($segments) {
     $command = Miio\newCommand('app_segment_clean', $segments);
+    $this->send($command);
+  }
+
+  public function zoneClean($zones) {
+    $command = Miio\newCommand('app_zoned_clean', $zones);
     $this->send($command);
   }
 

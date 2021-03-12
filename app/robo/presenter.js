@@ -24,79 +24,96 @@ const dateFormat = new Intl.DateTimeFormat('de-DE', {
   hour: 'numeric', minute: 'numeric'
 });
 
+const pauseStates = [2, 3, 10];
+
 function mapStatus(status) {
   let label = labels.get(status['state']) || 'Unbekannt';
   let battery = status['battery'] || 0;
   let cleaning = status['in_cleaning'] != 0;
   let charging = status['state'] == 8;
-  let paused = [2, 3, 10].includes(status['state']);
+  let paused = pauseStates.includes(status['state']);
   let cleanDate = status['last_clean'] && new Date(status['last_clean'][0] * 1000);
 
   return { label, battery, cleaning, charging, paused, cleanDate };
 }
 
+function scheduleEvery(timeout, action) {
+  return async function repeat() {
+    try {
+      await action();
+    } finally {
+      setTimeout(repeat, timeout);
+    }
+  }
+}
+
 Presenter.prototype.showIndex = function() {
-  let { topBar, bottomSheet, roomSelect } = this.shell;
+  let { topBar } = this.shell;
 
-  let state = topBar.addStatus('Status');
-  let power = topBar.addStatus('Ladezustand');
-  let lastClean = topBar.addStatus('Letzte Reinigung');
+  this.state = topBar.addStatus('Status');
+  this.power = topBar.addStatus('Ladezustand');
+  this.lastClean = topBar.addStatus('Letzte Reinigung');
 
-  let charge = bottomSheet.addButton()
+  let { bottomSheet } = this.shell;
+
+  this.charge = bottomSheet.addButton()
     .setLabel('Aufladen')
     .setIcon('charge')
     .setEnabled(false);
 
-  let pause = bottomSheet.addButton()
+  this.pause = bottomSheet.addButton()
     .setLabel('Anhalten')
     .setIcon('pause')
     .setEnabled(false);
 
-  let showStatus = (status) => {
-    let {
-      label, battery,
-      cleaning, charging,
-      paused, cleanDate
-    } = mapStatus(status);
+  let refreshStatus = scheduleEvery(8000,
+    () => this.client.status().then(status => this.updateStatus(status)));
 
-    state.set(label);
-    power.set(battery + '%');
-
-    if (cleanDate) {
-      lastClean.set(dateFormat.format(cleanDate) + ' Uhr');
-    }
-
-    topBar.enableBrush(cleaning && !paused);
-
-    pause.setLabel(paused ? 'Forsetzen' : 'Anhalten');
-    pause.setIcon(paused ? 'resume' : 'pause');
-
-    pause.setEnabled(cleaning || paused);
-    charge.setEnabled(!charging);
-
-    pause.onClicked = () => paused
-      ? this.client.resume()
-      : this.client.pause();
-  };
-
-  let refreshStatus = async () => {
-    try {
-      let status = await this.client.status();
-      showStatus(status);
-    } finally {
-      setTimeout(refreshStatus, 8000);
-    }
-  };
-
-  state.set('Verbindung herstellen');
+  this.state.set('Verbindung herstellen');
   refreshStatus();
 
-  roomSelect.addRoom('living-room', 'Wohnzimmer', '17');
-  roomSelect.addRoom('bed-room', 'Schlafzimmer', '2');
-  roomSelect.addRoom('kitchen', 'Küche', '16');
-  roomSelect.addRoom('bath-room', 'Bad', '1');
+  let { roomSelect } = this.shell;
 
-  roomSelect.onSubmitted = (rooms) => this.client.clean(rooms);
-  charge.onClicked = () => this.client.charge();
+  roomSelect.setTitle('Raumwahl');
+  roomSelect.addOption('living-room', 'Wohnzimmer', '17');
+  roomSelect.addOption('bed-room', 'Schlafzimmer', '2');
+  roomSelect.addOption('kitchen', 'Küche', '16');
+  roomSelect.addOption('bath-room', 'Bad', '1');
+  roomSelect.onSubmitted = (segments) => this.client.segmentClean(segments);
+
+  let { zoneSelect } = this.shell;
+
+  zoneSelect.setTitle('Bereichwahl');
+  zoneSelect.addOption('battle-station', 'Battlestation', '[23400, 24400, 25700, 27200, 1]');
+  zoneSelect.onSubmitted = (zones) => this.client.zoneClean(zones.map(JSON.parse));
+
+  this.charge.onClicked = () => this.client.charge();
+};
+
+Presenter.prototype.updateStatus = function(status) {
+  let {
+    label, battery,
+    cleaning, charging,
+    paused, cleanDate
+  } = mapStatus(status);
+
+  this.state.set(label);
+  this.power.set(battery + '%');
+
+  if (cleanDate) {
+    this.lastClean.set(dateFormat.format(cleanDate) + ' Uhr');
+  }
+
+  this.shell.topBar.enableBrush(cleaning && !paused);
+
+  this.pause.setLabel(paused ? 'Forsetzen' : 'Anhalten');
+  this.pause.setIcon(paused ? 'resume' : 'pause');
+
+  this.pause.setEnabled(cleaning || paused);
+  this.charge.setEnabled(!charging);
+
+  this.pause.onClicked = () => paused
+    ? this.client.resume()
+    : this.client.pause();
 };
 

@@ -4,7 +4,7 @@
   --background-color: 251, 251, 251;
   --divider-color: 230, 230, 230;
   --shadow-color: 62, 62, 62;
-  --primary-text: 31, 31, 31;
+  --primary-text: 51, 51, 51;
   --secondary-text: 117, 117, 117;
   --contrast-text: 255, 255, 255;
 }
@@ -190,13 +190,13 @@ input[type=checkbox]:checked.chip + label {
   display: inline-block;
 }
 
-[is=room-select] > form button {
+[is=clean-select] > form button {
   width: 90%;
-  margin: 24px auto 90px;
+  margin: 24px auto 45px;
 }
 
 [is=bottom-sheet] {
-  position: absolute;
+  position: fixed;
   bottom: 0; left: 0; right: 0;
   padding: 8px;
   background: rgb(var(--contrast-text));
@@ -204,6 +204,7 @@ input[type=checkbox]:checked.chip + label {
   box-shadow: 0 1px 4px 0 rgba(var(--shadow-color), 0.2);
   display: flex;
   justify-content: space-evenly;
+  z-index: 1;
 }
 
 [is=bottom-sheet] > button {
