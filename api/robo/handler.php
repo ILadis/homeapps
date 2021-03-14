@@ -27,7 +27,6 @@ class VacuumZoneClean implements Http\Handler {
 
   public function handle($request, $response) {
     $zones = (array) $request->getBodyAsJson();
-    $zones = array_map('intval', $zones);
     $this->vacuum->zoneClean($zones);
     $response->setStatus(200);
     return true;
