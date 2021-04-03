@@ -86,6 +86,7 @@ Presenter.prototype.showIndex = function() {
   zoneSelect.setTitle('Bereichwahl');
   zoneSelect.addOption('battle-station', 'Battlestation', '[23400, 24400, 25700, 27200, 1]');
   zoneSelect.addOption('hallway', 'Flur', '[25700, 22500, 31600, 24000, 1]');
+  zoneSelect.addOption('dining-area', 'Essbereich', '[26000, 19500, 28500, 24000, 1]');
   zoneSelect.onSubmitted = (zones) => this.client.zoneClean(zones.map(JSON.parse));
 
   this.charge.onClicked = () => this.client.charge();
