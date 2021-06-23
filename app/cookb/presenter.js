@@ -89,6 +89,14 @@ Presenter.prototype.showRecipe = async function(id) {
     this.showForm(id);
   };
 
+  view.setSharedEnabled(!!navigator.share);
+  view.onShareClicked = () => {
+    navigator.share({
+      title: recipe.name,
+      url: location.href,
+    })
+  };
+
   view.onServingsClicked = (delta) => {
     // TODO this does currently not work
     delta *= recipe.servings.increment || 1;

@@ -21,14 +21,14 @@ Shell.prototype.setContent = function(content) {
 export const Index = define('recipe-index', 'div', html`
 <header>
   <h1>
-    <svg viewBox="0 0 24 24"><use href="#refresh"></use></svg>
     <span><!-- title --></span>
+    <svg viewBox="0 0 24 24"><use href="#refresh"></use></svg>
+    <svg viewBox="2 2 20 20"><use href="#create"></use></svg>
   </h1>
   <input type="search" placeholder="Suchbegriff...">
 </header>
 <section>
   <ol><!-- recipes --></ol>
-  <svg viewBox="0 0 24 24"><use href="#create"></use></svg>
 </section>`, function() {
   let buttons = this.querySelectorAll('svg');
   buttons[0].onclick = () => this.onRefreshClicked();
@@ -103,13 +103,14 @@ Index.Recipe.prototype.onClicked = function() {
 export const Recipe = define('recipe-details', 'div', html`
 <header>
   <h1>
-    <svg viewBox="0 0 24 24"><use href="#edit"></use></svg>
     <span><!-- name --></span>
+    <svg viewBox="0 0 24 24"><use href="#edit"></use></svg>
+    <svg viewBox="0 0 24 24"><use href="#share"></use></svg>
   </h1>
   <h2>
-    <button>-</button>
+    <button>&minus;</button>
     <span><!-- servings --></span>
-    <button>+</button>
+    <button>&plus;</button>
   </h2>
   <ul><!-- (quantity unit) ingredient --></ul>
 </header>
@@ -119,18 +120,30 @@ export const Recipe = define('recipe-details', 'div', html`
 </section>`, function() {
   let buttons = this.querySelectorAll('svg, button');
   buttons[0].onclick = () => this.onEditClicked();
-  buttons[1].onclick = () => this.onServingsClicked(-1);
-  buttons[2].onclick = () => this.onServingsClicked(+1);
+  buttons[1].onclick = () => this.onShareClicked();
+  buttons[2].onclick = () => this.onServingsClicked(-1);
+  buttons[3].onclick = () => this.onServingsClicked(+1);
 
   this.ingredients = new Set();
   this.steps = new Set();
 });
+
+Recipe.prototype.onEditClicked = function() {
+};
+
+Recipe.prototype.onShareClicked = function() {
+};
 
 Recipe.prototype.setName = function({ name }) {
   let span = this.querySelector('header h1 span');
   span.textContent = name;
   return this;
 };
+
+Recipe.prototype.setSharedEnabled = function(enabled) {
+  let svgs = this.querySelectorAll('svg');
+  svgs[1].style.display = enabled ? 'block' : 'none';
+}
 
 Recipe.prototype.setServings = function({ servings }) {
   let span = this.querySelector('header h2 span');
@@ -203,10 +216,10 @@ Recipe.Step.prototype.addIngredient = function() {
 export const Form = define('recipe-form', 'div', html`
 <header>
   <h1>
-    <svg viewBox="0 0 24 24"><use href="#delete"></use></svg>
-    <a><svg viewBox="0 0 24 24"><use href="#export"></use></svg></a>
-    <svg viewBox="0 0 24 24"><use href="#done"></use></svg>
     <span><!-- title --></span>
+    <svg viewBox="0 0 24 24"><use href="#done"></use></svg>
+    <a><svg viewBox="0 0 24 24"><use href="#export"></use></svg></a>
+    <svg viewBox="0 0 24 24"><use href="#delete"></use></svg>
   </h1>
   <!-- name + servings -->
   <fieldset name="label">
@@ -228,9 +241,9 @@ export const Form = define('recipe-form', 'div', html`
   <svg viewBox="0 0 24 24"><use href="#create"></use></svg>
 </section>`, function() {
   let buttons = this.querySelectorAll('svg');
-  buttons[0].onclick = () => this.onDeleteClicked();
+  buttons[0].onclick = () => this.onDoneClicked();
   buttons[1].onclick = () => this.onExportClicked();
-  buttons[2].onclick = () => this.onDoneClicked();
+  buttons[2].onclick = () => this.onDeleteClicked();
   buttons[3].onclick = () => this.onAddStepClicked();
 
   let inputs = this.querySelectorAll('fieldset input');

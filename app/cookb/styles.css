@@ -6,7 +6,7 @@
 }
 
 body {
-  font: 12pt sans-serif;
+  font: 13pt sans-serif;
   color: #828282;
   background: #fff;
   cursor: default;
@@ -56,24 +56,25 @@ button {
 [is=recipe-form]  > header {
   position: relative;
   width: 100%;
-  padding: 8pt 18pt 12pt;
+  padding: 8pt 18pt 22pt;
   border-bottom: solid 1pt #ccc;
   box-shadow: 0 -1pt 2pt 1pt #bfbfbf;
   box-sizing: border-box;
-  background: #f9f8f5;
+  background: #fbfaf9;
   z-index: 1;
 }
 
 [is=recipe-index]   > header > h1,
 [is=recipe-details] > header > h1,
 [is=recipe-form]    > header > h1 {
-  position: relative;
-  padding-bottom: 16pt;
+  padding: 8pt 5pt 24pt 8pt;
+  display: flex;
 }
 
 [is=recipe-index]   > header > h1 span,
 [is=recipe-details] > header > h1 span,
 [is=recipe-form]    > header > h1 span {
+  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -86,15 +87,15 @@ button {
   margin-left: 12pt;
   width: 24pt;
   height: 24pt;
-  float: right;
+  flex-shrink: 0;
   fill: #4a4a4a;
 }
 
 [is=recipe-index] > header > h1 + input {
   margin: 0 auto;
-  padding: 4pt 8pt;
-  width: 190pt;
-  font-size: 12pt;
+  padding: 6pt 12pt;
+  width: 70%;
+  font-size: 13pt;
   color: #4a4a4a;
   border: solid 1pt #ccc;
   border-radius: 8pt;
@@ -104,7 +105,7 @@ button {
 
 [is=recipe-index] > section,
 [is=recipe-form]  > section {
-  padding: 12pt 8pt 0;
+  padding: 22pt 16pt 0;
   flex-grow: 1;
   overflow: scroll;
   scrollbar-width: none;
@@ -119,8 +120,8 @@ button {
 }
 
 [is=recipe-index] > section > ol > li {
-  padding: 8pt 0;
-  border-bottom: solid 1pt #ccc;
+  padding: 10pt 4pt;
+  border-bottom: solid 1pt #e6e6e6;
   cursor: pointer;
 }
 
@@ -155,27 +156,29 @@ button {
   height: 100%;
   padding: 8pt 18pt 34pt;
   box-sizing: border-box;
-  background: #f9f8f5;
+  background: #fbfaf9;
   flex-direction: column;
   display: flex;
   z-index: 1;
 }
 
 [is=recipe-details] > header > h2 {
-  padding: 0;
-  text-align: center;
-}
-
-[is=recipe-details] > header > h2 span {
-  margin: 0 8pt;
-  vertical-align: middle;
+  padding: 8pt 0 27pt;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
 
 [is=recipe-details] > header > h2 button {
-  padding: 0 6pt;
-  line-height: 15pt;
-  vertical-align: middle;
+  width: 26pt;
+  height: 26pt;
+  flex-shrink: 0;
+  line-height: 0;
   border: solid 1pt #ccc;
+  border-radius: 50%;
+  font-size: 20pt;
+  font-weight: 350;
+  color: #999;
   background: #fff;
 }
 
@@ -205,7 +208,7 @@ button {
   left: 2pt;
   max-height: 100%;
   padding: 8pt;
-  margin-top: -34pt;
+  margin-top: -42pt;
   border-radius: 8pt 8pt 0 0;
   box-shadow: 0 0 3pt 0 #bfbfbf;
   box-sizing: border-box;
@@ -216,10 +219,9 @@ button {
 }
 
 [is=recipe-details] > section > h2 {
-  padding: 0 8pt;
-  height: 26pt;
-  border-bottom: solid 1pt #e4e6e7;
-  flex-shrink: 0;
+  padding: 4pt 8pt 12pt;
+  font-size: 16pt;
+  font-weight: 500;
 }
 
 [is=recipe-details] > section > ol {
@@ -239,11 +241,11 @@ button {
 }
 
 [is=recipe-details] > section > ol > li:last-child {
-  padding-bottom: 0;
+  padding-bottom: 18pt;
 }
 
-[is=recipe-details] > section > ol > li:before ,
-[is=recipe-form]    > section > ol > li:before {
+[is=recipe-details] > section > ol > li::before ,
+[is=recipe-form]    > section > ol > li::before {
   position: absolute;
   left: 0; top: 12pt;
   width: 36pt;
@@ -251,28 +253,28 @@ button {
   line-height: 36pt;
   font-size: 18pt;
   text-align: center;
-  color: #4a4a4a;
+  color: #fff;
   border-radius: 50%;
-  background: #d7eeee;
+  background: #348d9a;
   display: block;
   counter-increment: steps;
   content: counter(steps);
 }
 
-[is=recipe-details] > section > ol > li:after,
-[is=recipe-form]    > section > ol > li:after {
+[is=recipe-details] > section > ol > li::after,
+[is=recipe-form]    > section > ol > li::after {
   content: ' ';
   position: absolute;
   left: 50%; bottom: 12pt;
   width: 50%;
   height: 1pt;
-  background: #e4e6e7;
+  background: #e6e6e6;
   transform: translateX(-50%);
   display: block;
 }
 
-[is=recipe-details] > section > ol > li:last-child:after,
-[is=recipe-form]    > section > ol > li:last-child:after {
+[is=recipe-details] > section > ol > li:last-child::after,
+[is=recipe-form]    > section > ol > li:last-child::after {
   display: none;
 }
 
@@ -287,11 +289,11 @@ button {
   display: inline;
 }
 
-[is=recipe-details] > section h3 + ul > li:first-child:before {
+[is=recipe-details] > section h3 + ul > li:first-child::before {
   display: none;
 }
 
-[is=recipe-details] > section h3 + ul > li:before {
+[is=recipe-details] > section h3 + ul > li::before {
   padding: 0 2pt;
   content: '•';
 }

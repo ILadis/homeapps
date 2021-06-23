@@ -11,7 +11,7 @@ require('api/cookb/handler.php');
 $root = realpath(__DIR__);
 $base = getenv('BASE');
 
-$repository = new Persistence\Repository("recipes");
+$repository = new Persistence\Repository('recipes');
 
 $request = Http\newRequest();
 $response = Http\newResponse();
