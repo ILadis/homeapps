@@ -4,14 +4,10 @@ import { html, define } from './dom.js';
 export const Shell = define('app-shell', 'div', html`
 <div is="top-bar"></div>
 <div is="bottom-sheet"></div>
-<div is="clean-select"></div>
 <div is="clean-select"></div>`, function() {
   this.topBar = this.querySelector('[is=top-bar]');
   this.bottomSheet = this.querySelector('[is=bottom-sheet]');
-
-  let selects = this.querySelectorAll('[is=clean-select]');
-  this.roomSelect = selects[0];
-  this.zoneSelect = selects[1];
+  this.zoneSelect = this.querySelector('[is=clean-select]');
 });
 
 export const RippleButton = define('ripple-button', 'button', html``, function() {

@@ -72,21 +72,16 @@ Presenter.prototype.showIndex = function() {
   this.state.set('Verbindung herstellen');
   refreshStatus();
 
-  let { roomSelect } = this.shell;
-
-  roomSelect.setTitle('Raumwahl');
-  roomSelect.addOption('living-room', 'Wohnzimmer', '17');
-  roomSelect.addOption('bed-room', 'Schlafzimmer', '2');
-  roomSelect.addOption('kitchen', 'Küche', '16');
-  roomSelect.addOption('bath-room', 'Bad', '1');
-  roomSelect.onSubmitted = (segments) => this.client.segmentClean(segments);
-
   let { zoneSelect } = this.shell;
 
   zoneSelect.setTitle('Bereichwahl');
-  zoneSelect.addOption('battle-station', 'Battlestation', '[23400, 24400, 25700, 27200, 1]');
-  zoneSelect.addOption('hallway', 'Flur', '[25700, 22500, 31600, 24000, 1]');
-  zoneSelect.addOption('dining-area', 'Essbereich', '[26000, 19500, 28500, 24000, 1]');
+  zoneSelect.addOption('living-room', 'Wohnzimmer', '[22900, 20200, 25900, 24300, 1]');
+  zoneSelect.addOption('dining-area', 'Essbereich', '[26000, 20200, 28600, 24100, 1]');
+  zoneSelect.addOption('hallway', 'Flur', '[25700, 22500, 31600, 24100, 1]');
+  zoneSelect.addOption('kitchen', 'Küche', '[26000, 24100, 27400, 26800, 1]');
+  zoneSelect.addOption('bath-room', 'Bad', '[30000, 20400, 33500, 22300, 1]');
+  zoneSelect.addOption('bed-room', 'Schlafzimmer', '[28600, 24100, 32800, 27450, 1]');
+  zoneSelect.addOption('battle-station', 'Battlestation', '[23300, 24300, 25900, 27500, 1]');
   zoneSelect.onSubmitted = (zones) => this.client.zoneClean(zones.map(JSON.parse));
 
   this.charge.onClicked = () => this.client.charge();
