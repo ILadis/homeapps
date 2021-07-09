@@ -34,6 +34,7 @@ foreach(array(
   '/app/dom.js' => 'app/dom.js',
   '/app/router.js' => 'app/router.js',
   '/app/search.js' => 'app/search.js',
+  '/app/storage.js' => 'app/storage.js',
   '/app/presenter.js' => 'app/cookb/presenter.js',
   '/app/repository.js' => 'app/cookb/repository.js',
   '/app/views.js' => 'app/cookb/views.js',

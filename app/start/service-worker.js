@@ -5,17 +5,12 @@ async function refreshAssets() {
   let cache = await caches.open('app');
   let resources = [
     '/',
-    '/icon.png',
     '/index.html',
     '/service-worker.js',
-    '/manifest.webmanifest',
 
-    '/app/async.js',
     '/app/dom.js',
     '/app/presenter.js',
     '/app/repository.js',
-    '/app/router.js',
-    '/app/search.js',
     '/app/views.js',
 
     '/app/styles.css',

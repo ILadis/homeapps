@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <title>Startpage</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <link href="./favicon.ico" rel="icon">
+  <link href="./app/styles.css" rel="stylesheet">
+  <script type="module">
+  import { Presenter } from './app/presenter.js';
+  import { Page, Repository } from './app/repository.js';
+  import { Shell } from './app/views.js';
+
+  const shell = new Shell();
+  const repository = new Repository();
+
+  const presenter = new Presenter(shell, repository);
+
+  if ('serviceWorker' in navigator) {
+//  navigator.serviceWorker.register('./service-worker.js');
+  }
+
+  window.onload = function() {
+    document.body.prepend(shell);
+    presenter.showIndex();
+  };
+
+  document.onselectstart = () => false;
+  </script>
+</head>
+<body>
+  <svg width="0" height="0">
+    <!-- TODO add paths/icons -->
+  </svg>
+</body>
+</html>
+

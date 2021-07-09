@@ -1,7 +1,8 @@
 
 self.oninstall = (event) => event.waitUntil(refreshAssets());
+
 async function refreshAssets() {
-  let cache = await caches.open('cookbook');
+  let cache = await caches.open('app');
   let resources = [
     '/',
     '/icon.png',
@@ -21,8 +22,7 @@ async function refreshAssets() {
   ];
 
   for (let url of resources) {
-    let request = new Request(url, { cache: 'no-cache' });
-
+    let request = new Request(url);
     let response = await fetch(request);
     await cache.put(request, response);
   }
@@ -30,15 +30,18 @@ async function refreshAssets() {
 
 self.onactivate = (event) => clients.claim();
 
-self.onfetch = (event) => event.respondWith(handleRequest(event));
+self.onfetch = (event) => {
+  if (event.request.method == 'GET') {
+    event.respondWith(handleRequest(event));
+  }
+};
+
 async function handleRequest({ request }) {
-  let cache = await caches.open('cookbook');
+  let cache = await caches.open('app');
   let response = await cache.match(request);
 
-  let headers = request.headers;
-  if (!response || headers.get('cache-control') == 'no-cache') {
+  if (!response) {
     response = await fetch(request);
-    cache.put(request, response.clone());
   }
 
   return response;
