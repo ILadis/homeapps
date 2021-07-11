@@ -6,6 +6,7 @@ export function Page(url, id = undefined) {
   this.id = id;
   this.title = '';
   this.tags = new Set();
+  this.hits = 0;
   // TODO consider adding image/favicon
 }
 
@@ -21,8 +22,12 @@ Page.prototype.addTag = function(tag) {
   this.tags.add(tag);
 };
 
+Page.prototype.increaseHits = function() {
+  this.hits++;
+};
+
 Page.fromJSON = function(json) {
-  let { id, url, title, tags } = json;
+  let { id, url, title, tags, hits } = json;
 
   let page = new Page(url, id);
   page.setTitle(title);
@@ -31,15 +36,22 @@ Page.fromJSON = function(json) {
     page.addTag(tag);
   }
 
+  while (hits-- > 0) {
+    page.increaseHits();
+  }
+
   return page;
 };
 
 Page.toJSON = function(page) {
-  let { url, id, title, tags } = page;
+  let { id, url, title, tags, hits } = page;
 
   let json = {
-    url, id, title,
-    tags: Array.from(tags)
+    id,
+    url,
+    title,
+    tags: Array.from(tags),
+    hits
   };
 
   return json;

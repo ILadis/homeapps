@@ -7,19 +7,31 @@ export function Presenter(shell, repository) {
 }
 
 Presenter.prototype.showIndex = async function() {
-  let { list, form } = this.shell;
+  let { clock, list, form } = this.shell;
 
-  for await (let page of this.repository.fetchAll()) {
+  function updateClock() {
+    let date = new Date();
+    clock.setTime(date);
+    clock.setDate(date);
+  }
+
+  updateClock();
+  window.setInterval(updateClock, 1000);
+
+  let repository = this.repository;
+  for await (let page of repository.fetchAll()) {
     list.addItem(page);
   }
 
   let page = new Page();
+
   form.onUrlChanged = (url) => page.setUrl(url);
   form.onTitleChanged = (title) => page.setTitle(title);
+  form.onSubmitted = submitPage;
 
-  form.onSubmitted = async () => {
+  async function submitPage() {
     form.clearValues();
-    await this.repository.save(page);
+    await repository.save(page);
     list.addItem(page);
     page = new Page();
   }
