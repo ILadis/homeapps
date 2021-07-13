@@ -33,10 +33,15 @@ Shell.prototype.setContent = function(...contents) {
 
 export const RippleButton = define('ripple-button', 'button', html`
 `, function() {
-  this.addEventListener('click', (event) => this.createRipple(event));
+  this.onclick = async (event) => {
+    event.preventDefault();
+    this.playAnimation(event);
+    await sleep(300);
+    this.onClicked();
+  };
 });
 
-RippleButton.prototype.createRipple = function(event) {
+RippleButton.prototype.playAnimation = function(event) {
   let rect = this.getBoundingClientRect();
 
   let diameter = Math.max(rect.width, rect.height);
@@ -57,10 +62,19 @@ RippleButton.prototype.createRipple = function(event) {
   span.style.top = top + 'px';
   span.className = 'ripple';
 
-  span.onanimationend = () => span.remove();
-
   this.appendChild(span);
+
+  return new Promise((resolve) => {
+    span.onanimationend = () => {
+      span.remove();
+      resolve();
+    };
+  });
 };
+
+RippleButton.prototype.onClicked = function() {
+};
+
 
 export const Tag = define('app-tag', 'span', html``, function() {
   this.className = 'chip';
@@ -428,16 +442,8 @@ BottomBar.prototype.setFloatingAction = function(icon, handler, files) {
   };
 
   let [button, use] = form.querySelectorAll('button, use');
+  button.onClicked = () => files ? input.click() : handler();
   use.setAttribute('href', '#' + icon);
-
-  button.onclick = async (event) => {
-    event.preventDefault();
-    if (files) {
-      await sleep(200);
-      input.click();
-    }
-    else handler();
-  };
 
   return this;
 };
@@ -449,12 +455,8 @@ BottomBar.prototype.addAction = function(icon, handler) {
   let node = template.content.cloneNode(true);
 
   let [button, use] = node.querySelectorAll('button, use');
+  button.onClicked = handler;
   use.setAttribute('href', '#' + icon);
-
-  button.onclick = async () => {
-    await sleep(200);
-    handler();
-  };
 
   nav.appendChild(node);
 
