@@ -1,17 +1,43 @@
 
 import { Database } from './storage.js';
 
-export function Page(url, id = undefined) {
-  this.url = url;
+export function Page(id = undefined) {
   this.id = id;
-  this.title = '';
+  this.url = Page.aboutBlank;
+  this.title = Page.emptyTitle;
   this.tags = new Set();
   this.hits = 0;
-  // TODO consider adding image/favicon
 }
 
-Page.prototype.setUrl = function(url) {
-  this.url = url;
+Page.aboutBlank = new URL('about:blank');
+Page.emptyTitle = '';
+
+Page.prototype.tryUrl = function(url) {
+  try {
+    this.url = new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+Page.prototype.inspect = async function() {
+  let url = this.url.toString();
+
+  let request = new Request('/api/inspect', {
+    method: 'POST',
+    body: url
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    return false;
+  }
+
+  // TODO consider adding image/favicon
+  let { title, favicon } = await response.json();
+
+  this.setTitle(title);
 };
 
 Page.prototype.setTitle = function(title) {
@@ -29,7 +55,8 @@ Page.prototype.increaseHits = function() {
 Page.fromJSON = function(json) {
   let { id, url, title, tags, hits } = json;
 
-  let page = new Page(url, id);
+  let page = new Page(id);
+  page.tryUrl(url);
   page.setTitle(title);
 
   for (let tag of tags.values()) {
@@ -47,11 +74,9 @@ Page.toJSON = function(page) {
   let { id, url, title, tags, hits } = page;
 
   let json = {
-    id,
-    url,
-    title,
-    tags: Array.from(tags),
-    hits
+    id, title, hits,
+    url: url.toString(),
+    tags: Array.from(tags)
   };
 
   return json;

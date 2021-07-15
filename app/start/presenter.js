@@ -7,7 +7,7 @@ export function Presenter(shell, repository) {
 }
 
 Presenter.prototype.showIndex = async function() {
-  let { clock, list, form } = this.shell;
+  let { clock, search, list } = this.shell;
 
   function updateClock() {
     let date = new Date();
@@ -23,17 +23,17 @@ Presenter.prototype.showIndex = async function() {
     list.addItem(page);
   }
 
-  let page = new Page();
+  search.onChanged = () => undefined;
+  search.onSubmitted = submitPage;
 
-  form.onUrlChanged = (url) => page.setUrl(url);
-  form.onTitleChanged = (title) => page.setTitle(title);
-  form.onSubmitted = submitPage;
-
-  async function submitPage() {
-    form.clearValues();
-    await repository.save(page);
-    list.addItem(page);
-    page = new Page();
+  async function submitPage(url) {
+    let page = new Page();
+    if (page.tryUrl(url)) {
+      search.clearValues();
+      await page.inspect();
+      await repository.save(page);
+      list.addItem(page);
+    }
   }
 };
 

@@ -5,6 +5,8 @@ set_error_handler(function($severity, $message, $file, $line) {
 });
 
 require('api/http.php');
+require('api/start/inspector.php');
+require('api/start/handler.php');
 
 $root = realpath(__DIR__);
 $base = getenv('BASE');
@@ -13,7 +15,8 @@ $request = Http\newRequest();
 $response = Http\newResponse();
 
 $router = new Http\Router($base);
-$router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
+$router->add('GET',  '/', Http\serveRedirect("{$base}/index.html"));
+$router->add('POST', '/api/inspect', new Http\Handler\InspectPage());
 
 foreach(array(
   '/index.html' => 'app/start/index.html',

@@ -5,17 +5,11 @@
   outline: none;
 }
 
-html, body {
-  height: 100%;
+body {
   font-family: sans-serif;
 }
 
-body > svg {
-  display: none;
-}
-
 [is=app-shell] {
-  height: 100%;
   padding: 4rem 1rem;
   box-sizing: border-box;
   display: flex;
@@ -24,8 +18,8 @@ body > svg {
 }
 
 [is=app-shell] > * {
-  max-width: 500px;
   width: 100%;
+  max-width: 80%;
 }
 
 [is=pages-clock] h1 {
@@ -41,42 +35,40 @@ body > svg {
 }
 
 [is=pages-search] form {
-  padding: 1.2rem 2rem 3rem;
+  padding: 1.2rem 0 3rem;
 }
 
 [is=pages-search] form input {
   padding: .4rem .8rem;
+  margin: 0 auto;
   width: 100%;
+  max-width: 500px;
   box-sizing: border-box;
-}
-
-[is=pages-list] {
-  max-height: 200px; /* FIXME */
+  display: block;
 }
 
 [is=pages-list] ul {
-  height: 100%;
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 
 [is=pages-list] ul li {
-  padding: .5rem 0;
+  padding: 1rem 2rem;
 }
 
 [is=pages-list] ul li span {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
   display: block;
+}
+
+[is=pages-list] ul li span:empty:before {
+  content: '\200b';
 }
 
 [is=pages-list] ul li a {
   text-decoration: none;
-}
-
-[is=pages-form] {
-  position: fixed;
-  bottom: 0;
-  padding-bottom: 1.2rem;
 }
 
