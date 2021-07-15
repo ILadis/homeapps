@@ -23,7 +23,7 @@ env BASE='/docs' DEVICE='192.168.178.2' php -S localhost:8080 docs.php
 ```
 
 ## Roborock
-Roborock is a simple web app that can be used to control a Xiamo Roborock vacuum cleaner. Only the most basic functionality is currently implemented.
+Roborock is a simple web app that can be used to control a Xiaomi Roborock vacuum cleaner. Only the most basic functionality is currently implemented.
 
 Required PHP extensions:
 - `sockets`: for accessing UDP stack
