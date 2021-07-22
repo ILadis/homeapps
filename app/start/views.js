@@ -32,7 +32,7 @@ export const Search = define('pages-search', 'div', html`
   <input type="text" placeholder="Suchen oder hinzufügen">
 </form>`, function() {
   let input = this.querySelector('input');
-  input.onchange = () => this.onChanged(input.value);
+  input.oninput = () => this.onChanged(input.value);
 
   let form = this.querySelector('form');
   form.onsubmit = (event) => (event.preventDefault(), this.onSubmitted(input.value));
@@ -70,5 +70,12 @@ List.prototype.addItem = function({ title, url }) {
 
   let ul = this.querySelector('ul');
   ul.appendChild(li);
+};
+
+List.prototype.clearItems = function() {
+  let ul = this.querySelector('ul');
+  while (ul.firstChild) {
+    ul.firstChild.remove();
+  }
 };
 

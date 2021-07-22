@@ -25,9 +25,11 @@ foreach(array(
   '/app/dom.js' => 'app/dom.js',
   '/app/router.js' => 'app/router.js',
   '/app/search.js' => 'app/search.js',
+  '/app/page.js' => 'app/start/page.js',
   '/app/storage.js' => 'app/storage.js',
   '/app/presenter.js' => 'app/start/presenter.js',
   '/app/repository.js' => 'app/start/repository.js',
+  '/app/syncmanager.js' => 'app/start/syncmanager.js',
   '/app/views.js' => 'app/start/views.js',
 
   '/app/styles.css' => 'app/start/styles.css',

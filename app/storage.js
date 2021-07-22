@@ -54,6 +54,18 @@ Database.prototype.deleteByKey = function(key) {
   return Database.promisify(request);
 };
 
+Database.prototype.fetchNext = async function(name, range) {
+  let index = this.store;
+  if (name) {
+    index = this.store.index(name);
+  }
+
+  let request = index.openCursor(range);
+  let cursor = await Database.promisify(request);
+
+  return cursor ? cursor.value : false;
+};
+
 Database.prototype.iterateAll = async function*(name, range) {
   let index = this.store;
   if (name) {

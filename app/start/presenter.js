@@ -1,5 +1,5 @@
 
-import { Page } from './repository.js';
+import { Page } from './page.js';
 
 export function Presenter(shell, repository) {
   this.shell = shell;
@@ -19,19 +19,26 @@ Presenter.prototype.showIndex = async function() {
   window.setInterval(updateClock, 1000);
 
   let repository = this.repository;
-  for await (let page of repository.fetchAll()) {
-    list.addItem(page);
+  loadPages();
+
+  async function loadPages(tag) {
+    let pages = Page.isTag(tag)
+      ? repository.fetchWithTag(tag)
+      : repository.fetchAll();
+
+    list.clearItems();
+    for await (let page of pages) list.addItem(page);
   }
 
-  search.onChanged = () => undefined;
+  search.onChanged = loadPages;
   search.onSubmitted = submitPage;
 
   async function submitPage(url) {
     let page = new Page();
+
     if (page.tryUrl(url)) {
       search.clearValues();
-      await page.inspect();
-      await repository.save(page);
+      await repository.saveNew(page);
       list.addItem(page);
     }
   }

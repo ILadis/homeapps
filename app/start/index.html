@@ -8,10 +8,12 @@
   <link href="./app/styles.css" rel="stylesheet">
   <script type="module">
   import { Presenter } from './app/presenter.js';
-  import { Page, Repository } from './app/repository.js';
+  import { Repository } from './app/repository.js';
+  import { SyncManager } from './app/syncmanager.js';
   import { Shell } from './app/views.js';
 
   const shell = new Shell();
+  const manager = new SyncManager();
   const repository = new Repository();
 
   const presenter = new Presenter(shell, repository);
