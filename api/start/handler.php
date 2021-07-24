@@ -28,4 +28,47 @@ class InspectPage implements Http\Handler {
   }
 }
 
+class SavePage implements Http\Handler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $url = basename($request->getUri()->getPath());
+    $url = rawurldecode($url);
+
+    $page = $request->getBodyAsJson();
+    $page['url'] = $url;
+
+    $saved = $this->repository->savePage($page);
+
+    if (!$saved) {
+      $response->setStatus(400);
+      return false;
+    }
+
+    $response->setStatus(200);
+    $response->setBodyAsJson($page);
+    return true;
+  }
+}
+
+class ListPages implements Http\Handler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $pages = iterator_to_array($this->repository->listPages());
+
+    $response->setStatus(200);
+    $response->setBodyAsJson($pages);
+    return true;
+  }
+}
+
 ?>
