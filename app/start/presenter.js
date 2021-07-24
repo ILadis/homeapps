@@ -1,5 +1,6 @@
 
 import { Page } from './page.js';
+import { Search } from './search.js';
 
 export function Presenter(shell, repository) {
   this.shell = shell;
@@ -19,16 +20,16 @@ Presenter.prototype.showIndex = async function() {
   window.setInterval(updateClock, 1000);
 
   let repository = this.repository;
-  loadPages();
+  let pages = new Set();
 
-  async function loadPages(tag) {
-    let pages = Page.isTag(tag)
-      ? repository.fetchWithTag(tag)
-      : repository.fetchAll();
+  showPages(repository.fetchAll());
 
+  async function showPages(iterator = pages) {
     let items = list.items.values();
 
-    for await (let page of pages) {
+    for await (let page of iterator) {
+      pages.add(page);
+
       let item = items.next().value || list.addItem();
       item.setTitle(page);
       item.setURL(page);
@@ -39,7 +40,13 @@ Presenter.prototype.showIndex = async function() {
     }
   }
 
-  search.onChanged = loadPages;
+  function searchPages(query) {
+    let search = new Search(pages, Page.search);
+    let results = search.execute(query) || pages;
+    showPages(results);
+  }
+
+  search.onChanged = searchPages;
   search.onSubmitted = submitPage;
 
   async function submitPage(url) {
@@ -48,7 +55,8 @@ Presenter.prototype.showIndex = async function() {
     if (page.tryUrl(url)) {
       search.clearValues();
       await repository.saveNew(page);
-      list.addItem(page);
+      pages.add(page);
+      showPages();
     }
   }
 };

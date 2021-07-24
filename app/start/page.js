@@ -11,6 +11,14 @@ Page.aboutBlank = new URL('about:blank');
 Page.emptyTitle = '';
 Page.tagPattern = new RegExp('^[a-zA-Z0-9]+$');
 
+Page.search = function*(page) {
+  yield page.title;
+  yield page.url;
+  for (let tag of page.tags) {
+    yield tag;
+  }
+};
+
 Page.isTag = function(tag) {
   return Page.tagPattern.test(tag || '');
 };
