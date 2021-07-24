@@ -2,7 +2,8 @@
 import { Database } from './storage.js';
 import { Page } from './page.js';
 
-export function Repository() {
+export function Repository(manager) {
+  this.manager = manager;
   this.db = Database.create('startpage', (schema) => {
     schema.createObjectStore('pages', {
       keyPath: 'id',
@@ -44,10 +45,22 @@ Repository.prototype.saveNew = async function(page) {
   let data = Page.toJSON(page);
   await db.save(data);
 
-  /* TODO use sync manager to save page remotely
-   * TODO consider adding remote id that we then store locally
-   * TODO save remote sync token to database
-   */
+  this.syncNew(page);
+};
+
+Repository.prototype.syncNew = async function(page) {
+  var body = Page.toJSON(page);
+  delete body['url'];
+  delete body['hits'];
+
+  var body = JSON.stringify(body);
+  let url = encodeURIComponent(page.url);
+
+  let request = new Request(`/api/pages/${url}`, {
+    method: 'PUT', body
+  });
+
+  await this.manager.tryFetch(request);
 };
 
 Repository.prototype.inspect = async function(page) {

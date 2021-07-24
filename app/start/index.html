@@ -14,7 +14,7 @@
 
   const shell = new Shell();
   const manager = new SyncManager();
-  const repository = new Repository();
+  const repository = new Repository(manager);
 
   const presenter = new Presenter(shell, repository);
 
