@@ -50,26 +50,25 @@ Search.prototype.clearValues = function() {
 };
 
 export const List = define('pages-list', 'div', html`
-<ul></ul>`);
+<ul></ul>`, function() {
+  this.items = new Set();
+});
 
-function toHostname(url) {
-  return new URL(url).hostname;
-}
-
-List.prototype.addItem = function({ title, url }) {
-  let span = document.createElement('span');
-  span.textContent = title;
-
-  let a = document.createElement('a');
-  a.href = url;
-  a.textContent = toHostname(url);
-
-  let li = document.createElement('li');
-  li.appendChild(span);
-  li.appendChild(a);
+List.prototype.addItem = function() {
+  let view = new Page();
 
   let ul = this.querySelector('ul');
-  ul.appendChild(li);
+  ul.appendChild(view);
+
+  this.items.add(view);
+  return view;
+};
+
+List.prototype.removeItem = function(view) {
+  let ul = this.querySelector('ul');
+  ul.removeChild(view);
+
+  this.items.delete(view);
 };
 
 List.prototype.clearItems = function() {
@@ -78,4 +77,23 @@ List.prototype.clearItems = function() {
     ul.firstChild.remove();
   }
 };
+
+export const Page = define('pages-item', 'li', html`
+<span></span>
+<a></a>`);
+
+Page.prototype.setTitle = function({ title }) {
+  let span = this.querySelector('span');
+  span.textContent = title;
+};
+
+Page.prototype.setURL = function({ url }) {
+  let a = this.querySelector('a');
+  a.textContent = toHostname(url);
+  a.href = url;
+};
+
+function toHostname(url) {
+  return new URL(url).hostname;
+}
 

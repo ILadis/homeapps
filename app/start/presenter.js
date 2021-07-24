@@ -26,8 +26,17 @@ Presenter.prototype.showIndex = async function() {
       ? repository.fetchWithTag(tag)
       : repository.fetchAll();
 
-    list.clearItems();
-    for await (let page of pages) list.addItem(page);
+    let items = list.items.values();
+
+    for await (let page of pages) {
+      let item = items.next().value || list.addItem();
+      item.setTitle(page);
+      item.setURL(page);
+    }
+
+    for (let item of items) {
+      list.removeItem(item);
+    }
   }
 
   search.onChanged = loadPages;
