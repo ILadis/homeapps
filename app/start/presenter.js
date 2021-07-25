@@ -37,7 +37,7 @@ Presenter.prototype.showIndex = async function() {
 
       let item = items.next().value || list.addItem();
       item.setTitle(page);
-      item.setURL(page);
+      item.setUrl(page);
     }
 
     for (let item of items) {
@@ -59,9 +59,15 @@ Presenter.prototype.showIndex = async function() {
 
     if (page.tryUrl(url)) {
       search.clearValues();
-      await repository.saveNew(page);
-      pages.add(page);
       showPages();
+
+      await repository.saveNew(page);
+
+      pages.add(page);
+
+      let item = list.addItem(true);
+      item.setTitle(page);
+      item.setURL(page);
     }
   }
 };

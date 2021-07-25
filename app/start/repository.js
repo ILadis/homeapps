@@ -76,8 +76,7 @@ Repository.prototype.syncAll = async function() {
   db.beginTx('pages', 'readwrite');
 
   for (let { title, url, tags } of pages) {
-    let id = await this.idByUrl(url);
-    ids.add(id);
+    var id = await this.idByUrl(url);
 
     let page = new Page(id);
     page.setTitle(title);
@@ -85,7 +84,9 @@ Repository.prototype.syncAll = async function() {
     page.addTags(tags);
 
     let data = Page.toJSON(page);
-    await db.save(data);
+    var id = await db.save(data);
+
+    ids.add(id);
   }
 
   for await (let { id } of db.iterateAll()) {

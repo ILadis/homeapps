@@ -50,15 +50,17 @@ Search.prototype.clearValues = function() {
 };
 
 export const List = define('pages-list', 'div', html`
+<h1>Lesezeichen</h1>
 <ul></ul>`, function() {
   this.items = new Set();
 });
 
-List.prototype.addItem = function() {
+List.prototype.addItem = function(isNew = false) {
   let view = new Page();
+  view.className = isNew ? 'new' : '';
 
   let ul = this.querySelector('ul');
-  ul.appendChild(view);
+  ul.prepend(view);
 
   this.items.add(view);
   return view;
@@ -87,7 +89,7 @@ Page.prototype.setTitle = function({ title }) {
   span.textContent = title;
 };
 
-Page.prototype.setURL = function({ url }) {
+Page.prototype.setUrl = function({ url }) {
   let a = this.querySelector('a');
   a.textContent = toHostname(url);
   a.href = url;

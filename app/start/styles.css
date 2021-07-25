@@ -1,4 +1,11 @@
 
+@keyframes fadein {
+  from {
+    transform: translateX(-7%);
+    opacity: 0;
+  }
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -7,6 +14,10 @@
 
 body {
   font-family: sans-serif;
+}
+
+body > svg {
+  display: none;
 }
 
 [is=app-shell] {
@@ -19,7 +30,7 @@ body {
 
 [is=app-shell] > * {
   width: 100%;
-  max-width: 80%;
+  max-width: 90%;
 }
 
 [is=pages-clock] h1 {
@@ -47,20 +58,35 @@ body {
   display: block;
 }
 
+[is=pages-list] h1 {
+  font-size: 1.7rem;
+  font-weight: 300;
+  margin-bottom: 1.2rem;
+  border-bottom: 1px solid;
+}
+
 [is=pages-list] ul {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(264px, 1fr));
 }
 
 [is=pages-list] ul li {
-  padding: 1rem 2rem;
+  padding: 1rem 6rem 1rem 0;
 }
 
-[is=pages-list] ul li span {
+[is=pages-list] ul li.new {
+  animation: fadein .3s ease-in-out;
+}
+
+[is=pages-list] ul li span,
+[is=pages-list] ul li a {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+[is=pages-list] ul li span {
   display: block;
 }
 
@@ -69,6 +95,8 @@ body {
 }
 
 [is=pages-list] ul li a {
+  max-width: 100%;
   text-decoration: none;
+  display: inline-block;
 }
 

@@ -13,7 +13,7 @@ Page.tagPattern = new RegExp('^[a-zA-Z0-9]+$');
 
 Page.search = function*(page) {
   yield page.title;
-  yield page.url;
+  yield page.url.toString();
   for (let tag of page.tags) {
     yield tag;
   }
