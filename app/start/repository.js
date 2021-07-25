@@ -8,10 +8,8 @@ export function Repository(manager) {
     schema.createObjectStore('pages', {
       keyPath: 'id',
       autoIncrement: true
-    }).createIndex('tags', 'tags', {
-      unique: false,
-      multiEntry: true,
-      locale: 'auto'
+    }).createIndex('url', 'url', {
+      unique: true
     });
   });
 }
@@ -56,18 +54,59 @@ Repository.prototype.syncNew = async function(page) {
   var body = JSON.stringify(body);
   let url = encodeURIComponent(page.url);
 
-  let request = new Request(`/api/pages/${url}`, {
-    method: 'PUT', body
-  });
+  let request = new Request(`/api/pages/${url}`, { method: 'PUT', body });
 
   await this.manager.tryFetch(request);
 };
 
+Repository.prototype.syncAll = async function() {
+  await this.manager.syncAll();
+
+  let request = new Request('/api/pages', { method: 'GET' });
+  let response = await fetch(request);
+
+  if (!response.ok) {
+    return false;
+  }
+
+  let pages = await response.json();
+  let ids = new Set();
+
+  let db = await this.db;
+  db.beginTx('pages', 'readwrite');
+
+  for (let { title, url, tags } of pages) {
+    let id = await this.idByUrl(url);
+    ids.add(id);
+
+    let page = new Page(id);
+    page.setTitle(title);
+    page.tryUrl(url);
+    page.addTags(tags);
+
+    let data = Page.toJSON(page);
+    await db.save(data);
+  }
+
+  for await (let { id } of db.iterateAll()) {
+    if (!ids.has(id)) await db.deleteByKey(id);
+  }
+};
+
+Repository.prototype.idByUrl = async function(url) {
+  let db = await this.db;
+
+  let range = IDBKeyRange.only(url);
+  let page = await db.fetchNext('url', range);
+
+  if (page !== false) {
+    return page.id;
+  }
+};
+
 Repository.prototype.inspect = async function(page) {
   let body = page.url.toString();
-  let request = new Request('/api/inspect', {
-    method: 'POST', body
-  });
+  let request = new Request('/api/inspect', { method: 'POST', body });
 
   try {
     let response = await fetch(request);

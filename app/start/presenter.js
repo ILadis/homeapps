@@ -24,6 +24,11 @@ Presenter.prototype.showIndex = async function() {
 
   showPages(repository.fetchAll());
 
+  await repository.syncAll();
+  pages.clear();
+
+  showPages(repository.fetchAll());
+
   async function showPages(iterator = pages) {
     let items = list.items.values();
 

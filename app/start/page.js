@@ -36,6 +36,12 @@ Page.prototype.setTitle = function(title) {
   this.title = title;
 };
 
+Page.prototype.addTags = function(tags) {
+  for (let tag of tags) {
+    this.tags.add(tag);
+  }
+};
+
 Page.prototype.addTag = function(tag) {
   this.tags.add(tag);
 };
