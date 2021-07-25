@@ -66,6 +66,17 @@ class Repository {
     }
   }
 
+  public function deletePageByUrl($url) {
+    $stmt = $this->db->prepare(''
+      .'DELETE FROM "pages" WHERE "url"=:url');
+
+    $stmt->bindValue(':url', $url, SQLITE3_TEXT);
+    $stmt->execute();
+
+    $changes = $this->db->changes();
+    return boolval($changes);
+  }
+
   private function purifyPage(&$page, $tags) {
     unset($page['id']);
     $page['tags'] = $tags;

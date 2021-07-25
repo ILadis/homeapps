@@ -71,4 +71,27 @@ class ListPages implements Http\Handler {
   }
 }
 
+class DeletePage implements Http\Handler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $url = basename($request->getUri()->getPath());
+    $url = rawurldecode($url);
+
+    $deleted = $this->repository->deletePageByUrl($url);
+
+    if (!$deleted) {
+      $response->setStatus(404);
+      return false;
+    }
+
+    $response->setStatus(204);
+    return true;
+  }
+}
+
 ?>
