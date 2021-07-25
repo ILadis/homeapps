@@ -136,7 +136,7 @@ class Repository {
     return boolval($changes);
   }
 
-    public function deleteFilesInInbox() {
+  public function deleteFilesInInbox() {
     $this->db->exec(''
       .'DELETE FROM "files" WHERE "inbox"=1');
 
