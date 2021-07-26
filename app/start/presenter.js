@@ -8,19 +8,19 @@ export function Presenter(shell, repository) {
 }
 
 Presenter.prototype.showIndex = async function() {
-  let { clock, search, list } = this.shell;
-
-  function updateClock() {
-    let date = new Date();
-    clock.setTime(date);
-    clock.setDate(date);
-  }
+  let { clock, form, list } = this.shell;
 
   updateClock();
   window.setInterval(updateClock, 1000);
 
   let repository = this.repository;
   let pages = new Set();
+  let search = new Search(pages, Page.search);
+
+  form.setTagPattern(Page.tagPattern);
+
+  form.onChanged = searchPages;
+  form.onSubmitted = submitPage;
 
   showPages(repository.fetchAll());
 
@@ -29,11 +29,18 @@ Presenter.prototype.showIndex = async function() {
 
   showPages(repository.fetchAll());
 
+  function updateClock() {
+    let date = new Date();
+    clock.setTime(date);
+    clock.setDate(date);
+  }
+
   async function showPages(iterator = pages) {
     let items = list.items.values();
 
     for await (let page of iterator) {
       pages.add(page);
+      page.tags.forEach(tag => form.addTag(tag));
 
       let item = items.next().value || list.addItem();
       item.setTitle(page);
@@ -45,20 +52,18 @@ Presenter.prototype.showIndex = async function() {
     }
   }
 
-  function searchPages(query) {
-    let search = new Search(pages, Page.search);
+  function searchPages() {
+    let query = [form.url, ...form.tags].join(' ');
     let results = search.execute(query) || pages;
     showPages(results);
   }
 
-  search.onChanged = searchPages;
-  search.onSubmitted = submitPage;
-
-  async function submitPage(url) {
+  async function submitPage() {
     let page = new Page();
+    page.addTags(form.tags);
 
-    if (page.tryUrl(url)) {
-      search.clearValues();
+    if (page.tryUrl(form.url)) {
+      form.clearValues();
       showPages();
 
       await repository.saveNew(page);
@@ -67,7 +72,7 @@ Presenter.prototype.showIndex = async function() {
 
       let item = list.addItem(true);
       item.setTitle(page);
-      item.setURL(page);
+      item.setUrl(page);
     }
   }
 };

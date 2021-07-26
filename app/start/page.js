@@ -9,7 +9,7 @@ export function Page(id = undefined) {
 
 Page.aboutBlank = new URL('about:blank');
 Page.emptyTitle = '';
-Page.tagPattern = new RegExp('^[a-zA-Z0-9]+$');
+Page.tagPattern = new RegExp('^[a-zA-Z][a-zA-Z0-9]*$');
 
 Page.search = function*(page) {
   yield page.title;
@@ -43,6 +43,7 @@ Page.prototype.addTags = function(tags) {
 };
 
 Page.prototype.addTag = function(tag) {
+  if (!Page.isTag(tag)) return false;
   this.tags.add(tag);
 };
 

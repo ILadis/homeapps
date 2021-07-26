@@ -1,4 +1,22 @@
 
+:root {
+  --primary-canvas: 249, 247, 247;
+  --primary-text: 17, 45, 78;
+  --secondary-canvas: 219, 226, 239;
+  --secondary-text: 17, 45, 78;
+  --link-text: 63, 114, 175;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-canvas: 34, 40, 49;
+    --primary-text: 238, 238, 238;
+    --secondary-canvas: 57, 62, 70;
+    --secondary-text: 238, 238, 238;
+    --link-text: 0, 173, 181;
+  }
+}
+
 @keyframes fadein {
   from {
     transform: translateX(-7%);
@@ -14,14 +32,23 @@
 
 body {
   font-family: sans-serif;
+  color: rgb(var(--primary-text));
+  background: rgb(var(--primary-canvas));
 }
 
+input {
+  font-size: 1rem;
+  background: transparent;
+  border: none;
+}
+
+input[type=checkbox],
 body > svg {
   display: none;
 }
 
 [is=app-shell] {
-  padding: 4rem 1rem;
+  padding: 4vh 1rem;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -45,17 +72,66 @@ body > svg {
   text-align: center;
 }
 
-[is=pages-search] form {
+[is=pages-form] {
   padding: 1.2rem 0 3rem;
 }
 
-[is=pages-search] form input {
-  padding: .4rem .8rem;
+[is=pages-form] form {
   margin: 0 auto;
+  padding: .8rem 1.2rem;
   width: 100%;
   max-width: 500px;
+  border-radius: .7rem;
   box-sizing: border-box;
-  display: block;
+  background: rgba(var(--primary-text), .1);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+[is=pages-form] form input.url {
+  width: 100%;
+  height: 1.6rem;
+  padding: 0 0 .8rem .2rem;
+  color: rgb(var(--primary-text));
+}
+
+[is=pages-form] form input.tag {
+  width: 0;
+  min-width: 16%;
+  max-width: 100%;
+  border-bottom: solid 1px rgba(var(--primary-text), .3);
+  text-overflow: ellipsis;
+  color: rgb(var(--primary-text));
+  flex-grow: 1;
+  transition: all .3s ease-in-out;
+}
+
+[is=pages-form] form input.tag:invalid {
+  border-bottom-width: 1px;
+  border-bottom-color: #e84545;
+}
+
+[is=pages-form] form input + label,
+[is=pages-form] form input.tag {
+  margin: .4rem .2rem 0;
+  line-height: 1.6rem;
+  display: inline-block;
+}
+
+[is=pages-form] form input:checked + label {
+  color: rgb(var(--link-text));
+  background: rgba(var(--link-text), .3);
+  border-color: rgb(var(--link-text));
+}
+
+[is=pages-form] form input + label {
+  padding: 0 .8rem;
+  border: solid 1px transparent;
+  border-radius: .8rem;
+  color: rgb(var(--primary-canvas));
+  background: rgb(var(--primary-text));
+  transition: all .3s ease-in-out;
 }
 
 [is=pages-list] h1 {
@@ -97,6 +173,7 @@ body > svg {
 [is=pages-list] ul li a {
   max-width: 100%;
   text-decoration: none;
+  color: rgb(var(--link-text));
   display: inline-block;
 }
 

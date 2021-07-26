@@ -41,7 +41,9 @@ Repository.prototype.saveNew = async function(page) {
   db.beginTx('pages', 'readwrite');
 
   let data = Page.toJSON(page);
-  await db.save(data);
+  let id = await db.save(data);
+
+  page.id = id;
 
   this.syncNew(page);
 };

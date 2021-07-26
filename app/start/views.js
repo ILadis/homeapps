@@ -3,10 +3,10 @@ import { html, define } from './dom.js';
 
 export const Shell = define('app-shell', 'div', html`
 <div is="pages-clock"></div>
-<div is="pages-search"></div>
+<div is="pages-form"></div>
 <div is="pages-list"></div>`, function() {
   this.clock = this.querySelector('[is=pages-clock]');
-  this.search = this.querySelector('[is=pages-search]');
+  this.form = this.querySelector('[is=pages-form]');
   this.list = this.querySelector('[is=pages-list]');
 });
 
@@ -27,26 +27,71 @@ Clock.prototype.setDate = function(date) {
   h2.textContent = Clock.dateFormat.format(date);
 };
 
-export const Search = define('pages-search', 'div', html`
+export const Form = define('pages-form', 'div', html`
 <form>
-  <input type="text" placeholder="Suchen oder hinzufügen">
+  <input type="text" placeholder="Seite hinzufügen" class="url">
+  <input type="text" placeholder="Tag hinzufügen"  class="tag">
+  <input type="submit" hidden>
 </form>`, function() {
-  let input = this.querySelector('input');
-  input.oninput = () => this.onChanged(input.value);
+  let inputs = this.querySelectorAll('input[type=text]');
+  inputs[0].oninput = () => this.onChanged();
 
   let form = this.querySelector('form');
-  form.onsubmit = (event) => (event.preventDefault(), this.onSubmitted(input.value));
+  form.onsubmit = (event) => (event.preventDefault(), inputs[1].value
+      ? this.addTag(inputs[1].value, true)
+      : this.onSubmitted());
+
+  this.tags = new Set();
+  Object.defineProperty(this, 'url', { get: () => inputs[0].value });
 });
 
-Search.prototype.onChanged = function(value) {
+Form.prototype.onChanged = function() {
 };
 
-Search.prototype.onSubmitted = function(value) {
+Form.prototype.onSubmitted = function() {
 };
 
-Search.prototype.clearValues = function() {
+Form.prototype.addTag = function(tag, isChecked = false) {
+  let inputs = this.querySelectorAll('input[type=text]');
+  let input = document.getElementById(tag);
+
+  if (input) return false;
+
+  input = document.createElement('input');
+  input.type = 'checkbox';
+  input.checked = isChecked;
+  input.id = tag;
+
+  input.onchange = () => (input.checked
+    ? this.tags.add(tag)
+    : this.tags.delete(tag),
+      this.onChanged());
+
+  let label = document.createElement('label');
+  label.setAttribute('for', tag);
+  label.textContent = tag;
+
+  inputs[1].parentNode.insertBefore(input, inputs[1]);
+  inputs[1].parentNode.insertBefore(label, inputs[1]);
+  inputs[1].value = '';
+
+  if (isChecked) {
+    this.tags.add(tag);
+    this.onChanged();
+  }
+};
+
+Form.prototype.setTagPattern = function(pattern) {
+  let input = this.querySelector('input.tag');
+  input.pattern = pattern.source;
+};
+
+Form.prototype.clearValues = function() {
   let form = this.querySelector('form');
   form.reset();
+
+  this.tags.clear();
+  this.onChanged();
 };
 
 export const List = define('pages-list', 'div', html`
