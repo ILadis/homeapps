@@ -148,26 +148,24 @@ body > svg {
 }
 
 [is=pages-list] ul li {
-  padding: 1rem 6rem 1rem 0;
+  padding: 1rem 4rem 1rem 0;
 }
 
 [is=pages-list] ul li.new {
   animation: fadein .3s ease-in-out;
 }
 
-[is=pages-list] ul li span,
+[is=pages-list] ul li input,
 [is=pages-list] ul li a {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-[is=pages-list] ul li span {
+[is=pages-list] ul li input {
+  width: 100%;
+  color: rgb(var(--primary-text));
   display: block;
-}
-
-[is=pages-list] ul li span:empty:before {
-  content: '\200b';
 }
 
 [is=pages-list] ul li a {

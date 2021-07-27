@@ -14,6 +14,29 @@ export function Repository(manager) {
   });
 }
 
+Repository.prototype.save = async function(page) {
+  let db = await this.db;
+  db.beginTx('pages', 'readwrite');
+
+  let data = Page.toJSON(page);
+  let id = await db.save(data);
+
+  page.id = id;
+
+  var body = Page.toJSON(page);
+  delete body['url'];
+  delete body['hits'];
+
+  var body = JSON.stringify(body);
+  let url = encodeURIComponent(page.url);
+
+  let request = new Request(`/api/pages/${url}`, {
+    method: 'PUT', body
+  });
+
+  await this.manager.tryFetch(request);
+};
+
 Repository.prototype.fetchAll = async function*() {
   let db = await this.db;
   db.beginTx('pages', 'readonly');
@@ -24,49 +47,14 @@ Repository.prototype.fetchAll = async function*() {
   }
 };
 
-Repository.prototype.fetchWithTag = async function*(tag) {
-  let db = await this.db;
-  db.beginTx('pages', 'readonly');
-
-  let iterator = db.iterateAll('tags', IDBKeyRange.only(tag));
-  for await (let data of iterator) {
-    yield Page.fromJSON(data);
-  }
-};
-
-Repository.prototype.saveNew = async function(page) {
-  await this.inspect(page);
-
-  let db = await this.db;
-  db.beginTx('pages', 'readwrite');
-
-  let data = Page.toJSON(page);
-  let id = await db.save(data);
-
-  page.id = id;
-
-  this.syncNew(page);
-};
-
-Repository.prototype.syncNew = async function(page) {
-  var body = Page.toJSON(page);
-  delete body['url'];
-  delete body['hits'];
-
-  var body = JSON.stringify(body);
-  let url = encodeURIComponent(page.url);
-
-  let request = new Request(`/api/pages/${url}`, { method: 'PUT', body });
-
-  await this.manager.tryFetch(request);
-};
-
 Repository.prototype.syncAll = async function() {
   await this.manager.syncAll();
 
-  let request = new Request('/api/pages', { method: 'GET' });
-  let response = await fetch(request);
+  let request = new Request('/api/pages', {
+    method: 'GET'
+  });
 
+  let response = await fetch(request);
   if (!response.ok) {
     return false;
   }
@@ -109,7 +97,9 @@ Repository.prototype.idByUrl = async function(url) {
 
 Repository.prototype.inspect = async function(page) {
   let body = page.url.toString();
-  let request = new Request('/api/inspect', { method: 'POST', body });
+  let request = new Request('/api/inspect', {
+    method: 'POST', body
+  });
 
   try {
     let response = await fetch(request);
@@ -121,3 +111,4 @@ Repository.prototype.inspect = async function(page) {
     return false;
   }
 };
+

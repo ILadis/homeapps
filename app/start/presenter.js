@@ -43,6 +43,7 @@ Presenter.prototype.showIndex = async function() {
       page.tags.forEach(tag => form.addTag(tag));
 
       let item = items.next().value || list.addItem();
+      item.onEdited = editPage(page);
       item.setTitle(page);
       item.setUrl(page);
     }
@@ -58,6 +59,13 @@ Presenter.prototype.showIndex = async function() {
     showPages(results);
   }
 
+  function editPage(page) {
+    return async (title) => {
+      page.setTitle(title);
+      await repository.save(page);
+    };
+  }
+
   async function submitPage() {
     let page = new Page();
     page.addTags(form.tags);
@@ -66,7 +74,8 @@ Presenter.prototype.showIndex = async function() {
       form.clearValues();
       showPages();
 
-      await repository.saveNew(page);
+      await repository.inspect(page);
+      await repository.save(page);
 
       pages.add(page);
 

@@ -14,8 +14,17 @@ export const Clock = define('pages-clock', 'div', html`
 <h1><!-- time --></h1>
 <h2><!-- date --></h2>`);
 
-Clock.timeFormat = new Intl.DateTimeFormat('de', { hour: '2-digit', minute: '2-digit', hour12: false });
-Clock.dateFormat = new Intl.DateTimeFormat('de', { weekday: 'long', month: 'long', day: 'numeric' });
+Clock.timeFormat = new Intl.DateTimeFormat('de', {
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false
+});
+
+Clock.dateFormat = new Intl.DateTimeFormat('de', {
+  weekday: 'long',
+  month: 'long',
+  day: 'numeric'
+});
 
 Clock.prototype.setTime = function(date) {
   let h1 = this.querySelector('h1');
@@ -126,12 +135,18 @@ List.prototype.clearItems = function() {
 };
 
 export const Page = define('pages-item', 'li', html`
-<span></span>
-<a></a>`);
+<input type="text">
+<a></a>`, function() {
+  let input = this.querySelector('input');
+  input.onchange = () => this.onEdited(input.value);
+});
+
+Page.prototype.onEdited = function(title) {
+};
 
 Page.prototype.setTitle = function({ title }) {
-  let span = this.querySelector('span');
-  span.textContent = title;
+  let input = this.querySelector('input');
+  input.value = title;
 };
 
 Page.prototype.setUrl = function({ url }) {
