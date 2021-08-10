@@ -35,6 +35,22 @@ class Stream {
     return $data;
   }
 
+  public function readLine() {
+    $data = '';
+
+    while (true) {
+      $chunk = $this->recv(1);
+      $len = strlen($chunk);
+
+      if ($len != 1) throw new Exception('could not read');
+      if ($chunk == "\n") break;
+
+      $data .= $chunk;
+    }
+
+    return $data;
+  }
+
   protected function send($data) {
     return fwrite($this->fd, $data);
   }
@@ -53,6 +69,11 @@ class Stream {
     } while ($data != '' && $exact);
 
     return $length;
+  }
+
+  public function writeLine($data) {
+    $this->write($data);
+    $this->write("\n");
   }
 
   public function close() {

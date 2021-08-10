@@ -1,6 +1,6 @@
 <?php
 namespace Http;
-use Closure;
+use Closure, Exception;
 
 class Request {
   protected $method, $uri, $headers, $body;
