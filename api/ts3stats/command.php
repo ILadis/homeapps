@@ -65,8 +65,8 @@ class Command {
       $command .= $key .'='. self::escape($value) .' ';
     }
 
-    foreach ($this->options as $options) {
-      $command .= '-'. $name .' ';
+    foreach ($this->options as $option) {
+      $command .= '-'. $option .' ';
     }
 
     return substr_replace($command, "\n", -1);
@@ -98,41 +98,42 @@ class Parser {
     $cursor = Characters::getIterator($line);
     $command = new Command();
 
-    while ($this->nextToken($cursor, $token)) {
+    while ($this->nextToken($cursor, $token, false)) {
       $current = $cursor->current();
 
       if (Characters::isSeparator($current)) {
-        $cursor->next();
         $this->nextValue($cursor, $value);
         $command->addParameter($token, $value);
       }
 
       else if (Characters::isDash($current)) {
-        $cursor->next();
         $this->nextToken($cursor, $value);
         $command->setOption($value);
       }
 
       else if (Characters::isTerminator($current)) {
-        $cursor->next();
         $command->setName($token);
       }
 
       else throw new Exception("unexpected character {$current}");
 
+      $current = $cursor->current();
+
       if (Characters::isSplitterator($current)) {
         yield $command;
-        $cursor->next();
         $command = new Command();
       }
+
+      $cursor->next();
     }
 
     yield $command;
   }
 
-  private function nextToken($cursor, &$value) {
+  private function nextToken($cursor, &$value, $next = true) {
     $value = '';
 
+    if ($next) $cursor->next();
     while ($cursor->valid()) {
       $current = $cursor->current();
 
@@ -147,15 +148,17 @@ class Parser {
     return false;
   }
 
-  private function nextValue($cursor, &$value) {
+  private function nextValue($cursor, &$value, $next = true) {
     $value = '';
     $escape = Characters::$NoEscape;
 
+    if ($next) $cursor->next();
     while ($cursor->valid()) {
       $current = $cursor->current();
 
       if (Characters::isEscape($current)) {
         $escape = Characters::$Unescape;
+        $cursor->next();
         continue;
       }
 
