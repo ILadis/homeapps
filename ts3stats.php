@@ -26,6 +26,7 @@ $response = Http\newResponse();
 $router = new Http\Router($base);
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
+$router->add('GET', '/api/ts3/info', new Http\Handler\ServerInfo($session));
 $router->add('GET', '/api/ts3/clients', new Http\Handler\ListClients($session));
 
 foreach(array(

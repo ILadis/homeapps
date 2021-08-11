@@ -1,0 +1,66 @@
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: sans-serif;
+  font-size: 15px;
+  background: #2b3346;
+  color: #efefef;
+}
+
+div[is=server-info] {
+  padding: 32px 0 24px;
+  margin-bottom: 32px;
+  border-bottom: solid 1px #22262d;
+  background: #1c2538;
+}
+
+div[is=server-info] svg {
+  width: 148px;
+  height: 148px;
+  margin: 0 auto 18px;
+  display: block;
+}
+
+div[is=server-info] dl {
+  width: 80%;
+  max-width: 360px;
+  margin: 0 auto;
+  font-size: 0;
+}
+
+div[is=server-info] dl dt { width: 35%; font-weight: 500; text-align: right; }
+div[is=server-info] dl dd { width: 65%; font-weight: 300; }
+
+div[is=server-info] dl dt,
+div[is=server-info] dl dd {
+  padding: 2px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: initial;
+  box-sizing: border-box;
+  display: inline-block;
+}
+
+div[is=client-list] {
+  width: 80%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+div[is=client-list] h1 {
+  font-size: 17px;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: solid 1px #efefef;
+}
+
+div[is=client-list] ul {
+  list-style: none;
+}

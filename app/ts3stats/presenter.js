@@ -5,10 +5,25 @@ export function Presenter(shell, client) {
 }
 
 Presenter.prototype.showIndex = async function() {
-  let clients = await this.client.listClients();
+  let { serverInfo, clientList } = this.shell;
 
-  for (let client of clients) {
-    this.shell.addClient(client);
+  let client = this.client;
+  refreshClients();
+  refreshInfo();
+
+  async function refreshInfo() {
+    let info = await client.serverInfo();
+    // TODO format version and uptime
+    serverInfo.add('Servername', info.name);
+    serverInfo.add('Version', info.version);
+    serverInfo.add('Laufzeit', info.uptime);
+  }
+
+  async function refreshClients() {
+    let clients = await client.listClients();
+    for (let client of clients) {
+      clientList.add(client);
+    }
   }
 };
 
