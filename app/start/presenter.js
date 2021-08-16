@@ -2,13 +2,14 @@
 import { Page } from './page.js';
 import { Search } from './search.js';
 
-export function Presenter(shell, repository) {
+export function Presenter(shell, repository, accountsManager) {
   this.shell = shell;
   this.repository = repository;
+  this.accountsManager = accountsManager;
 }
 
 Presenter.prototype.showIndex = async function() {
-  let { clock, form, list } = this.shell;
+  let { accounts, clock, form, list } = this.shell;
 
   updateClock();
   window.setInterval(updateClock, 1000);
@@ -17,6 +18,11 @@ Presenter.prototype.showIndex = async function() {
   let pages = new Set();
   let search = new Search(pages, Page.search);
 
+  let self = this.accountsManager.currentUser();
+  await showUsers(this.accountsManager.listUsers());
+
+  accounts.onChanged = switchUsers;
+
   form.setTagPattern(Page.tagPattern);
 
   form.onChanged = searchPages;
@@ -24,7 +30,7 @@ Presenter.prototype.showIndex = async function() {
 
   showPages(repository.fetchAll());
 
-  await repository.syncAll();
+  await repository.syncAll(self);
   pages.clear();
 
   showPages(repository.fetchAll());
@@ -33,6 +39,19 @@ Presenter.prototype.showIndex = async function() {
     let date = new Date();
     clock.setTime(date);
     clock.setDate(date);
+  }
+
+  async function showUsers(users) {
+    for (let user of await users) {
+      if (self == false) self = user;
+
+      let current = self?.token === user?.token;
+      accounts.addUser(user, current);
+    }
+  }
+
+  async function switchUsers(id) {
+    // TODO
   }
 
   async function showPages(iterator = pages) {
@@ -75,7 +94,7 @@ Presenter.prototype.showIndex = async function() {
       showPages();
 
       await repository.inspect(page);
-      await repository.save(page);
+      await repository.save(page, self);
 
       pages.add(page);
 

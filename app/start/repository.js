@@ -14,7 +14,7 @@ export function Repository(manager) {
   });
 }
 
-Repository.prototype.save = async function(page) {
+Repository.prototype.save = async function(page, user) {
   let db = await this.db;
   db.beginTx('pages', 'readwrite');
 
@@ -31,7 +31,11 @@ Repository.prototype.save = async function(page) {
   let url = encodeURIComponent(page.url);
 
   let request = new Request(`/api/pages/${url}`, {
-    method: 'PUT', body
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${user.token}`
+    },
+    body
   });
 
   await this.manager.tryFetch(request);
@@ -47,11 +51,14 @@ Repository.prototype.fetchAll = async function*() {
   }
 };
 
-Repository.prototype.syncAll = async function() {
+Repository.prototype.syncAll = async function(user) {
   await this.manager.syncAll();
 
   let request = new Request('/api/pages', {
-    method: 'GET'
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${user.token}`
+    }
   });
 
   let response = await fetch(request);

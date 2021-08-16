@@ -21,6 +21,8 @@ $response = Http\newResponse();
 $router = new Http\Router($base);
 $router->add('GET',    '/', Http\serveRedirect("{$base}/index.html"));
 $router->add('POST',   '/api/inspect', new Http\Handler\InspectPage());
+$router->add('GET',    '/api/users', new Http\Handler\ListUsers($repository));
+$router->add('POST',   '/api/users', new Http\Handler\CreateUser($repository));
 $router->add('GET',    '/api/pages', new Http\Handler\ListPages($repository));
 $router->add('PUT',    '/api/pages/[-_.~%a-zA-Z0-9]+', new Http\Handler\SavePage($repository));
 $router->add('DELETE', '/api/pages/[-_.~%a-zA-Z0-9]+', new Http\Handler\DeletePage($repository));
@@ -33,6 +35,7 @@ foreach(array(
   '/app/router.js' => 'app/router.js',
   '/app/search.js' => 'app/search.js',
   '/app/page.js' => 'app/start/page.js',
+  '/app/accounts.js' => 'app/start/accounts.js',
   '/app/storage.js' => 'app/storage.js',
   '/app/presenter.js' => 'app/start/presenter.js',
   '/app/repository.js' => 'app/start/repository.js',

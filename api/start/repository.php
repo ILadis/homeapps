@@ -6,6 +6,7 @@ class Repository {
   public static function openNew($db) {
     $repository = new Repository($db);
     $repository->createTables();
+    $repository->createDefaultUser();
     return $repository;
   }
 
@@ -23,7 +24,9 @@ class Repository {
       .'  "id"    INTEGER PRIMARY KEY AUTOINCREMENT,'
       .'  "title" TEXT,'
       .'  "url"   TEXT NOT NULL,'
-      .'  UNIQUE("url"))');
+      .'  "user"  INTEGER NOT NULL,'
+      .'  UNIQUE("url", "user"),'
+      .'  FOREIGN KEY ("user") REFERENCES "page_users" ("id") ON DELETE CASCADE)');
 
     $this->db->exec(''
       .'CREATE TABLE IF NOT EXISTS "page_tags" ('
@@ -31,15 +34,83 @@ class Repository {
       .'  "tag"   TEXT NOT NULL,'
       .'  UNIQUE("id", "tag"),'
       .'  FOREIGN KEY ("id") REFERENCES "pages" ("id") ON DELETE CASCADE)');
+
+    $this->db->exec(''
+      .'CREATE TABLE IF NOT EXISTS "page_users" ('
+      .'  "id"    INTEGER PRIMARY KEY AUTOINCREMENT,'
+      .'  "token" TEXT NOT NULL,'
+      .'  "name"  TEXT NOT NULL,'
+      .'  UNIQUE("token"))');
   }
 
-  public function savePage(&$page) {
-    $stmt = $this->db->prepare(''
-      .'INSERT INTO "pages" ("title", "url") '
-      .'VALUES (:title, :url) '
-      .'ON CONFLICT (url) DO UPDATE SET title=:title '
-      .'RETURNING id');
+  private function newUserToken() {
+    return bin2hex(random_bytes(16));
+  }
 
+  private function lookupUserId($token) {
+    $stmt = $this->db->prepare(''
+      .'SELECT "id" FROM "page_users" '
+      .'WHERE "token"=:token');
+
+    $stmt->bindValue(':token', $token, SQLITE3_TEXT);
+    $result = $stmt->execute();
+
+    while ($user = $result->fetchArray(SQLITE3_ASSOC)) {
+      return intval($user['id']);
+    }
+
+    return false;
+  }
+
+  private function createDefaultUser() {
+    $stmt = $this->db->prepare(''
+      .'INSERT INTO  "page_users" ("id", "token", "name") '
+      .'VALUES (1, :token, :name) '
+      .'ON CONFLICT DO NOTHING');
+
+    $token = $this->newUserToken();
+    $name = 'Default';
+
+    $stmt->bindValue(':token', $token, SQLITE3_TEXT);
+    $stmt->bindValue(':name',  $name,  SQLITE3_TEXT);
+    $stmt->execute();
+  }
+
+  public function createUser($name) {
+    $stmt = $this->db->prepare(''
+      .'INSERT INTO "page_users" ("id", "token", "name") '
+      .'VALUES (:token, :name)');
+
+    $token = $this->newUserToken();
+
+    $stmt->bindValue(':token', $token, SQLITE3_TEXT);
+    $stmt->bindValue(':name',  $name,  SQLITE3_TEXT);
+    $result = $stmt->execute();
+
+    return $result ? $token : false;
+  }
+
+  public function listUsers() {
+    $stmt = $this->db->prepare(''
+      .'SELECT "name", "token" FROM "page_users"');
+
+    $result = $stmt->execute();
+    while ($user = $result->fetchArray(SQLITE3_ASSOC)) {
+      yield $user;
+    }
+  }
+
+  public function savePage(&$page, $token) {
+    $user = $this->lookupUserId($token);
+    if (!$user) return false;
+
+    $stmt = $this->db->prepare(''
+      .'INSERT INTO "pages" ("title", "url", "user") '
+      .'VALUES (:title, :url, :user) '
+      .'ON CONFLICT ("url", "user") DO UPDATE SET title=:title '
+      .'RETURNING "id"');
+
+    $stmt->bindValue(':user', $user, SQLITE3_INTEGER);
     $stmt->bindValue(':title', $page['title'], SQLITE3_TEXT);
     $stmt->bindValue(':url',   $page['url'],   SQLITE3_TEXT);
     $result = $stmt->execute();
@@ -49,14 +120,17 @@ class Repository {
 
     $this->saveTags($id, $tags);
     $this->purifyPage($page, $tags);
-
-    return true;
   }
 
-  public function listPages() {
-    $stmt = $this->db->prepare(''
-      .'SELECT "id", "title", "url" FROM "pages"');
+  public function listPages($token) {
+    $user = $this->lookupUserId($token);
+    if (!$user) return false;
 
+    $stmt = $this->db->prepare(''
+      .'SELECT "id", "title", "url" FROM "pages" '
+      .'WHERE "user"=:user');
+
+    $stmt->bindValue(':user', $user, SQLITE3_INTEGER);
     $result = $stmt->execute();
 
     while ($page = $result->fetchArray(SQLITE3_ASSOC)) {

@@ -2,13 +2,47 @@
 import { html, define } from './dom.js';
 
 export const Shell = define('app-shell', 'div', html`
+<div is="pages-accounts"></div>
 <div is="pages-clock"></div>
 <div is="pages-form"></div>
 <div is="pages-list"></div>`, function() {
+  this.accounts = this.querySelector('[is=pages-accounts]');
   this.clock = this.querySelector('[is=pages-clock]');
   this.form = this.querySelector('[is=pages-form]');
   this.list = this.querySelector('[is=pages-list]');
 });
+
+export const Accounts = define('pages-accounts', 'div', html`
+<svg viewBox="0 0 24 24"><use href="#account"></use></svg>
+<select hidden>
+  <option id="create">Hinzufügen...</option>
+</select>`, function() {
+  let select = this.querySelector('select');
+  let create = this.querySelector('#create');
+
+  select.onchange = () => create.selected
+    ? this.onSubmitted()
+    : this.onChanged(select.value);
+});
+
+Accounts.prototype.onSubmitted = function() {
+};
+
+Accounts.prototype.onChanged = function(token) {
+};
+
+Accounts.prototype.addUser = function({ token, name }, isSelected = false) {
+  let option = document.createElement('option');
+  option.value = token;
+  option.textContent = name;
+  option.selected = isSelected;
+
+  let select = this.querySelector('select');
+  select.hidden = false;
+
+  let node = this.querySelector('#create');
+  node.parentNode.insertBefore(option, node);
+};
 
 export const Clock = define('pages-clock', 'div', html`
 <h1><!-- time --></h1>
