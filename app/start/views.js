@@ -35,13 +35,19 @@ Accounts.prototype.addUser = function({ token, name }, isSelected = false) {
   let option = document.createElement('option');
   option.value = token;
   option.textContent = name;
-  option.selected = isSelected;
 
   let select = this.querySelector('select');
   select.hidden = false;
 
   let node = this.querySelector('#create');
   node.parentNode.insertBefore(option, node);
+
+  if (isSelected) option.selected = true;
+};
+
+Accounts.prototype.selectUser = function({ token }) {
+  let options = this.querySelectorAll('option');
+  options.forEach(option => option.selected = option.value == token);
 };
 
 export const Clock = define('pages-clock', 'div', html`
@@ -122,6 +128,11 @@ Form.prototype.addTag = function(tag, isChecked = false) {
     this.tags.add(tag);
     this.onChanged();
   }
+};
+
+Form.prototype.removeTags = function() {
+  let nodes = this.querySelectorAll('input[type=checkbox], label');
+  nodes.forEach(node => node.remove());
 };
 
 Form.prototype.setTagPattern = function(pattern) {

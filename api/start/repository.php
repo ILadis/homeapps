@@ -40,7 +40,9 @@ class Repository {
       .'  "id"    INTEGER PRIMARY KEY AUTOINCREMENT,'
       .'  "token" TEXT NOT NULL,'
       .'  "name"  TEXT NOT NULL,'
-      .'  UNIQUE("token"))');
+      .'  UNIQUE("token"),'
+      .'  UNIQUE("name"),'
+      .'  CHECK(LENGTH(name) > 0))');
   }
 
   private function newUserToken() {
@@ -78,7 +80,7 @@ class Repository {
 
   public function createUser($name) {
     $stmt = $this->db->prepare(''
-      .'INSERT INTO "page_users" ("id", "token", "name") '
+      .'INSERT INTO "page_users" ("token", "name") '
       .'VALUES (:token, :name)');
 
     $token = $this->newUserToken();
@@ -87,7 +89,9 @@ class Repository {
     $stmt->bindValue(':name',  $name,  SQLITE3_TEXT);
     $result = $stmt->execute();
 
-    return $result ? $token : false;
+    $user = array('token' => $token, 'name' => $name);
+
+    return $result ? $user : false;
   }
 
   public function listUsers() {

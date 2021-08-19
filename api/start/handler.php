@@ -36,16 +36,16 @@ class CreateUser implements Http\Handler {
   }
 
   public function handle($request, $response) {
-    $alias = $request->getBodyAsText();
+    $name = $request->getBodyAsText();
 
-    $token = $this->repository->createUser($alias);
-    if (!$token) {
+    $user = $this->repository->createUser($name);
+    if (!$user) {
       $response->setStatus(400);
       return false;
     }
 
     $response->setStatus(200);
-    $response->setBodyAsText($token);
+    $response->setBodyAsJson($user);
     return true;
   }
 }

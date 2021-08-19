@@ -15,13 +15,18 @@ Presenter.prototype.showIndex = async function() {
   window.setInterval(updateClock, 1000);
 
   let repository = this.repository;
+  let accountsManager = this.accountsManager;
+
   let pages = new Set();
   let search = new Search(pages, Page.search);
 
-  let self = this.accountsManager.currentUser();
-  await showUsers(this.accountsManager.listUsers());
+  let self = accountsManager.currentUser();
+  await showUsers(accountsManager.listUsers());
 
-  accounts.onChanged = switchUsers;
+  accountsManager.switchUser(self);
+
+  accounts.onChanged = switchUser;
+  accounts.onSubmitted = createUser;
 
   form.setTagPattern(Page.tagPattern);
 
@@ -29,11 +34,8 @@ Presenter.prototype.showIndex = async function() {
   form.onSubmitted = submitPage;
 
   showPages(repository.fetchAll());
-
   await repository.syncAll(self);
-  pages.clear();
-
-  showPages(repository.fetchAll());
+  showPages(repository.fetchAll(), true);
 
   function updateClock() {
     let date = new Date();
@@ -50,12 +52,37 @@ Presenter.prototype.showIndex = async function() {
     }
   }
 
-  async function switchUsers(id) {
-    // TODO
+  async function switchUser(token) {
+    self = await accountsManager.findUser(token);
+    accountsManager.switchUser(self);
+
+    await repository.syncAll(self);
+    showPages(repository.fetchAll(), true);
   }
 
-  async function showPages(iterator = pages) {
+  async function createUser() {
+    let name = prompt('Benutzername:');
+
+    try {
+      self = await accountsManager.createUser(name);
+
+      accountsManager.switchUser(self);
+      accounts.addUser(self, true);
+    } catch {
+      accounts.selectUser(self);
+    }
+
+    await repository.syncAll(self);
+    showPages(repository.fetchAll(), true);
+  }
+
+  async function showPages(iterator = pages, clear = false) {
     let items = list.items.values();
+
+    if (clear) {
+      pages.clear();
+      form.removeTags();
+    }
 
     for await (let page of iterator) {
       pages.add(page);
@@ -81,7 +108,7 @@ Presenter.prototype.showIndex = async function() {
   function editPage(page) {
     return async (title) => {
       page.setTitle(title);
-      await repository.save(page);
+      await repository.save(page, self);
     };
   }
 
