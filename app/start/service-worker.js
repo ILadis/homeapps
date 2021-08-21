@@ -9,8 +9,14 @@ async function refreshAssets() {
     '/service-worker.js',
 
     '/app/dom.js',
+    '/app/router.js',
+    '/app/search.js',
+    '/app/page.js',
+    '/app/accounts.js',
+    '/app/storage.js',
     '/app/presenter.js',
     '/app/repository.js',
+    '/app/syncmanager.js',
     '/app/views.js',
 
     '/app/styles.css',
