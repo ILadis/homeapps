@@ -56,7 +56,7 @@ class Client {
   }
 
   private function exchange($command) {
-    $socket = UnixDatagram::open($this->socket);
+    $socket = UnixDatagram::connect($this->socket);
 
     try {
       $socket->write($command);

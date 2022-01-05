@@ -119,7 +119,7 @@ class Datagram extends Stream {
 
 class UnixDatagram extends Stream {
 
-  public static function open($file) {
+  public static function connect($file) {
     $fd = socket_create(AF_UNIX, SOCK_DGRAM, 0);
     if (!socket_connect($fd, $file)) {
       throw new Exception("could not open {$file}");
@@ -140,6 +140,65 @@ class UnixDatagram extends Stream {
   private function __construct($fd, $file) {
     parent::__construct($fd);
     $this->file = $file;
+  }
+
+  protected function recv($length) {
+    return socket_read($this->fd, $length);
+  }
+
+  protected function send($data) {
+    return socket_write($this->fd, $data);
+  }
+
+  public function close() {
+    socket_close($this->fd);
+    unlink($this->file);
+  }
+}
+
+class UnixSocket extends Stream {
+
+  public static function listen($file) {
+    $fd = socket_create(AF_UNIX, SOCK_STREAM, 0);
+    @unlink($file);
+
+    if (!socket_bind($fd, $file)) {
+      throw new Exception("could not open {$file}");
+    }
+
+    if (!socket_listen($fd)) {
+      throw new Exception("could not open {$file}");
+    }
+
+    return new UnixSocket($fd, $file);
+  }
+
+  public static function connect($file) {
+    $fd = socket_create(AF_UNIX, SOCK_STREAM, 0);
+    if (!socket_connect($fd, $file)) {
+      throw new Exception("could not open {$file}");
+    }
+
+    $file = tempnam(sys_get_temp_dir(), 'socket.');
+    unlink($file);
+
+    if (!socket_bind($fd, $file)) {
+      throw new Exception("could not open {$file}");
+    }
+
+    return new UnixSocket($fd, $file);
+  }
+
+  private $file;
+
+  private function __construct($fd, $file) {
+    parent::__construct($fd);
+    $this->file = $file;
+  }
+
+  public function accept() {
+    $fd = socket_accept($this->fd);
+    return new UnixSocket($fd, false);
   }
 
   protected function recv($length) {
