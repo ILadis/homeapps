@@ -2,8 +2,8 @@
 import { Recipe } from './recipe.js';
 import { Database } from './storage.js';
 
-export function Repository() {
-  this.remote = new RemoteRepository();
+export function Repository(principal) {
+  this.remote = new RemoteRepository(principal);
   this.local = new LocalRepository();
 }
 
@@ -39,7 +39,8 @@ Repository.prototype.delete = async function(recipe) {
   await this.local.delete(recipe);
 };
 
-function RemoteRepository() {
+function RemoteRepository(principal) {
+  this.principal = principal;
 }
 
 RemoteRepository.prototype.fetchAll = async function*() {
@@ -84,6 +85,8 @@ RemoteRepository.prototype.save = async function(recipe) {
     body: JSON.stringify(json)
   });
 
+  this.principal.authenticate(request);
+
   let response = await fetch(request);
   if (!response.ok) {
     throw new Error('failed to save recipe');
@@ -97,6 +100,8 @@ RemoteRepository.prototype.delete = async function(recipe) {
   let request = new Request(`./recipes/${recipe.id}`, {
     method: 'DELETE'
   });
+
+  this.principal.authenticate(request);
 
   let response = await fetch(request);
   if (!response.ok) {

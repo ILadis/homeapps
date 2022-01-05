@@ -12,12 +12,14 @@
   import { Router } from './app/router.js';
   import { Presenter } from './app/presenter.js';
   import { Repository } from './app/repository.js';
+  import { Principal } from './app/principal.js';
   import { Shell } from './app/views.js';
 
-  const repo = new Repository();
+  const principal = new Principal(window.localStorage);
+  const repo = new Repository(principal);
   const shell = new Shell();
 
-  const presenter = new Presenter(shell, repo);
+  const presenter = new Presenter(shell, repo, principal);
   const router = new Router();
 
   let index = router.register('list', [], () =>

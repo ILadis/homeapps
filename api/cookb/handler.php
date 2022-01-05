@@ -2,6 +2,44 @@
 namespace Http\Handler;
 use Http;
 
+class Login implements Http\Handler {
+
+  public function __construct($password, $delegate = false) {
+    $this->token = base64_encode($password);
+    $this->delegate = $delegate;
+  }
+
+  public function handle($request, $response) {
+    $auth = $request->getHeader('Authorization');
+    $token = preg_replace('/Bearer\s+/i', '', strval($auth));
+
+    if (!$auth || !$token) {
+      $response->setStatus(400);
+      return false;
+    }
+
+    if ($token != $this->token) {
+      $response->setStatus(403);
+      return false;
+    }
+
+    if ($this->delegate !== false) {
+      $this->delegate->handle($request, $response);
+      return true;
+    }
+
+    $response->setStatus(200);
+    return true;
+  }
+
+  public function guard($handler) {
+    $password = base64_decode($this->token);
+
+    return new Login($password, $handler);
+  }
+
+}
+
 class CreateDocument implements Http\Handler {
   private $repository;
 

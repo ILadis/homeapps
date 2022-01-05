@@ -57,13 +57,25 @@ Index.prototype.setTitle = function(title) {
   span.textContent = title;
 };
 
+Index.prototype.promptForPassword = function() {
+  // replace this with HTML5 dialog once it's usable
+  let password = prompt('Passwort zum Freischalten weiterer Funktionen:');
+  this.onPasswordProvided(password);
+};
+
 Index.prototype.onRefreshClicked = function() {
 };
 
 Index.prototype.onCreateClicked = function() {
 };
 
+Index.prototype.onUnlockClicked = function() {
+};
+
 Index.prototype.onQueryChanged = function(query) {
+};
+
+Index.prototype.onPasswordProvided = function(password) {
 };
 
 Index.prototype.getQuery = function() {
@@ -128,22 +140,27 @@ export const Recipe = define('recipe-details', 'div', html`
   this.steps = new Set();
 });
 
-Recipe.prototype.onEditClicked = function() {
-};
-
-Recipe.prototype.onShareClicked = function() {
-};
-
 Recipe.prototype.setName = function({ name }) {
   let span = this.querySelector('header h1 span');
   span.textContent = name;
   return this;
 };
 
-Recipe.prototype.setSharedEnabled = function(enabled) {
+Recipe.prototype.enableEditAction = function(enabled) {
+  let buttons = this.querySelectorAll('svg');
+  buttons[0].style.display = enabled ? 'block' : 'none';
+};
+
+Recipe.prototype.enableShareAction = function(enabled) {
   let svgs = this.querySelectorAll('svg');
   svgs[1].style.display = enabled ? 'block' : 'none';
-}
+};
+
+Recipe.prototype.onEditClicked = function() {
+};
+
+Recipe.prototype.onShareClicked = function() {
+};
 
 Recipe.prototype.setServings = function({ servings }) {
   let span = this.querySelector('header h2 span');
@@ -261,6 +278,16 @@ export const Form = define('recipe-form', 'div', html`
 Form.prototype.setTitle = function(title) {
   let span = this.querySelector('header h1 span');
   span.textContent = title;
+};
+
+Form.prototype.enableDoneAction = function(enabled) {
+  let buttons = this.querySelectorAll('svg');
+  buttons[0].style.display = enabled ? 'block' : 'none';
+};
+
+Form.prototype.enableDeleteAction = function(enabled) {
+  let buttons = this.querySelectorAll('svg');
+  buttons[2].style.display = enabled ? 'block' : 'none';
 };
 
 Form.prototype.onDoneClicked = function() {

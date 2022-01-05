@@ -3,9 +3,10 @@ import { Search } from './search.js';
 import { Recipe, Ingredient } from './recipe.js';
 import * as Views from './views.js';
 
-export function Presenter(shell, repo) {
+export function Presenter(shell, repo, principal) {
   this.shell = shell;
   this.repo = repo;
+  this.principal = principal;
 }
 
 Presenter.prototype.showIndex = async function() {
@@ -22,6 +23,14 @@ Presenter.prototype.showIndex = async function() {
   this.view = view;
   this.shell.setTitle('Kochbuch');
   this.shell.setContent(view);
+
+  let authenticated = this.principal.authenticated();
+  view.onPasswordProvided = async (password) => {
+    authenticated = await this.principal.login(password);
+    if (authenticated) {
+      this.showForm();
+    }
+  };
 
   view.onQueryChanged = (query) => {
     let results = search.execute(query) || recipes;
@@ -41,7 +50,10 @@ Presenter.prototype.showIndex = async function() {
   };
 
   view.onCreateClicked = () => {
-    this.showForm();
+    if (authenticated) {
+      this.showForm();
+    }
+    else view.promptForPassword();
   };
 
   let showRecipes = async (view, iterator) => {
@@ -82,6 +94,9 @@ Presenter.prototype.showRecipe = async function(id) {
   view.setName(recipe);
   view.setServings(recipe);
 
+  let authenticated = this.principal.authenticated();
+  view.enableEditAction(authenticated);
+
   this.shell.setTitle(recipe.name);
   this.shell.setContent(view);
 
@@ -89,7 +104,7 @@ Presenter.prototype.showRecipe = async function(id) {
     this.showForm(id);
   };
 
-  view.setSharedEnabled(!!navigator.share);
+  view.enableShareAction(!!navigator.share);
   view.onShareClicked = () => {
     navigator.share({
       title: recipe.name,
@@ -144,6 +159,10 @@ Presenter.prototype.showForm = async function(id) {
     recipe.addStep();
     var title = 'Neues Rezept';
   }
+
+  let authenticated = this.principal.authenticated();
+  view.enableDoneAction(authenticated);
+  view.enableDeleteAction(authenticated);
 
   view.setTitle(title);
 

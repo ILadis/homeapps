@@ -10,6 +10,7 @@ require('api/cookb/handler.php');
 
 $root = realpath(__DIR__);
 $base = getenv('BASE');
+$password = getenv('PASSWORD');
 
 $repository = new Persistence\Repository('recipes');
 
@@ -19,11 +20,12 @@ $response = Http\newResponse();
 $router = new Http\Router($base);
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
-$router->add('POST',   '/recipes', new Http\Handler\CreateDocument($repository));
+$router->add('POST',   '/login', $login = new Http\Handler\Login($password));
+$router->add('POST',   '/recipes', $login->guard(new Http\Handler\CreateDocument($repository)));
 $router->add('GET',    '/recipes', new Http\Handler\ListDocuments($repository));
 $router->add('GET',    '/recipes/[a-z0-9-]+', new Http\Handler\FindDocument($repository));
-$router->add('PUT',    '/recipes/[a-z0-9-]+', new Http\Handler\SaveDocument($repository));
-$router->add('DELETE', '/recipes/[a-z0-9-]+', new Http\Handler\DeleteDocument($repository));
+$router->add('PUT',    '/recipes/[a-z0-9-]+', $login->guard(new Http\Handler\SaveDocument($repository)));
+$router->add('DELETE', '/recipes/[a-z0-9-]+', $login->guard(new Http\Handler\DeleteDocument($repository)));
 
 foreach(array(
   '/icon.png' => 'app/cookb/icon.png',
@@ -36,6 +38,7 @@ foreach(array(
   '/app/search.js' => 'app/search.js',
   '/app/storage.js' => 'app/storage.js',
   '/app/presenter.js' => 'app/cookb/presenter.js',
+  '/app/principal.js' => 'app/cookb/principal.js',
   '/app/repository.js' => 'app/cookb/repository.js',
   '/app/views.js' => 'app/cookb/views.js',
   '/app/recipe.js' => 'app/cookb/recipe.js',
