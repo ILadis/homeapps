@@ -25,8 +25,14 @@ Repository.prototype.fetchAll = async function*(fresh = false) {
   }
 };
 
-Repository.prototype.fetchById = function(id) {
-  return this.local.fetchById(id);
+Repository.prototype.fetchById = async function(id) {
+  var recipe = await this.local.fetchById(id);
+
+  if (!recipe) {
+    var recipe = await this.remote.fetchById(id);
+  }
+
+  return recipe;
 };
 
 Repository.prototype.save = async function(recipe) {
@@ -145,6 +151,10 @@ LocalRepository.prototype.fetchById = async function(id) {
   db.beginTx('recipes', 'readonly');
 
   let data = await db.fetchByKey(id);
+  if (!data) {
+    return false;
+  }
+
   return Recipe.fromJSON(data);
 };
 

@@ -113,7 +113,7 @@ Presenter.prototype.showRecipe = async function(id) {
   };
 
   view.onServingsClicked = (delta) => {
-    // TODO this does currently not work
+    // TODO increment is currently not implemented
     delta *= recipe.servings.increment || 1;
     recipe.convertServings(delta);
     view.setServings(recipe);
