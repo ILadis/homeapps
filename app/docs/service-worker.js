@@ -18,6 +18,9 @@ async function refreshAssets() {
     '/app/search.js',
     '/app/views.js',
 
+    '/app/pdf.js',
+    '/app/pdf.worker.js',
+
     '/app/styles.css',
   ];
 

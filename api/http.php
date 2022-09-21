@@ -158,6 +158,19 @@ function serveFile($file) {
   };
 }
 
+function serveUrl($url) {
+  return function($request, $response) use ($url) {
+    $contents = file_get_contents($url);
+    $size = strlen($contents);
+    $mime = MediaType::fromFileExt($url);
+
+    $response->setStatus(200);
+    $response->setHeader('Content-Type', $mime);
+    $response->setHeader('Content-Length', $size);
+    fwrite($response->getBody(), $contents);
+  };
+}
+
 function serveBase64Encoded($data, $mime) {
   return function($request, $response) use ($data, $mime) {
     $body = base64_decode($data);

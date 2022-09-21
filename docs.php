@@ -60,6 +60,13 @@ foreach(array(
   $router->add('GET', $path, Http\serveFile("{$root}/{$file}"));
 }
 
+foreach(array(
+  '/app/pdf.js' => 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js',
+  '/app/pdf.worker.js' => 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js',
+) as $path => $url) {
+  $router->add('GET', $path, Http\serveUrl($url));
+}
+
 try {
   if (!$router->apply($request, $response)) {
     $response->setStatus(404);

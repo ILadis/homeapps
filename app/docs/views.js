@@ -75,7 +75,6 @@ RippleButton.prototype.playAnimation = function(event) {
 RippleButton.prototype.onClicked = function() {
 };
 
-
 export const Tag = define('app-tag', 'span', html``, function() {
   this.className = 'chip';
   this.onclick = () => this.onClicked();
@@ -267,8 +266,8 @@ PdfFileViewer.prototype.loadPdfjs = function() {
     return Promise.resolve(window.pdfjsLib);
   }
 
-  let pdfjsSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.min.js';
-  let workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js';
+  let pdfjsSrc = '/app/pdf.js';
+  let workerSrc = '/app/pdf.worker.js';
 
   let script = document.createElement('script');
   script.src = pdfjsSrc;
