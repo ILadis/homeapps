@@ -157,8 +157,19 @@ FileListItem.prototype.setName = function(name) {
 
 FileListItem.prototype.setSize = function(size) {
   let h2 = this.querySelector('h2:first-of-type');
-  h2.textContent = size;
+  h2.textContent = format(size);
   return this;
+
+  function format(bytes) {
+    if (!+bytes) return '0 Bytes'
+
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) +' '+ sizes[i];
+  }
 };
 
 FileListItem.prototype.setDate = function(date) {
