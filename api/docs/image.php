@@ -27,8 +27,8 @@ function read($fd) {
 
 function scale($value = 1) {
   return function($image) use ($value) {
-    $width = imagesx($image) * $value;
-    $height = imagesy($image) * $value;
+    $width = round(imagesx($image) * $value);
+    $height = round(imagesy($image) * $value);
     $scaled = imagescale($image, $width, $height, IMG_NEAREST_NEIGHBOUR);
     imagedestroy($image);
     return $scaled;
