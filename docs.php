@@ -5,6 +5,7 @@ set_error_handler(function($severity, $message, $file, $line) {
 });
 
 require('api/io.php');
+require('api/log.php');
 require('api/http.php');
 require('api/docs/image.php');
 require('api/docs/document.php');
@@ -19,6 +20,8 @@ $host = getenv('DEVICE');
 $db = new SQLite3('db.sqlite');
 $repository = Persistence\Repository::openNew($db);
 $scanner = new Devices\Scanner($host, 54921);
+
+$rootLogger = Log\ConsoleLogger::for('RootLogger');
 
 $request = Http\newRequest();
 $response = Http\newResponse();
@@ -72,6 +75,7 @@ try {
     $response->setStatus(404);
   }
 } catch (Exception $e) {
+  $rootLogger->error('uncaugth {exception}', ['exception' => $e]);
   $response->setStatus(500);
   $response->setBodyAsText($e->getMessage());
 }
