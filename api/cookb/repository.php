@@ -78,7 +78,7 @@ class Document implements JsonSerializable {
     unlink($this->file);
   }
 
-  public function jsonSerialize() {
+  public function jsonSerialize(): mixed {
     return $this->get();
   }
 }

@@ -3,6 +3,8 @@ namespace Http\Handler;
 use Http;
 
 class Login implements Http\Handler {
+  private $token;
+  private $delegate;
 
   public function __construct($password, $delegate = false) {
     $this->token = base64_encode($password);
