@@ -48,7 +48,7 @@ class ConsoleLogger {
     foreach ($context as $key => $val) {
       $replace['{' . $key . '}'] = strval($val);
     }
-    return strtr($message, $replace);
+    return strtr(strval($message), $replace);
   }
 
   private function currentTimestamp(): string {

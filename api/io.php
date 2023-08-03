@@ -51,6 +51,26 @@ class Stream {
     return $data;
   }
 
+  public function readVarint() {
+    $number = 0;
+    $position = 0;
+
+    while(true) {
+      $value = $this->recv(1);
+      $len = strlen($value);
+
+      if ($len != 1) throw new Exception('could not read');
+
+      $value = ord($value);
+      $number |= ($value & 0x7F) << ($position++ * 7);
+
+      if ($position > 5) throw new Exception('varint too large');
+      if (($value & 0x80) != 128) break;
+    }
+
+    return $number;
+  }
+
   protected function send($data) {
     return fwrite($this->fd, $data);
   }
