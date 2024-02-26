@@ -38,6 +38,11 @@ Recipe.prototype.convertServings = function(delta) {
   let scale = this.servings.scalingFor(delta || 0);
   this.servings.scaleTo(scale);
 
+  if (this.servings.value < 1) {
+    // undo conversion if servings drop below one
+    return this.convertServings(-delta);
+  }
+
   for (let ingredient of this.ingredients.values()) {
     ingredient.quantity.scaleTo(scale);
   }
@@ -158,8 +163,9 @@ Quantity.prototype.toString = function() {
   let integer = Math.trunc(value);
   let fraction = value - integer;
 
+  // do not show fractions for large numbers (or too small fractions)
   if (integer >= 10 || fraction <= 0.1) {
-    return (integer || '') + ' ' + unit;
+    return Math.round(value) + ' ' + unit;
   }
 
   let cp = fractions.reduce((closest, current) => {
