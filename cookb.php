@@ -4,6 +4,7 @@ set_error_handler(function($severity, $message, $file, $line) {
   throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
+require('api/log.php');
 require('api/http.php');
 require('api/cookb/repository.php');
 require('api/cookb/handler.php');
@@ -14,10 +15,13 @@ $password = getenv('PASSWORD');
 
 $repository = new Persistence\Repository('recipes');
 
+$rootLogger = Log\ConsoleLogger::for('RootLogger');
+$httpLogger = Log\ConsoleLogger::for('HttpLogger');
+
 $request = Http\newRequest();
 $response = Http\newResponse();
 
-$router = new Http\Router($base);
+$router = new Http\Router($base, $httpLogger);
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
 $router->add('POST',   '/login', $login = new Http\Handler\Login($password));
@@ -52,7 +56,8 @@ try {
   if (!$router->apply($request, $response)) {
     $response->setStatus(404);
   }
-} catch (Exception $e) {
+} catch (Throwable $e) {
+  $rootLogger->error('uncaught {exception}', ['exception' => $e]);
   $response->setStatus(500);
   $response->setBodyAsText($e->getMessage());
 }

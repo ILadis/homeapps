@@ -4,6 +4,7 @@ set_error_handler(function($severity, $message, $file, $line) {
   throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
+require('api/log.php');
 require('api/http.php');
 require('api/start/inspector.php');
 require('api/start/repository.php');
@@ -15,10 +16,13 @@ $base = getenv('BASE');
 $db = new SQLite3('db.sqlite');
 $repository = Persistence\Repository::openNew($db);
 
+$rootLogger = Log\ConsoleLogger::for('RootLogger');
+$httpLogger = Log\ConsoleLogger::for('HttpLogger');
+
 $request = Http\newRequest();
 $response = Http\newResponse();
 
-$router = new Http\Router($base);
+$router = new Http\Router($base, $httpLogger);
 $router->add('GET',    '/', Http\serveRedirect("{$base}/index.html"));
 $router->add('POST',   '/api/inspect', new Http\Handler\InspectPage());
 $router->add('GET',    '/api/users', new Http\Handler\ListUsers($repository));
@@ -51,7 +55,8 @@ try {
   if (!$router->apply($request, $response)) {
     $response->setStatus(404);
   }
-} catch (Exception $e) {
+} catch (Throwable $e) {
+  $rootLogger->error('uncaught {exception}', ['exception' => $e]);
   $response->setStatus(500);
   $response->setBodyAsText($e->getMessage());
 }

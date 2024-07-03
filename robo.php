@@ -5,6 +5,7 @@ set_error_handler(function($severity, $message, $file, $line) {
 });
 
 require('api/io.php');
+require('api/log.php');
 require('api/miio.php');
 require('api/http.php');
 require('api/robo/vacuum.php');
@@ -17,10 +18,13 @@ $host = getenv('DEVICE');
 
 $vacuum = new Devices\Vacuum($host, 54321, hex2bin($token));
 
+$rootLogger = Log\ConsoleLogger::for('RootLogger');
+$httpLogger = Log\ConsoleLogger::for('HttpLogger');
+
 $request = Http\newRequest();
 $response = Http\newResponse();
 
-$router = new Http\Router();
+$router = new Http\Router($base, $httpLogger);
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
 $router->add('POST', '/api/vacuum/clean/segment', new Http\Handler\VacuumSegmentClean($vacuum));
@@ -50,7 +54,8 @@ try {
   if (!$router->apply($request, $response)) {
     $response->setStatus(404);
   }
-} catch (Exception $e) {
+} catch (Throwable $e) {
+  $rootLogger->error('uncaught {exception}', ['exception' => $e]);
   $response->setStatus(500);
   $response->setBodyAsText($e->getMessage());
 }

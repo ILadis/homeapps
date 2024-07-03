@@ -5,6 +5,7 @@ set_error_handler(function($severity, $message, $file, $line) {
 });
 
 require('api/io.php');
+require('api/log.php');
 require('api/http.php');
 require('api/ts3stats/command.php');
 require('api/ts3stats/client.php');
@@ -20,10 +21,13 @@ $client = new TS3\Client('127.0.0.1', 10011);
 $session = new TS3\Session($client);
 $session->use($username, $password, 1);
 
+$rootLogger = Log\ConsoleLogger::for('RootLogger');
+$httpLogger = Log\ConsoleLogger::for('HttpLogger');
+
 $request = Http\newRequest();
 $response = Http\newResponse();
 
-$router = new Http\Router($base);
+$router = new Http\Router($base, $httpLogger);
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
 $router->add('GET', '/api/ts3/info', new Http\Handler\ServerInfo($session));
@@ -46,7 +50,8 @@ try {
   if (!$router->apply($request, $response)) {
     $response->setStatus(404);
   }
-} catch (Exception $e) {
+} catch (Throwable $e) {
+  $rootLogger->error('uncaught {exception}', ['exception' => $e]);
   $response->setStatus(500);
   $response->setBodyAsText($e->getMessage());
 }

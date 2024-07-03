@@ -5,6 +5,7 @@ set_error_handler(function($severity, $message, $file, $line) {
 });
 
 require('api/io.php');
+require('api/log.php');
 require('api/http.php');
 require('api/wifi/hostapd.php');
 require('api/wifi/handler.php');
@@ -16,10 +17,13 @@ $iface = getenv('IFACE');
 
 $hostapd = new Hostapd\Client($iface);
 
+$rootLogger = Log\ConsoleLogger::for('RootLogger');
+$httpLogger = Log\ConsoleLogger::for('HttpLogger');
+
 $request = Http\newRequest();
 $response = Http\newResponse();
 
-$router = new Http\Router();
+$router = new Http\Router($base, $httpLogger);
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
 $router->add('POST', '/api/wifi/enable', new Http\Handler\HostapdEnable($hostapd));
@@ -45,7 +49,8 @@ try {
   if (!$router->apply($request, $response)) {
     $response->setStatus(404);
   }
-} catch (Exception $e) {
+} catch (Throwable $e) {
+  $rootLogger->error('uncaught {exception}', ['exception' => $e]);
   $response->setStatus(500);
   $response->setBodyAsText($e->getMessage());
 }

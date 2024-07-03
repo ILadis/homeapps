@@ -1,6 +1,6 @@
 <?php
 namespace Http;
-use Closure, Exception;
+use Log, Closure, Exception;
 
 class Request {
   protected $method, $uri, $headers, $body;
@@ -215,10 +215,12 @@ class Uri {
 
 class Router {
   private $routes, $base;
+  private $logger;
 
-  public function __construct($base = '') {
+  public function __construct($base = '', $logger = null) {
     $this->routes = array();
     $this->base = $base;
+    $this->logger = $logger ?? new Log\NoopLogger();
   }
 
   public function add($method, $uri, $handler) {
@@ -231,13 +233,24 @@ class Router {
   }
 
   public function apply($request, $response) {
+    $context = fn() => [
+      'method' => $request->getMethod(),
+      'uri' => $request->getUri()->getPath(),
+      'status' => $response->getStatus(),
+    ];
+
     foreach ($this->routes as $route) {
       if ($route->matches($this->base, $request)) {
-        $route->activate($request, $response);
-        return $route;
+        try {
+          $route->activate($request, $response);
+          return $route;
+        } finally {
+          $this->logger->debug('request to {method} {uri} -> {status}', $context());
+        }
       }
     }
 
+    $this->logger->warn('request to {method} {uri} (not handled)', $context());
     return false;
   }
 }

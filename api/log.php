@@ -8,18 +8,14 @@ class LogLevel {
   const DEBUG     = 'debug';
 }
 
-class ConsoleLogger {
+interface Logger {
+  public function error($message, $context = array());
+  public function warn($message, $context = array());
+  public function info($message, $context = array());
+  public function debug($message, $context = array());
+}
 
-  public static function for($name) {
-    return new ConsoleLogger($name);
-  }
-
-  private $name = null;
-
-  private function __construct($name) {
-    $this->name = strval($name);
-  }
-
+abstract class BaseLogger implements Logger {
   public function error($message, $context = array()) {
     $this->log(LogLevel::ERROR, $message, $context);
   }
@@ -36,7 +32,22 @@ class ConsoleLogger {
     $this->log(LogLevel::DEBUG, $message, $context);
   }
 
-  private function log($level, $message, $context = array()) {
+  abstract protected function log($level, $message, $context = array());
+}
+
+class ConsoleLogger extends BaseLogger {
+
+  public static function for($name) {
+    return new ConsoleLogger($name);
+  }
+
+  private $name = null;
+
+  private function __construct($name) {
+    $this->name = strval($name);
+  }
+
+  protected function log($level, $message, $context = array()) {
     $date = $this->currentTimestamp();
     $message = $this->interpolateMessage($message, $context);
     $log = sprintf("%s [%9s] --- %s: %s\n", $date, $level, $this->name, $message);
@@ -56,6 +67,14 @@ class ConsoleLogger {
     $date = $now->format('Y-m-d H:i:s:v');
     return $date;
   }
+}
+
+class NoopLogger extends BaseLogger {
+
+  protected function log($level, $message, $context = array()) {
+    // do nothing
+  }
+
 }
 
 ?>
