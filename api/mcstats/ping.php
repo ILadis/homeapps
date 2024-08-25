@@ -4,8 +4,6 @@ use IO\Socket;
 
 // https://wiki.vg/Server_List_Ping
 
-// TODO add packet class
-
 class Ping {
 
   private $socket;
@@ -53,5 +51,7 @@ class Ping {
     return json_decode($data, true);
   }
 }
+
+// TODO add packet class
 
 ?>
