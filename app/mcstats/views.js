@@ -3,9 +3,9 @@ import { html, define } from './dom.js';
 
 export const Shell = define('app-shell', 'div', html`
 <header is="server-info"></header>
-<table is="client-list"></table>`, function() {
+<table is="player-list"></table>`, function() {
   this.serverInfo = this.querySelector('[is=server-info]');
-  this.clientList = this.querySelector('[is=client-list]');
+  this.playerList = this.querySelector('[is=player-list]');
 });
 
 export const ServerInfo = define('server-info', 'header', html`
@@ -53,18 +53,18 @@ ServerInfo.prototype.add = function(key, value) {
   table.appendChild(tr);
 };
 
-export const ClientList = define('client-list', 'table', html`
+export const PlayerList = define('player-list', 'table', html`
 <thead>
   <tr><th></th></tr>
 </thead>
 <tbody></tbody>`);
 
-ClientList.prototype.online = function(online) {
+PlayerList.prototype.online = function(online) {
   let th = this.querySelector('thead th');
   th.textContent = online ? 'Online' : 'Offline';
 };
 
-ClientList.prototype.set = function(players) {
+PlayerList.prototype.set = function(players) {
   let tbody = this.querySelector('tbody');
 
   while (tbody.firstChild) {
@@ -78,6 +78,6 @@ ClientList.prototype.set = function(players) {
     let tr = document.createElement('tr');
     tr.appendChild(td);
 
-    tbody.appendChild(tableRow);
+    tbody.appendChild(tr);
   }
 };

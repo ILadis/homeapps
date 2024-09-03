@@ -5,7 +5,7 @@ export function Presenter(shell, client) {
 }
 
 Presenter.prototype.showIndex = async function() {
-  let { serverInfo, clientList } = this.shell;
+  let { serverInfo, playerList } = this.shell;
 
   let client = this.client;
   refreshPlayers();
@@ -24,10 +24,10 @@ Presenter.prototype.showIndex = async function() {
     let players = await client.listPlayers();
 
     if (players !== false) {
-      clientList.online(true);
-      clientList.set(players);
+      playerList.online(true);
+      playerList.set(players);
     } else {
-      clientList.online(false);
+      playerList.online(false);
     }
   }
 };
