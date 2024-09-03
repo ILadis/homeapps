@@ -3,11 +3,11 @@ export function Client() {
 }
 
 Client.prototype.serverInfo = async function loadServerInfos() {
-  return get('/api/mc/info');
+  return get('api/mc/info');
 };
 
 Client.prototype.listPlayers = async function() {
-  return get('/api/mc/players');
+  return get('api/mc/players');
 };
 
 async function get(url) {
