@@ -17,6 +17,7 @@ Presenter.prototype.showIndex = async function() {
     if (info !== false) {
       serverInfo.add('Name', info.name);
       serverInfo.add('Version', info.version);
+      serverInfo.add('Tage', info.days);
     }
   }
 
