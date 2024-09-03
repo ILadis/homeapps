@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <title>Minecraft Server Status</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./favicon.ico" rel="icon">
+  <link href="./app/styles.css" rel="stylesheet">
+  <script type="module">
+  import { Presenter } from './app/presenter.js';
+  import { Client } from './app/client.js';
+  import { Shell } from './app/views.js';
+
+  const shell = new Shell();
+  const client = new Client();
+
+  const presenter = new Presenter(shell, client);
+
+  window.onload = function() {
+    document.body.prepend(shell);
+    presenter.showIndex();
+  };
+
+  document.onselectstart = () => false;
+  </script>
+</head>
+<body>
+</body>
+</html>

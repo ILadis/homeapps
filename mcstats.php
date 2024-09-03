@@ -35,6 +35,17 @@ $router->add('GET', '/api/mc/players', new Http\Handler\ListPlayers($session));
 
 foreach(array(
   '/index.html' => 'app/mcstats/index.html',
+
+  '/app/dom.js' => 'app/dom.js',
+  '/app/presenter.js' => 'app/mcstats/presenter.js',
+  '/app/client.js' => 'app/mcstats/client.js',
+  '/app/views.js' => 'app/mcstats/views.js',
+
+  '/app/styles.css' => 'app/mcstats/styles.css',
+
+  '/app/border.png' => 'app/mcstats/border.png',
+  '/app/dirt.png' => 'app/mcstats/dirt.png',
+  '/app/grass.png' => 'app/mcstats/grass.png',
 ) as $path => $file) {
   $router->add('GET', $path, Http\serveFile("{$root}/{$file}"));
 }

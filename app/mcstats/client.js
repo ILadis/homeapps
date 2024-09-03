@@ -2,12 +2,12 @@
 export function Client() {
 }
 
-Client.prototype.serverInfo = function() {
-  return get('./api/ts3/info');
+Client.prototype.serverInfo = async function loadServerInfos() {
+  return get('/api/mc/info');
 };
 
-Client.prototype.listClients = async function() {
-  return get('./api/ts3/clients');
+Client.prototype.listPlayers = async function() {
+  return get('/api/mc/players');
 };
 
 async function get(url) {
@@ -15,7 +15,7 @@ async function get(url) {
   let response = await fetch(request);
 
   if (!response.ok) {
-    throw new Error(`failed to get: ${url}`);
+    return false;
   }
 
   return await response.json();
