@@ -38,8 +38,8 @@ Recipe.prototype.convertServings = function(delta) {
   let scale = this.servings.scalingFor(delta || 0);
   this.servings.scaleTo(scale);
 
-  if (this.servings.value < 1) {
-    // undo conversion if servings drop below one
+  if (this.servings.value < 0.1) {
+    // undo conversion if servings get too small
     return this.convertServings(-delta);
   }
 
@@ -159,6 +159,11 @@ Quantity.prototype.toString = function() {
     { value: 1/4, codePoint: 188 },
     { value: 1/5, codePoint: 8533},
   ];
+
+  // show nothing if there's no value
+  if (value == 0) {
+    return '';
+  }
 
   let integer = Math.trunc(value);
   let fraction = value - integer;
