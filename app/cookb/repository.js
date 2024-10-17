@@ -26,10 +26,14 @@ Repository.prototype.fetchAll = async function*(fresh = false) {
 };
 
 Repository.prototype.fetchById = async function(id) {
-  var recipe = await this.local.fetchById(id);
+  var recipe = await this.local.fetchById(id).catch(() => false);
 
   if (!recipe) {
-    var recipe = await this.remote.fetchById(id);
+    var recipe = await this.remote.fetchById(id).catch(() => false);
+  }
+
+  if (!recipe) {
+    var recipe = await this.remote.retrieveByUrl(id).catch(() => false);
   }
 
   return recipe;
@@ -73,6 +77,24 @@ RemoteRepository.prototype.fetchById = async function(id) {
   let response = await fetch(request);
   if (!response.ok) {
     throw new Error('failed to fetch recipe');
+  }
+
+  let json = await response.json();
+  return Recipe.fromJSON(json);
+};
+
+RemoteRepository.prototype.retrieveByUrl = async function(url) {
+  let request = new Request('./recipes/retrieve', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain'
+    },
+    body: url
+  });
+
+  let response = await fetch(request);
+  if (!response.ok) {
+    throw new Error('failed to retrieve recipe by url');
   }
 
   let json = await response.json();

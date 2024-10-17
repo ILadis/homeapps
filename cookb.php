@@ -8,6 +8,7 @@ require('api/log.php');
 require('api/http.php');
 require('api/cookb/repository.php');
 require('api/cookb/handler.php');
+require('api/cookb/recipes.php');
 
 $root = realpath(__DIR__);
 $base = getenv('BASE');
@@ -25,6 +26,7 @@ $router = new Http\Router($base, $httpLogger);
 $router->add('GET', '/', Http\serveRedirect("{$base}/index.html"));
 
 $router->add('POST',   '/login', $login = new Http\Handler\Login($password));
+$router->add('POST',   '/recipes/retrieve', new Http\Handler\Retriever());
 $router->add('POST',   '/recipes', $login->guard(new Http\Handler\CreateDocument($repository)));
 $router->add('GET',    '/recipes', new Http\Handler\ListDocuments($repository));
 $router->add('GET',    '/recipes/[a-z0-9-]+', new Http\Handler\FindDocument($repository));

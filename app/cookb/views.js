@@ -236,6 +236,7 @@ export const Form = define('recipe-form', 'div', html`
     <span><!-- title --></span>
     <svg viewBox="0 0 24 24"><use href="#done"></use></svg>
     <a><svg viewBox="0 0 24 24"><use href="#export"></use></svg></a>
+    <svg viewBox="0 -960 960 960"><use href="#retrieve"></use></svg>
     <svg viewBox="0 0 24 24"><use href="#delete"></use></svg>
   </h1>
   <!-- name + servings -->
@@ -260,8 +261,9 @@ export const Form = define('recipe-form', 'div', html`
   let buttons = this.querySelectorAll('svg');
   buttons[0].onclick = () => this.onDoneClicked();
   buttons[1].onclick = () => this.onExportClicked();
-  buttons[2].onclick = () => this.onDeleteClicked();
-  buttons[3].onclick = () => this.onAddStepClicked();
+  buttons[2].onclick = () => this.onRetrieveClicked();
+  buttons[3].onclick = () => this.onDeleteClicked();
+  buttons[4].onclick = () => this.onAddStepClicked();
 
   let inputs = this.querySelectorAll('fieldset input');
   inputs[0].onchange = ({ target }) => this.onLabelChanged(target.value);
@@ -305,6 +307,18 @@ Form.prototype.setExportUrl = function(name, url) {
 };
 
 Form.prototype.onExportClicked = function() {
+};
+
+Form.prototype.onRetrieveClicked = function() {
+};
+
+Form.prototype.onRetrieveUrlProvided = function(url) {
+};
+
+Form.prototype.promptForRetrieve = function() {
+  // replace this with HTML5 dialog once it's usable
+  let url = prompt('URL zum Rezept für Import eingeben:');
+  this.onRetrieveUrlProvided(url);
 };
 
 Form.prototype.onDeleteClicked = function() {

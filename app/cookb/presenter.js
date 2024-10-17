@@ -122,27 +122,30 @@ Presenter.prototype.showRecipe = async function(id) {
     showSteps(view, recipe);
   };
 
-  let showIngredients = (view, { ingredients }) => {
+  showIngredients(view, recipe);
+  showSteps(view, recipe);
+  this.onRecipeShown(recipe);
+
+  function showIngredients(view, { ingredients }) {
     let views = view.ingredients.values();
     for (let ingredient of ingredients.values()) {
       let v = views.next().value || view.addIngredient();
       v.setLabel(ingredient);
     }
-  };
+  }
 
-  let showSteps = (view, { steps }) => {
+  function showSteps(view, { steps }) {
     let views = view.steps.values();
     for (let step of steps.values()) {
+      // skip empty steps when displaying recipe
+      if (!step.text) continue;
+
       let v = views.next().value || view.addStep();
       v.setText(step);
 
       showIngredients(v, step);
     }
-  };
-
-  showIngredients(view, recipe);
-  showSteps(view, recipe);
-  this.onRecipeShown(recipe);
+  }
 };
 
 Presenter.prototype.onRecipeShown = function(recipe) {
@@ -150,10 +153,14 @@ Presenter.prototype.onRecipeShown = function(recipe) {
 
 Presenter.prototype.showForm = async function(id) {
   let view = new Views.Form();
+
   if (id) {
     var recipe = await this.repo.fetchById(id);
     var title = 'Rezept bearbeiten';
-  } else {
+  }
+
+  // failed to fetch or no id is given
+  if (!recipe) {
     var recipe = new Recipe();
     recipe.setServings(undefined, 'Stück');
     recipe.addStep();
@@ -185,9 +192,7 @@ Presenter.prototype.showForm = async function(id) {
     view.setServings(recipe);
   };
 
-  view.onOtherUnitClicked = () => {
-    view.promptForUnit();
-  };
+  view.onOtherUnitClicked = () => view.promptForUnit();
 
   view.onExportClicked = () => {
     recipe.removeEmptySteps();
@@ -200,6 +205,9 @@ Presenter.prototype.showForm = async function(id) {
 
     view.setExportUrl(name, url);
   };
+
+  view.onRetrieveClicked = () => view.promptForRetrieve();
+  view.onRetrieveUrlProvided = (url) => this.showForm(url);
 
   view.onAddStepClicked = () => {
     recipe.addStep();
@@ -223,7 +231,10 @@ Presenter.prototype.showForm = async function(id) {
     this.showIndex();
   };
 
-  let showIngredients = (view, step) => {
+  showSteps(view, recipe);
+  this.onFormShown(recipe);
+
+  function showIngredients(view, step) {
     let iterator = step.ingredients.values();
     let views = view.ingredients.values();
     for (let ingredient of iterator) {
@@ -235,9 +246,9 @@ Presenter.prototype.showForm = async function(id) {
     for (let v of views) {
       view.removeIngredient(v);
     }
-  };
+  }
 
-  let showSteps = (view, { steps }) => {
+  function showSteps(view, { steps }) {
     let iterator = steps.values();
     let views = view.steps.values();
     for (let step of iterator) {
@@ -262,25 +273,22 @@ Presenter.prototype.showForm = async function(id) {
     for (let v of views) {
       view.removeStep(v);
     }
-  };
+  }
 
-  let addIngredient = (text) => {
+  function addIngredient(text) {
     let { ingredient, quantity, unit } = Ingredient.parse(text);
     if (ingredient) {
       return recipe.addIngredient(ingredient, quantity, unit);
     }
-  };
+  }
 
-  let removeIngredient = (view, step, ingredient) => {
+  function removeIngredient(view, step, ingredient) {
     return function() {
       step.removeIngredient(ingredient);
       recipe.removeIngredient(ingredient);
       view.removeIngredient(this);
     };
-  };
-
-  showSteps(view, recipe);
-  this.onFormShown(recipe);
+  }
 };
 
 Presenter.prototype.onFormShown = function(edit) {

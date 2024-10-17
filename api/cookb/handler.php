@@ -42,6 +42,25 @@ class Login implements Http\Handler {
 
 }
 
+class Retriever implements Http\Handler {
+
+  public function handle($request, $response) {
+    $url = $request->getBodyAsText();
+    $recipe = \Recipes\Chefkoch::byUrl($url);
+
+    if (!$recipe) {
+      $response->setStatus(404);
+      return false;
+    }
+
+    $response->setStatus(200);
+    $response->setBodyAsJson($recipe);
+
+    return true;
+  }
+
+}
+
 class CreateDocument implements Http\Handler {
   private $repository;
 

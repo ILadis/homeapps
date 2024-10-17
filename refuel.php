@@ -10,12 +10,12 @@ require('api/refuel/scraper.php');
 
 function main($argv, $argc) {
   $scraper = Fuel\WebScraper::loadWithId($argv[1]);
- 
+
   $prices = $scraper->getPrices();
   foreach ($prices as $price) {
     echo("{$price['name']}: {$price['value']}\n");
   }
- 
+
   exit(0);
 }
 
