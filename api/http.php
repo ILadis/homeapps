@@ -158,9 +158,14 @@ function serveFile($file) {
   };
 }
 
-function serveUrl($url) {
-  return function($request, $response) use ($url) {
+function serveUrl($url, $hash = false) {
+  return function($request, $response) use ($url, $hash) {
     $contents = file_get_contents($url);
+
+    if ($hash !== false && $hash != hash('sha256', $contents)) {
+      throw new Exception('provided hash does not match url contents');
+    }
+
     $size = strlen($contents);
     $mime = MediaType::fromFileExt($url);
 

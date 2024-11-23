@@ -65,10 +65,10 @@ foreach(array(
 }
 
 foreach(array(
-  '/app/pdf.js' => 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js',
-  '/app/pdf.worker.js' => 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js',
-) as $path => $url) {
-  $router->add('GET', $path, Http\serveUrl($url));
+  '/app/pdf.js' => ['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js', '1fc294eefda602e591a06c1d5af361cae23756b5a334fc2421d5f9accce038e5'],
+  '/app/pdf.worker.js' => ['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js', '99732130603cd4980f009a29a38a86373b43ffb9ae22c35ec85440f311ceddfc'],
+) as $path => list($url, $hash)) {
+  $router->add('GET', $path, Http\serveUrl($url, $hash));
 }
 
 try {
