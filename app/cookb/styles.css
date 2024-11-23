@@ -129,7 +129,6 @@ button {
   border: none;
 }
 
-[is=recipe-index] > section > svg,
 [is=recipe-form]  > section > svg {
   position: fixed;
   right: 30pt;
@@ -139,7 +138,7 @@ button {
   padding: 6pt;
   border-radius: 50%;
   background: #7f7f7f;
-  box-shadow: 0 4pt 6pt 1pt #bfbfbf;
+  filter: drop-shadow(1pt 4pt 6pt #bfbfbf);
   fill: #fff;
 }
 

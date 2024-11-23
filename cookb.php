@@ -54,6 +54,12 @@ foreach(array(
   $router->add('GET', $path, Http\serveFile("{$root}/{$file}"));
 }
 
+foreach(array(
+  '/app/custom-elements.js' => ['https://unpkg.com/@ungap/custom-elements@1.3.0/min.js', 'cc14433db77c53e92706d93a0c8e3df870d9826c6c334044c9fe976c2726cb22'],
+) as $path => list($url, $hash)) {
+  $router->add('GET', $path, Http\serveUrl($url, $hash));
+}
+
 try {
   if (!$router->apply($request, $response)) {
     $response->setStatus(404);
