@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "name": "Extension for Startpage",
+  "version": "1.0",
+
+  "permissions": ["tabs"],
+
+  "content_scripts": [
+    {
+      "matches": ["*://localhost/start/*"],
+      "js": ["broker.js", "content.js"]
+    }
+  ],
+  "background": {
+    "scripts": ["broker.js", "background.js"]
+  }
+}

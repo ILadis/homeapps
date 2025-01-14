@@ -62,7 +62,7 @@ body > svg {
 }
 
 [is=pages-accounts] {
-  padding-bottom: 32px;
+  padding-bottom: 2rem;
 }
 
 [is=pages-accounts] svg {
@@ -149,6 +149,10 @@ body > svg {
   color: rgb(var(--primary-canvas));
   background: rgb(var(--primary-text));
   transition: all .3s ease-in-out;
+}
+
+[is=pages-list] {
+  padding-bottom: 3rem;
 }
 
 [is=pages-list] h1 {

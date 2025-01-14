@@ -5,11 +5,15 @@ export const Shell = define('app-shell', 'div', html`
 <div is="pages-accounts"></div>
 <div is="pages-clock"></div>
 <div is="pages-form"></div>
+<div is="pages-list" hidden></div>
 <div is="pages-list"></div>`, function() {
   this.accounts = this.querySelector('[is=pages-accounts]');
   this.clock = this.querySelector('[is=pages-clock]');
   this.form = this.querySelector('[is=pages-form]');
-  this.list = this.querySelector('[is=pages-list]');
+
+  let lists = this.querySelectorAll('[is=pages-list]');
+  this.tabs = lists[0];
+  this.bookmarks = lists[1];
 });
 
 export const Accounts = define('pages-accounts', 'div', html`
@@ -149,10 +153,15 @@ Form.prototype.clearValues = function() {
 };
 
 export const List = define('pages-list', 'div', html`
-<h1>Lesezeichen</h1>
+<h1></h1>
 <ul></ul>`, function() {
   this.items = new Set();
 });
+
+List.prototype.setHeadline = function(headline) {
+  let h1 = this.querySelector('h1');
+  h1.textContent = headline;
+};
 
 List.prototype.addItem = function(isNew = false) {
   let view = new Page();

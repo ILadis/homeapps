@@ -30,7 +30,7 @@ Repository.prototype.save = async function(page, user) {
   var body = JSON.stringify(body);
   let url = encodeURIComponent(page.url);
 
-  let request = new Request(`/api/pages/${url}`, {
+  let request = new Request(`./api/pages/${url}`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${user.token}`
@@ -54,7 +54,7 @@ Repository.prototype.fetchAll = async function*() {
 Repository.prototype.syncAll = async function(user) {
   await this.manager.syncAll();
 
-  let request = new Request('/api/pages', {
+  let request = new Request('./api/pages', {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${user.token}`
@@ -104,7 +104,7 @@ Repository.prototype.idByUrl = async function(url) {
 
 Repository.prototype.inspect = async function(page) {
   let body = page.url.toString();
-  let request = new Request('/api/inspect', {
+  let request = new Request('./api/inspect', {
     method: 'POST', body
   });
 

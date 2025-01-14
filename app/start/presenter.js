@@ -2,20 +2,25 @@
 import { Page } from './page.js';
 import { Search } from './search.js';
 
-export function Presenter(shell, repository, accountsManager) {
+export function Presenter(shell, repository, accountsManager, tabsManager) {
   this.shell = shell;
   this.repository = repository;
   this.accountsManager = accountsManager;
+  this.tabsManager = tabsManager;
 }
 
 Presenter.prototype.showIndex = async function() {
-  let { accounts, clock, form, list } = this.shell;
+  let { accounts, clock, form, tabs, bookmarks } = this.shell;
+
+  tabs.setHeadline('Tabs');
+  bookmarks.setHeadline('Lesezeichen');
 
   updateClock();
   window.setInterval(updateClock, 1000);
 
   let repository = this.repository;
   let accountsManager = this.accountsManager;
+  let tabsManager = this.tabsManager;
 
   let pages = new Set();
   let search = new Search(pages, Page.search);
@@ -28,14 +33,18 @@ Presenter.prototype.showIndex = async function() {
   accounts.onChanged = switchUser;
   accounts.onSubmitted = createUser;
 
+  tabs.hidden = true;
+  tabsManager.isAvailable().then(available => tabs.hidden = !available);
+  showTabs(tabsManager.observeTabs());
+
   form.setTagPattern(Page.tagPattern);
 
-  form.onChanged = searchPages;
-  form.onSubmitted = submitPage;
+  form.onChanged = searchBookmarks;
+  form.onSubmitted = submitBookmark;
 
-  showPages(repository.fetchAll());
+  showBookmarks(repository.fetchAll());
   await repository.syncAll(self);
-  showPages(repository.fetchAll(), true);
+  showBookmarks(repository.fetchAll(), true);
 
   function updateClock() {
     let date = new Date();
@@ -57,7 +66,7 @@ Presenter.prototype.showIndex = async function() {
     accountsManager.switchUser(self);
 
     await repository.syncAll(self);
-    showPages(repository.fetchAll(), true);
+    showBookmarks(repository.fetchAll(), true);
   }
 
   async function createUser() {
@@ -73,11 +82,27 @@ Presenter.prototype.showIndex = async function() {
     }
 
     await repository.syncAll(self);
-    showPages(repository.fetchAll(), true);
+    showBookmarks(repository.fetchAll(), true);
   }
 
-  async function showPages(iterator = pages, clear = false) {
-    let items = list.items.values();
+  async function showTabs(iterator) {
+    for await (let pages of iterator) {
+      let items = tabs.items.values();
+
+      for (let page of pages) {
+        let item = items.next().value || tabs.addItem();
+        item.setTitle(page);
+        item.setUrl(page);
+      }
+
+      for (let item of items) {
+        tabs.removeItem(item);
+      }
+    }
+  }
+
+  async function showBookmarks(iterator, clear = false) {
+    let items = bookmarks.items.values();
 
     if (clear) {
       pages.clear();
@@ -88,44 +113,43 @@ Presenter.prototype.showIndex = async function() {
       pages.add(page);
       page.tags.forEach(tag => form.addTag(tag));
 
-      let item = items.next().value || list.addItem();
-      item.onEdited = editPage(page);
+      let item = items.next().value || bookmarks.addItem();
+      item.onEdited = editBookmark(page);
       item.setTitle(page);
       item.setUrl(page);
     }
 
     for (let item of items) {
-      list.removeItem(item);
+      bookmarks.removeItem(item);
     }
   }
 
-  function searchPages() {
+  function searchBookmarks() {
     let query = [form.url, ...form.tags].join(' ');
     let results = search.execute(query) || pages;
-    showPages(results);
+    showBookmarks(results);
   }
 
-  function editPage(page) {
+  function editBookmark(page) {
     return async (title) => {
       page.setTitle(title);
       await repository.save(page, self);
     };
   }
 
-  async function submitPage() {
+  async function submitBookmark() {
     let page = new Page();
     page.addTags(form.tags);
 
     if (page.tryUrl(form.url)) {
       form.clearValues();
-      showPages();
 
       await repository.inspect(page);
       await repository.save(page, self);
 
       pages.add(page);
 
-      let item = list.addItem(true);
+      let item = bookmarks.addItem(true);
       item.setTitle(page);
       item.setUrl(page);
     }

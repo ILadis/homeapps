@@ -8,7 +8,7 @@ AccountsManager.tokenKey = 'user_token';
 AccountsManager.nameKey = 'user_name';
 
 AccountsManager.prototype.createUser = async function(name) {
-  let request = new Request('/api/users', {
+  let request = new Request('./api/users', {
     method: 'POST', body: name
   });
 
@@ -53,7 +53,7 @@ AccountsManager.prototype.listUsers = async function() {
   let self = this.currentUser();
   if (self) this.users.push(self);
 
-  let request = new Request('/api/users', {
+  let request = new Request('./api/users', {
     method: 'GET'
   });
 

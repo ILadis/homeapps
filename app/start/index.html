@@ -6,10 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link href="./favicon.ico" rel="icon">
   <link href="./app/styles.css" rel="stylesheet">
+  <script src="./app/broker.js"></script>
   <script type="module">
   import { Presenter } from './app/presenter.js';
   import { Repository } from './app/repository.js';
   import { AccountsManager } from './app/accounts.js';
+  import { TabsManager } from './app/tabs.js';
   import { SyncManager } from './app/syncmanager.js';
   import { Shell } from './app/views.js';
 
@@ -20,14 +22,16 @@
 
   const storage = window.localStorage;
   const accountsManager = new AccountsManager(storage);
+  const tabsManager = new TabsManager(broker);
 
-  const presenter = new Presenter(shell, repository, accountsManager);
+  const presenter = new Presenter(shell, repository, accountsManager, tabsManager);
 
   if ('serviceWorker' in navigator) {
 //  navigator.serviceWorker.register('./service-worker.js');
   }
 
   window.onload = function() {
+    broker.start();
     document.body.prepend(shell);
     presenter.showIndex();
   };
