@@ -18,7 +18,7 @@ $base = getenv('BASE');
 $host = getenv('DEVICE');
 
 $db = new SQLite3('db.sqlite');
-$repository = Persistence\Repository::openNew($db);
+$repository = Persistence\Repository::open($db);
 $scanner = new Devices\Scanner($host, 54921);
 
 $rootLogger = Log\ConsoleLogger::for('RootLogger');

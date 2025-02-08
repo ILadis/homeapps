@@ -14,7 +14,7 @@ $root = realpath(__DIR__);
 $base = getenv('BASE');
 
 $db = new SQLite3('db.sqlite');
-$repository = Persistence\Repository::openNew($db);
+$repository = Persistence\Repository::open($db);
 
 $rootLogger = Log\ConsoleLogger::for('RootLogger');
 $httpLogger = Log\ConsoleLogger::for('HttpLogger');

@@ -3,7 +3,7 @@ namespace Persistence;
 
 class Repository {
 
-  public static function openNew($db) {
+  public static function open($db) {
     $repository = new Repository($db);
     $repository->createTables();
     $repository->createDefaultUser();
