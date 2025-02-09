@@ -1,6 +1,6 @@
 <?php
 namespace Http\Handler;
-use Http, IO\CSV, Entity\Filters;
+use Http, IO\CSV, Entity\Member, Entity\Filters;
 
 class ShowMember implements Http\Handler {
   private $repository;
@@ -18,7 +18,7 @@ class ShowMember implements Http\Handler {
     }
 
     $response->setStatus(200);
-    $response->setBodyAsJson($members[0]);
+    $response->setBodyAsJson($member);
     return true;
   }
 
@@ -27,7 +27,33 @@ class ShowMember implements Http\Handler {
     $filter = Filters::byIds([$id]);
 
     $members = iterator_to_array($this->repository->findMembers($filter));
-    return count($members) != 1 ? false : $members[0];
+    return count($members) != 1 ? false : current($members);
+  }
+}
+
+class SaveMember implements Http\Handler {
+  private $repository;
+
+  public function __construct($repository) {
+    $this->repository = $repository;
+  }
+
+  public function handle($request, $response) {
+    $id = basename($request->getUri()->getPath());
+
+    $member = new Member();
+    $member->id = $id;
+
+    $fields = $request->getBodyAsJson();
+    foreach ($fields as $field => $value) {
+      $member->$field = $value;
+    }
+
+    $updated = $this->repository->saveMember($member);
+
+    $response->setStatus($updated ? 200 : 201);
+    $response->setBodyAsJson($member);
+    return true;
   }
 }
 

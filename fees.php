@@ -40,6 +40,7 @@ $response = Http\newResponse();
 $router = new Http\Router($base, $httpLogger);
 $router->add('GET',  '/api/members', new Http\Handler\ListMembers($repository));
 $router->add('GET',  '/api/members/[A-Za-z0-9-]+', new Http\Handler\ShowMember($repository));
+$router->add('PUT',  '/api/members/[A-Za-z0-9-]+', new Http\Handler\SaveMember($repository));
 $router->add('POST', '/api/members/export', new Http\Handler\ExportMembers($repository));
 
 try {

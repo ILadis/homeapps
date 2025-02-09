@@ -4,12 +4,12 @@ namespace IO\CSV;
 class DataSource {
 
   public static function open($file, $separator = ';', $enclosure = '"', $escape = '\\') {
-    $stream = fopen($file, 'r+');
+    $stream = fopen($file, 'c+');
     return DataSource::from($stream, $separator, $enclosure, $escape);
   }
 
   public static function wrap($buffer, $separator = ';', $enclosure = '"', $escape = '\\') {
-    $stream = fopen('data://text/plain,'. $buffer, 'r');
+    $stream = fopen('data://text/plain,'. $buffer, 'r+');
     return DataSource::from($stream, $separator, $enclosure, $escape);
   }
 
@@ -57,7 +57,7 @@ class Template {
   private function apply($entry) {
     $replacer = function($match) use ($entry) {
       $key = substr($match[1], 1, -1);
-      $value = $entry[$key] ?? $match[1];
+      $value = $entry->$key ?? $match[1];
       return $value;
     };
 
@@ -73,7 +73,7 @@ class Template {
     $target->write($this->headers);
 
     foreach ($entries as $entry) {
-      $fields = $this->apply((array) $entry);
+      $fields = $this->apply($entry);
       $target->write($fields);
     }
   }

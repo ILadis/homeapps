@@ -17,6 +17,15 @@ class Member {
   public $tariff;
   public $accountIban;
   public $accountHolder;
+
+  public function __get($name) {
+    if ($name == 'fee') {
+      switch ($this->tariff) {
+        case 'F': return '18,00';
+        case 'E': return '12,00';
+      }
+    }
+  }
 }
 
 // TODO add stuff for normalization and validation
