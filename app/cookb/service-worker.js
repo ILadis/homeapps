@@ -11,12 +11,14 @@ async function refreshAssets() {
     '/manifest.webmanifest',
 
     '/app/dom.js',
-    '/app/presenter.js',
-    '/app/recipe.js',
-    '/app/repository.js',
     '/app/router.js',
     '/app/search.js',
+    '/app/storage.js',
+    '/app/presenter.js',
+    '/app/principal.js',
+    '/app/repository.js',
     '/app/views.js',
+    '/app/recipe.js',
 
     '/app/styles.css',
   ];

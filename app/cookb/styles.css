@@ -68,6 +68,7 @@ button {
 [is=recipe-details] > header > h1,
 [is=recipe-form]    > header > h1 {
   padding: 8pt 5pt 24pt 8pt;
+  align-items: center;
   display: flex;
 }
 
@@ -89,6 +90,13 @@ button {
   height: 24pt;
   flex-shrink: 0;
   fill: #4a4a4a;
+}
+
+[is=recipe-details] > header > h1 > svg:first-child,
+[is=recipe-form]    > header > h1 > svg:first-child {
+  margin-left: 0;
+  width: 18pt;
+  height: 18pt;
 }
 
 [is=recipe-index] > header > h1 + input {

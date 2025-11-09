@@ -100,6 +100,7 @@ Presenter.prototype.showRecipe = async function(id) {
   this.shell.setTitle(recipe.name);
   this.shell.setContent(view);
 
+  view.onBackClicked = () => window.history.back();
   view.onEditClicked = () => {
     this.showForm(id);
   };
@@ -208,6 +209,7 @@ Presenter.prototype.showForm = async function(id) {
 
   view.onRetrieveClicked = () => view.promptForRetrieve();
   view.onRetrieveUrlProvided = (url) => this.showForm(url);
+  view.onBackClicked = () => window.history.back();
 
   view.onAddStepClicked = () => {
     recipe.addStep();

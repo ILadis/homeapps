@@ -30,9 +30,9 @@ export const Index = define('recipe-index', 'div', html`
 <section>
   <ol><!-- recipes --></ol>
 </section>`, function() {
-  let buttons = this.querySelectorAll('svg');
-  buttons[0].onclick = () => this.onRefreshClicked();
-  buttons[1].onclick = () => this.onCreateClicked();
+  let actions = this.querySelectorAll('svg');
+  actions[0].onclick = () => this.onRefreshClicked();
+  actions[1].onclick = () => this.onCreateClicked();
 
   let input = this.querySelector('header input');
   input.oninput = () => this.onQueryChanged(input.value);
@@ -115,6 +115,7 @@ Index.Recipe.prototype.onClicked = function() {
 export const Recipe = define('recipe-details', 'div', html`
 <header>
   <h1>
+    <svg viewBox="0 -960 960 960"><use href="#back"></use></svg>
     <span><!-- name --></span>
     <svg viewBox="0 0 24 24"><use href="#edit"></use></svg>
     <svg viewBox="0 0 24 24"><use href="#share"></use></svg>
@@ -130,11 +131,12 @@ export const Recipe = define('recipe-details', 'div', html`
   <h2><!-- steps --></h2>
   <ol><!-- (ingredients) step --></ol>
 </section>`, function() {
-  let buttons = this.querySelectorAll('svg, button');
-  buttons[0].onclick = () => this.onEditClicked();
-  buttons[1].onclick = () => this.onShareClicked();
-  buttons[2].onclick = () => this.onServingsClicked(-1);
-  buttons[3].onclick = () => this.onServingsClicked(+1);
+  let actions = this.querySelectorAll('svg, button');
+  actions[0].onclick = () => this.onBackClicked();
+  actions[1].onclick = () => this.onEditClicked();
+  actions[2].onclick = () => this.onShareClicked();
+  actions[3].onclick = () => this.onServingsClicked(-1);
+  actions[4].onclick = () => this.onServingsClicked(+1);
 
   this.ingredients = new Set();
   this.steps = new Set();
@@ -147,13 +149,16 @@ Recipe.prototype.setName = function({ name }) {
 };
 
 Recipe.prototype.enableEditAction = function(enabled) {
-  let buttons = this.querySelectorAll('svg');
-  buttons[0].style.display = enabled ? 'block' : 'none';
+  let action = this.querySelector('use[href="#edit"]').parentNode;
+  action.style.display = enabled ? 'block' : 'none';
 };
 
 Recipe.prototype.enableShareAction = function(enabled) {
-  let svgs = this.querySelectorAll('svg');
-  svgs[1].style.display = enabled ? 'block' : 'none';
+  let action = this.querySelector('use[href="#share"]').parentNode;
+  action.style.display = enabled ? 'block' : 'none';
+};
+
+Recipe.prototype.onBackClicked = function() {
 };
 
 Recipe.prototype.onEditClicked = function() {
@@ -233,6 +238,7 @@ Recipe.Step.prototype.addIngredient = function() {
 export const Form = define('recipe-form', 'div', html`
 <header>
   <h1>
+    <svg viewBox="0 -960 960 960"><use href="#back"></use></svg>
     <span><!-- title --></span>
     <svg viewBox="0 0 24 24"><use href="#done"></use></svg>
     <a><svg viewBox="0 0 24 24"><use href="#export"></use></svg></a>
@@ -258,12 +264,13 @@ export const Form = define('recipe-form', 'div', html`
   <ol><!-- steps + ingredients --></ol>
   <svg viewBox="0 0 24 24"><use href="#create"></use></svg>
 </section>`, function() {
-  let buttons = this.querySelectorAll('svg');
-  buttons[0].onclick = () => this.onDoneClicked();
-  buttons[1].onclick = () => this.onExportClicked();
-  buttons[2].onclick = () => this.onRetrieveClicked();
-  buttons[3].onclick = () => this.onDeleteClicked();
-  buttons[4].onclick = () => this.onAddStepClicked();
+  let actions = this.querySelectorAll('svg');
+  actions[0].onclick = () => this.onBackClicked();
+  actions[1].onclick = () => this.onDoneClicked();
+  actions[2].onclick = () => this.onExportClicked();
+  actions[3].onclick = () => this.onRetrieveClicked();
+  actions[4].onclick = () => this.onDeleteClicked();
+  actions[5].onclick = () => this.onAddStepClicked();
 
   let inputs = this.querySelectorAll('fieldset input');
   inputs[0].onchange = ({ target }) => this.onLabelChanged(target.value);
@@ -290,6 +297,9 @@ Form.prototype.enableDoneAction = function(enabled) {
 Form.prototype.enableDeleteAction = function(enabled) {
   let buttons = this.querySelectorAll('svg');
   buttons[2].style.display = enabled ? 'block' : 'none';
+};
+
+Form.prototype.onBackClicked = function() {
 };
 
 Form.prototype.onDoneClicked = function() {
