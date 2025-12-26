@@ -15,28 +15,54 @@ function define() {
   }
 }
 
-async function require(url, names = []) {
+async function require(url, names = [], factory = () => import(url)) {
   try {
     define.amd = true;
     define.names = names;
     define.modules = define.modules || {};
 
-    await import(url);
+    await factory();
   } finally {
     define.amd = false;
     define.names = [];
   }
 }
 
+function declare(name, depends, factory) {
+  return require('.', [name], () => define(depends, factory));
+}
+
 window.define = define;
+window.require = require;
 
 await require('./vendor/chart.js', ['chart.js']);
+
+/* minimum set of helper functions required by zoom plugin, for implementations see:
+ * https://github.com/chartjs/Chart.js/tree/master/src/helpers
+ */
+await declare('chart.js/helpers', [], () => Object.seal({
+  // math:
+  sign: (value) => Math.sign(value),
+  almostEquals: (x, y, epsilon) => Math.abs(x - y) < epsilon,
+  // utils:
+  getRelativePosition: (event) => ('native' in event) ? event : undefined,
+  valueOrDefault: (value, defaultValue) => (typeof value === 'undefined') ? defaultValue : value,
+  callback: (handler, args, self) => (typeof handler?.call === 'function') ? handler.apply(self, args) : undefined,
+
+  each: (value, handler, self) => {
+    const entries = Object.entries(value);
+    entries.forEach(([_, value], index) => handler.call(self, value, index));
+  }
+}));
 
 /* for available date adapters see:
  * https://github.com/chartjs/awesome?tab=readme-ov-file#adapters
  */
 await require('./vendor/moment.js', ['moment']);
 await require('./vendor/chartjs-adapter-moment.js');
+
+await require('./vendor/hammer.js', ['hammerjs']);
+await require('./vendor/chartjs-plugin-zoom.js');
 
 const Chart = define.modules['chart.js'];
 const { define: element, html } = await import('./dom.js');
@@ -45,15 +71,34 @@ export const Timechart = element('chart-time', 'div', html`
 <canvas>
   <!-- where the chart is drawn -->
 </canvas>`, function() {
+  /* for available zoom plugin options see:
+   * https://www.chartjs.org/chartjs-plugin-zoom/latest/guide/options.html
+   */
+  let zoom = {
+    pan: {
+      enabled: true,
+      mode: 'x'
+    },
+    zoom: {
+      wheel: { enabled: true },
+      pinch: { enabled: true },
+      mode: 'x',
+    },
+    limits: {
+      x: { min: 'original', max: 'original' },
+      y: { min: 'original', max: 'original' },
+    }
+  };
+
   /* for available time chart options see:
    * https://www.chartjs.org/docs/latest/axes/cartesian/time.html
    */
-
   let options = {
     responsive: true,
     maintainAspectRatio: false,
     elements: { point: { pointStyle: false } },
     scales: { x: { type: 'time' }, y: { } },
+    plugins: { zoom },
   };
 
   let canvas = this.querySelector('canvas');
@@ -160,3 +205,29 @@ Gaugechart.prototype.addDataset = async function(label, dataset, ...options) {
   this.update();
 };
 
+export const Datasets = {
+  TemperatureTrend: async function*(url) {
+    let data = await fetch(url);
+    let values = await data.json();
+
+    for (let value of values) {
+      yield { x: value['timestamp'], y: (value['value'] / 100).toFixed(2) };
+    }
+  },
+
+  TemperatureValue: async function(url) {
+    let data = await fetch(url);
+    let values = await data.json();
+
+    let temperature = (values[0]['value'] / 100).toFixed(2);
+    return [temperature, 26 - temperature];
+  },
+
+  HumidityValue: async function(url) {
+    let data = await fetch(url);
+    let values = await data.json();
+
+    let humidity = (values[0]['value'] / 100).toFixed(0);
+    return [humidity, 100 - humidity];
+  },
+};

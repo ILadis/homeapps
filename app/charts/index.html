@@ -7,32 +7,7 @@
   <link href="./app/styles.css" rel="stylesheet">
   <script type="module">
   window.onload = async () => {
-    const { Timechart, Gaugechart } = await import('./app/chart.js');
-
-    async function* TemperatureTrend(url) {
-      let data = await fetch(url);
-      let values = await data.json();
-
-      for (let value of values) {
-        yield { x: value['timestamp'], y: (value['value'] / 100).toFixed(2) };
-      }
-    }
-
-    async function TemperatureValue(url) {
-      let data = await fetch(url);
-      let values = await data.json();
-
-      let temperature = (values[0]['value'] / 100).toFixed(2);
-      return [temperature, 26 - temperature];
-    }
-
-    async function HumidityValue(url) {
-      let data = await fetch(url);
-      let values = await data.json();
-
-      let humidity = (values[0]['value'] / 100).toFixed(0);
-      return [humidity, 100 - humidity];
-    }
+    const { Timechart, Gaugechart, Datasets } = await import('./app/chart.js');
 
     const chart1 = new Timechart();
     chart1.setTitle('Bad');
@@ -41,7 +16,7 @@
     chart1.showLegends(false);
 
     chart1.timeSpan('days');
-    chart1.addDataset('Temperatur', TemperatureTrend, './api/metrics/1');
+    chart1.addDataset('Temperatur', Datasets.TemperatureTrend, './api/metrics/1');
 
     const chart2 = new Timechart();
     chart2.setTitle('Zimmer');
@@ -50,19 +25,19 @@
     chart2.showLegends(false);
 
     chart2.timeSpan('days');
-    chart2.addDataset('Temperatur', TemperatureTrend, './api/metrics/2');
+    chart2.addDataset('Temperatur', Datasets.TemperatureTrend, './api/metrics/2');
 
     const chart3 = new Gaugechart();
-    chart3.addDataset('Temperatur: Bad', TemperatureValue, './api/metrics/1');
+    chart3.addDataset('Temperatur: Bad', Datasets.TemperatureValue, './api/metrics/1');
 
     const chart4 = new Gaugechart();
-    chart4.addDataset('Temperatur: Zimmer', TemperatureValue, './api/metrics/2');
+    chart4.addDataset('Temperatur: Zimmer', Datasets.TemperatureValue, './api/metrics/2');
 
     const chart5 = new Gaugechart();
-    chart5.addDataset('rel. Luftfeuchtigkeit: Bad', HumidityValue, './api/metrics/3');
+    chart5.addDataset('rel. Luftfeuchtigkeit: Bad', Datasets.HumidityValue, './api/metrics/3');
 
     const chart6 = new Gaugechart();
-    chart6.addDataset('rel. Luftfeuchtigkeit: Zimmer', HumidityValue, './api/metrics/4');
+    chart6.addDataset('rel. Luftfeuchtigkeit: Zimmer', Datasets.HumidityValue, './api/metrics/4');
 
     document.body.appendChild(chart3);
     document.body.appendChild(chart5);
@@ -73,6 +48,4 @@
   };
   </script>
 </head>
-  <body>
-  </body>
 </html>
