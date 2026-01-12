@@ -219,8 +219,10 @@ Barchart.prototype.addDataset = async function(label, dataset, ...options) {
     }
   }
 
-  labels.push(current.label);
-  items.push(current.value);
+  if (current.label !== false) {
+    labels.push(current.label);
+    items.push(current.value);
+  }
 
   this.update();
 };
