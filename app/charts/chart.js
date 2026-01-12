@@ -157,6 +157,128 @@ Timechart.prototype.addDataset = async function(label, dataset, ...options) {
   this.update();
 };
 
+export const Barchart = element('chart-bar', 'div', html`
+<canvas>
+  <!-- where the chart is drawn -->
+</canvas>`, function() {
+  let options = {
+    responsive: true,
+    maintainAspectRatio: false,
+  };
+
+  let canvas = this.querySelector('canvas');
+  let chart = new Chart(canvas, { type: 'bar', options });
+
+  this.options = options;
+  this.data = chart.data;
+
+  this.update = () => chart.update();
+  this.destroy = () => chart.destroy();
+});
+
+Barchart.prototype.setTitle = function(title) {
+  this.options.plugins.title = { text: title, display: !!title };
+};
+
+Barchart.prototype.showLegends = function(show, alignment = 'top') {
+  this.options.plugins.legend = { display: show, position: alignment };
+};
+
+Barchart.prototype.addDataset = async function(label, dataset, ...options) {
+  let items = new Array();
+
+  this.data.datasets.push({
+    label, data: items,
+    backgroundColor: '#00afd7',
+    borderColor: '#00afd7',
+  });
+
+  let labels = this.data.labels;
+  let current = {
+    label: false,
+    value: 0,
+  };
+
+  for await (let item of dataset(...options)) {
+    let date = new Date(item.x);
+
+    // TODO make this configurable (dataset must be moved into buckets/labels and accumulated)
+    let label = 'ab ' + date.getHours() + ' Uhr';
+    if (current.label === false) {
+      current.label = label;
+    }
+
+    if (label != current.label) {
+      labels.push(current.label);
+      items.push(current.value);
+
+      current.label = label;
+      current.value = item.y;
+    } else {
+      current.value += item.y;
+    }
+  }
+
+  labels.push(current.label);
+  items.push(current.value);
+
+  this.update();
+};
+
+export const Piechart = element('chart-pie', 'div', html`
+<canvas>
+  <!-- where the chart is drawn -->
+</canvas>`, function() {
+  let options = {
+    responsive: true,
+    maintainAspectRatio: false,
+  };
+
+  let canvas = this.querySelector('canvas');
+  let chart = new Chart(canvas, { type: 'doughnut', options });
+
+  this.options = options;
+  this.data = chart.data;
+
+  this.update = () => chart.update();
+  this.destroy = () => chart.destroy();
+});
+
+Piechart.prototype.setTitle = function(title) {
+  this.options.plugins.title = { text: title, display: !!title };
+};
+
+Piechart.prototype.showLegends = function(show, alignment = 'top') {
+  this.options.plugins.legend = { display: show, position: alignment };
+};
+
+Piechart.prototype.setDataset = async function(dataset, ...options) {
+  let items = new Array();
+
+  this.data.datasets.pop();
+  this.data.datasets.push({
+    label: '', data: items,
+    // TODO use different colors
+  });
+
+  let labels = this.data.labels;
+
+  for await (let item of dataset(...options)) {
+    let label = item.y;
+    let index = labels.indexOf(label);
+
+    if (index === -1) {
+      index = labels.length;
+      labels.push(label);
+      items.push(0);
+    }
+
+    items[index]++;
+  }
+
+  this.update();
+};
+
 export const Gaugechart = element('chart-gauge', 'div', html`
 <canvas>
   <!-- where the chart is drawn -->
@@ -229,5 +351,30 @@ export const Datasets = {
 
     let humidity = (values[0]['value'] / 100).toFixed(0);
     return [humidity, 100 - humidity];
+  },
+
+  HttpNotFound: async function*(url) {
+    let data = await fetch(url);
+    let values = await data.json();
+
+    for (let value of values) {
+      if (value['status'] == '404') {
+        yield { x: value['timestamp'], y: 1 };
+      }
+    }
+  },
+
+  HttpUserAgents: async function*(url) {
+    let data = await fetch(url);
+    let values = await data.json();
+    let pattern = new RegExp('(?<name>[^/ ]+)/(?<version>[0-9.]+)', 'g');
+
+    for (let value of values) {
+      let agents = value['user_agent'].matchAll(pattern);
+
+      for (let agent of agents) {
+        yield { x: value['timestamp'], y: agent.groups['name'] };
+      }
+    }
   },
 };

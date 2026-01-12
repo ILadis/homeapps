@@ -7,14 +7,13 @@
   <link href="./app/styles.css" rel="stylesheet">
   <script type="module">
   window.onload = async () => {
-    const { Timechart, Gaugechart, Datasets } = await import('./app/chart.js');
+    const { Timechart, Barchart, Piechart, Gaugechart, Datasets } = await import('./app/chart.js');
 
     const chart1 = new Timechart();
     chart1.setTitle('Bad');
     chart1.setOrdinate('', value => value.toLocaleString() + ' °C');
     chart1.showTooltips(true);
     chart1.showLegends(false);
-
     chart1.timeSpan('days');
     chart1.addDataset('Temperatur', Datasets.TemperatureTrend, './api/metrics/1');
 
@@ -23,7 +22,6 @@
     chart2.setOrdinate('', value => value.toLocaleString() + ' °C');
     chart2.showTooltips(true);
     chart2.showLegends(false);
-
     chart2.timeSpan('days');
     chart2.addDataset('Temperatur', Datasets.TemperatureTrend, './api/metrics/2');
 
@@ -39,12 +37,23 @@
     const chart6 = new Gaugechart();
     chart6.addDataset('rel. Luftfeuchtigkeit: Zimmer', Datasets.HumidityValue, './api/metrics/4');
 
+    const chart7 = new Barchart();
+    chart7.setTitle('HTTP Fehler');
+    chart7.addDataset('404', Datasets.HttpNotFound, './api/metrics/5');
+
+    const chart8 = new Piechart();
+    chart8.setTitle('HTTP User-Agents');
+    chart8.showLegends(true, 'left');
+    chart8.setDataset(Datasets.HttpUserAgents, './api/metrics/5');
+
     document.body.appendChild(chart3);
     document.body.appendChild(chart5);
     document.body.appendChild(chart1);
     document.body.appendChild(chart4);
     document.body.appendChild(chart6);
     document.body.appendChild(chart2);
+    document.body.appendChild(chart7);
+    document.body.appendChild(chart8);
   };
   </script>
 </head>
