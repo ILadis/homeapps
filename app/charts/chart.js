@@ -67,6 +67,29 @@ await require('./vendor/chartjs-plugin-zoom.js');
 const Chart = define.modules['chart.js'];
 const { define: element, html } = await import('./dom.js');
 
+const Colors = {
+  'Alizarin':  ['#EC7063', '#F5B7B1'],
+  'Wisteria':  ['#A569BD', '#D2B4DE'],
+  'River':     ['#5DADE2', '#AED6F1'],
+  'Emerald':   ['#58D68D', '#ABEBC6'],
+  'Sunflower': ['#F4D03F', '#F9E79F'],
+  'Carrot':    ['#EB984E', '#F5CBA7'],
+  'Asphalt':   ['#5D6D7E', '#AEB6BF'],
+  'Grey':      ['#eeeeee'],
+};
+
+Colors.primary = function(name) {
+  return this[name]?.[0];
+};
+
+Colors.primaries = function() {
+  return Object.keys(this).map(name => this[name]?.[0]);
+};
+
+Colors.secondary = function(name) {
+  return this[name]?.[1];
+};
+
 export const Timechart = element('chart-time', 'div', html`
 <canvas>
   <!-- where the chart is drawn -->
@@ -140,18 +163,18 @@ Timechart.prototype.timeSpan = function(span) {
 }
 
 Timechart.prototype.addDataset = async function(label, dataset, ...options) {
-  let items = new Array();
+  let data = new Array();
 
   this.data.datasets.push({
-    label, data: items,
-    backgroundColor: '#00afd7',
-    borderColor: '#00afd7',
-    fill: { target: 'origin', above: '#00b0d733' },
+    label, data,
+    backgroundColor: Colors.primary('River'),
+    borderColor: Colors.primary('River'),
+    fill: { target: 'origin', above: Colors.secondary('River') },
     cubicInterpolationMode: 'monotone',
   });
 
-  for await (let item of dataset(...options)) {
-    items.push(item);
+  for await (let value of dataset(...options)) {
+    data.push(value);
   }
 
   this.update();
@@ -185,44 +208,19 @@ Barchart.prototype.showLegends = function(show, alignment = 'top') {
 };
 
 Barchart.prototype.addDataset = async function(label, dataset, ...options) {
-  let items = new Array();
+  let data = new Array();
 
   this.data.datasets.push({
-    label, data: items,
-    backgroundColor: '#00afd7',
-    borderColor: '#00afd7',
+    label, data,
+    backgroundColor: Colors.primary('River'),
+    borderColor: Colors.primary('River'),
   });
 
-  let labels = this.data.labels;
-  let current = {
-    label: false,
-    value: 0,
-  };
+  let [labels, values] = await dataset(...options);
 
-  for await (let item of dataset(...options)) {
-    let date = new Date(item.x);
-
-    // TODO make this configurable (dataset must be moved into buckets/labels and accumulated)
-    let label = 'ab ' + date.getHours() + ' Uhr';
-    if (current.label === false) {
-      current.label = label;
-    }
-
-    if (label != current.label) {
-      labels.push(current.label);
-      items.push(current.value);
-
-      current.label = label;
-      current.value = item.y;
-    } else {
-      current.value += item.y;
-    }
-  }
-
-  if (current.label !== false) {
-    labels.push(current.label);
-    items.push(current.value);
-  }
+  // TODO check existing labels match new dataset
+  this.data.labels = labels;
+  data.push(...values);
 
   this.update();
 };
@@ -255,28 +253,18 @@ Piechart.prototype.showLegends = function(show, alignment = 'top') {
 };
 
 Piechart.prototype.setDataset = async function(dataset, ...options) {
-  let items = new Array();
+  let data = new Array();
 
   this.data.datasets.pop();
   this.data.datasets.push({
-    label: '', data: items,
-    // TODO use different colors
+    label: '', data,
+    backgroundColor: Colors.primaries(),
   });
 
-  let labels = this.data.labels;
+  let [labels, values] = await dataset(...options);
 
-  for await (let item of dataset(...options)) {
-    let label = item.y;
-    let index = labels.indexOf(label);
-
-    if (index === -1) {
-      index = labels.length;
-      labels.push(label);
-      items.push(0);
-    }
-
-    items[index]++;
-  }
+  this.data.labels = labels;
+  data.push(...values);
 
   this.update();
 };
@@ -305,20 +293,23 @@ export const Gaugechart = element('chart-gauge', 'div', html`
 });
 
 Gaugechart.prototype.addDataset = async function(label, dataset, ...options) {
-  let items = new Array();
+  let data = new Array();
 
   this.data.labels = [];
   this.data.datasets.push({
-    label, data: items,
-    backgroundColor: ['#00afd7', '#eeeeee'],
+    label, data,
+    backgroundColor: [
+      Colors.primary('River'),
+      Colors.primary('Grey')
+    ],
   });
 
   let values = await dataset(...options);
-  items.push(...values);
+  data.push(...values);
 
   this.options.plugins.title = { text: label, display: true };
   this.options.plugins.tooltip = { enabled: false };
-  
+
   this.options.plugins.subtitle = {
     text: values[0].toString(),
     font: { size: 18 },
@@ -327,56 +318,4 @@ Gaugechart.prototype.addDataset = async function(label, dataset, ...options) {
   };
 
   this.update();
-};
-
-export const Datasets = {
-  TemperatureTrend: async function*(url) {
-    let data = await fetch(url);
-    let values = await data.json();
-
-    for (let value of values) {
-      yield { x: value['timestamp'], y: (value['value'] / 100).toFixed(2) };
-    }
-  },
-
-  TemperatureValue: async function(url) {
-    let data = await fetch(url);
-    let values = await data.json();
-
-    let temperature = (values[0]['value'] / 100).toFixed(2);
-    return [temperature, 26 - temperature];
-  },
-
-  HumidityValue: async function(url) {
-    let data = await fetch(url);
-    let values = await data.json();
-
-    let humidity = (values[0]['value'] / 100).toFixed(0);
-    return [humidity, 100 - humidity];
-  },
-
-  HttpNotFound: async function*(url) {
-    let data = await fetch(url);
-    let values = await data.json();
-
-    for (let value of values) {
-      if (value['status'] == '404') {
-        yield { x: value['timestamp'], y: 1 };
-      }
-    }
-  },
-
-  HttpUserAgents: async function*(url) {
-    let data = await fetch(url);
-    let values = await data.json();
-    let pattern = new RegExp('(?<name>[^/ ]+)/(?<version>[0-9.]+)', 'g');
-
-    for (let value of values) {
-      let agents = value['user_agent'].matchAll(pattern);
-
-      for (let agent of agents) {
-        yield { x: value['timestamp'], y: agent.groups['name'] };
-      }
-    }
-  },
 };

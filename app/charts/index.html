@@ -7,7 +7,8 @@
   <link href="./app/styles.css" rel="stylesheet">
   <script type="module">
   window.onload = async () => {
-    const { Timechart, Barchart, Piechart, Gaugechart, Datasets } = await import('./app/chart.js');
+    const { Timechart, Barchart, Piechart, Gaugechart } = await import('./app/chart.js');
+    const Datasets = await import('./app/dataset.js');
 
     const chart1 = new Timechart();
     chart1.setTitle('Bad');
@@ -39,12 +40,12 @@
 
     const chart7 = new Barchart();
     chart7.setTitle('HTTP Fehler');
-    chart7.addDataset('404', Datasets.HttpNotFound, './api/metrics/5');
+    chart7.addDataset('404', Datasets.HttpStatusCodes, './api/metrics/5', '404');
 
     const chart8 = new Piechart();
     chart8.setTitle('HTTP User-Agents');
     chart8.showLegends(true, 'left');
-    chart8.setDataset(Datasets.HttpUserAgents, './api/metrics/5');
+    chart8.setDataset(Datasets.HttpUserAgents, './api/metrics/5', 7);
 
     document.body.appendChild(chart3);
     document.body.appendChild(chart5);

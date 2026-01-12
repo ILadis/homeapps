@@ -65,6 +65,7 @@ foreach(array(
 
   '/app/dom.js' => 'app/dom.js',
   '/app/chart.js' => 'app/charts/chart.js',
+  '/app/dataset.js' => 'app/charts/dataset.js',
 ) as $path => $file) {
   $router->add('GET', $path, Http\serveFile("{$root}/{$file}"));
 }
