@@ -39,8 +39,8 @@
     chart6.addDataset('rel. Luftfeuchtigkeit: Zimmer', Datasets.HumidityValue, './api/metrics/4');
 
     const chart7 = new Barchart();
-    chart7.setTitle('HTTP Fehler');
-    chart7.addDataset('404', Datasets.HttpStatusCodes, './api/metrics/5', '404');
+    chart7.setTitle('HTTP Status-Codes');
+    chart7.setDataset(Datasets.HttpStatusCodes, './api/metrics/5');
 
     const chart8 = new Piechart();
     chart8.setTitle('HTTP User-Agents');

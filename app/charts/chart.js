@@ -68,22 +68,24 @@ const Chart = define.modules['chart.js'];
 const { define: element, html } = await import('./dom.js');
 
 const Colors = {
+  'River':     ['#5DADE2', '#AED6F1'],
+  'Sunflower': ['#F4D03F', '#F9E79F'],
+  'Emerald':   ['#58D68D', '#ABEBC6'],
   'Alizarin':  ['#EC7063', '#F5B7B1'],
   'Wisteria':  ['#A569BD', '#D2B4DE'],
-  'River':     ['#5DADE2', '#AED6F1'],
-  'Emerald':   ['#58D68D', '#ABEBC6'],
-  'Sunflower': ['#F4D03F', '#F9E79F'],
   'Carrot':    ['#EB984E', '#F5CBA7'],
   'Asphalt':   ['#5D6D7E', '#AEB6BF'],
   'Grey':      ['#eeeeee'],
 };
 
-Colors.primary = function(name) {
-  return this[name]?.[0];
-};
+Colors.primary = function(kind) {
+  let names = Object.keys(this);
 
-Colors.primaries = function() {
-  return Object.keys(this).map(name => this[name]?.[0]);
+  switch (typeof kind) {
+    case 'string': return this[kind]?.[0];
+    case 'number': return this[names[kind % names.length]][0];
+    case 'undefined': return names.map(name => this[name][0]);
+  }
 };
 
 Colors.secondary = function(name) {
@@ -187,6 +189,7 @@ export const Barchart = element('chart-bar', 'div', html`
   let options = {
     responsive: true,
     maintainAspectRatio: false,
+    scales: { x: { stacked: true }, y: { stacked: true } },
   };
 
   let canvas = this.querySelector('canvas');
@@ -207,20 +210,19 @@ Barchart.prototype.showLegends = function(show, alignment = 'top') {
   this.options.plugins.legend = { display: show, position: alignment };
 };
 
-Barchart.prototype.addDataset = async function(label, dataset, ...options) {
-  let data = new Array();
-
-  this.data.datasets.push({
-    label, data,
-    backgroundColor: Colors.primary('River'),
-    borderColor: Colors.primary('River'),
-  });
-
+Barchart.prototype.setDataset = async function(dataset, ...options) {
   let [labels, values] = await dataset(...options);
 
-  // TODO check existing labels match new dataset
-  this.data.labels = labels;
-  data.push(...values);
+  while (this.data.datasets.pop());
+
+  for (let label in values) {
+    this.data.labels = labels;
+    this.data.datasets.push({
+      label, data: values[label],
+      backgroundColor: Colors.primary(this.data.datasets.length),
+      borderColor: Colors.primary(this.data.datasets.length),
+    });
+  }
 
   this.update();
 };
@@ -253,18 +255,15 @@ Piechart.prototype.showLegends = function(show, alignment = 'top') {
 };
 
 Piechart.prototype.setDataset = async function(dataset, ...options) {
-  let data = new Array();
-
-  this.data.datasets.pop();
-  this.data.datasets.push({
-    label: '', data,
-    backgroundColor: Colors.primaries(),
-  });
-
   let [labels, values] = await dataset(...options);
 
+  while (this.data.datasets.pop());
+
   this.data.labels = labels;
-  data.push(...values);
+  this.data.datasets.push({
+    label: '', data: values,
+    backgroundColor: Colors.primary(),
+  });
 
   this.update();
 };

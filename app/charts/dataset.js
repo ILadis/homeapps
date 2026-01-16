@@ -24,28 +24,31 @@ export async function HumidityValue(url) {
   return [humidity, 100 - humidity];
 }
 
-export async function HttpStatusCodes(url, status) {
+export async function HttpStatusCodes(url) {
   let result = await fetch(url);
   let values = await result.json();
 
   let labels = new Array();
-  let data = new Array();
+  let data = new Object();
+
+  for (let hours = 0; hours < 24; hours++) {
+    let label = 'ab ' + hours + ' Uhr';
+    labels.push(label);
+  }
 
   for (let value of values) {
-    if (value['status'] != status) {
-      continue;
-    }
-
+    let status = value['status'];
     let date = new Date(value['timestamp']);
-    let label = 'ab ' + date.getHours() + ' Uhr';
 
-    let index = labels.indexOf(label);
-    if (index === -1) {
-      labels.push(label);
-      data.push(1);
-    } else {
-      data[index]++;
+    if (status in data == false) {
+      data[status] = new Array();
+      for (let hours = 0; hours < 24; hours++) {
+        data[status].push(0);
+      }
     }
+
+    let hour = date.getHours();
+    data[status][hour]++;
   }
 
   return [labels, data];
@@ -70,7 +73,7 @@ export async function HttpUserAgents(url, top) {
     }
   }
 
-  labels = Object.keys(data).sort((a, b) => data[b] - data[a]).splice(0, top);
+  labels = Object.keys(data).sort((i, j) => data[j] - data[i]).splice(0, top);
   values = labels.map(label => data[label]);
 
   return [labels, values];
