@@ -12,7 +12,7 @@ export async function TemperatureValue(url) {
   let result = await fetch(url);
   let values = await result.json();
 
-  let temperature = (values[0]['value'] / 100).toFixed(2);
+  let temperature = values.length ? (values[0]['value'] / 100).toFixed(2) : 0;
   return [temperature, 26 - temperature];
 }
 
@@ -20,7 +20,7 @@ export async function HumidityValue(url) {
   let result = await fetch(url);
   let values = await result.json();
 
-  let humidity = (values[0]['value'] / 100).toFixed(0);
+  let humidity = values.length ? (values[0]['value'] / 100).toFixed(0) : 0;
   return [humidity, 100 - humidity];
 }
 
@@ -77,4 +77,34 @@ export async function HttpUserAgents(url, top) {
   values = labels.map(label => data[label]);
 
   return [labels, values];
+}
+
+export async function BikingDistance(url) {
+  let result = await fetch(url);
+  let values = await result.json();
+
+  let labels = new Array(
+    'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli',
+    'August', 'September', 'Oktober', 'November', 'Dezember');
+
+  let data = new Object();
+
+  for (let value of values) {
+    let type = value['type'];
+    let distance = value['distance'] / 1000;
+    let date = new Date(value['timestamp']);
+    let now = new Date();
+
+    if (type != 'biking') continue;
+    if (date.getYear() != now.getYear()) continue;
+
+    let label = labels[date.getMonth()];
+    if (label in data == false) {
+      data[label] = 0;
+    }
+
+    data[label] += distance;
+  }
+
+  return [labels, { 'km': data }];
 }

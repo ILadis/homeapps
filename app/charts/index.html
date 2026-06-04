@@ -47,12 +47,18 @@
     chart8.showLegends(true, 'left');
     chart8.setDataset(Datasets.HttpUserAgents, './api/metrics/5', 7);
 
+    const chart9 = new Barchart();
+    chart9.setTitle('Fahrradtouren (km)');
+    chart9.showLegends(false);
+    chart9.setDataset(Datasets.BikingDistance, './api/metrics/6');
+
     document.body.appendChild(chart3);
     document.body.appendChild(chart5);
     document.body.appendChild(chart1);
     document.body.appendChild(chart4);
     document.body.appendChild(chart6);
     document.body.appendChild(chart2);
+    document.body.appendChild(chart9);
     document.body.appendChild(chart7);
     document.body.appendChild(chart8);
   };

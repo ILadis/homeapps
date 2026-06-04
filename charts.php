@@ -44,7 +44,12 @@ $metrics[] = new Persistence\SQLiteDataset('metrics.sqlite', <<<'SQL'
   ORDER BY "log"."timestamp" DESC
 SQL);
 
-$metrics[] = new Persistence\LogfileDataset('current.log', '/[0-9:\- ]+ \[vpstun\] (?P<timestamp>[0-9:\-+T]+) (?P<forwarded>[0-9., ]+[0-9]) "(?P<method>[A-Z]+) (?P<uri>[^"]+) HTTP\/(?P<version>[0-9.]+)" (?P<status>\d{3}) "(?P<referer>[^"]+)" "(?P<user_agent>[^"]+)"/');
+$metrics[] = new Persistence\LogfileDataset('current.log', ''
+  .'/[0-9:\- ]+ \[vpstun\] (?P<timestamp>[0-9:\-+T]+) (?P<forwarded>[0-9., ]+[0-9]) '
+  .'"(?P<method>[A-Z]+) (?P<uri>[^"]+) HTTP\/(?P<version>[0-9.]+)" '
+  .'(?P<status>\d{3}) "(?P<referer>[^"]+)" "(?P<user_agent>[^"]+)"/');
+
+$metrics[] = new Persistence\GpxDataset('tracks/');
 
 $rootLogger = Log\ConsoleLogger::for('RootLogger');
 $httpLogger = Log\ConsoleLogger::for('HttpLogger');
