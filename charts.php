@@ -49,7 +49,15 @@ $metrics[] = new Persistence\LogfileDataset('current.log', ''
   .'"(?P<method>[A-Z]+) (?P<uri>[^"]+) HTTP\/(?P<version>[0-9.]+)" '
   .'(?P<status>\d{3}) "(?P<referer>[^"]+)" "(?P<user_agent>[^"]+)"/');
 
-$metrics[] = new Persistence\GpxDataset('tracks/');
+$metrics[] = new Persistence\GpxDataset('tracks/', [
+  '/gpx/trk/name' => ['name', 'strval'],
+  '/gpx/trk/type' => ['type', 'strval'],
+  '/gpx/trk/trkseg/trkpt/time' => ['timestamp', 'strval'],
+  '/gpx/trk/extensions/gpxtrkx:trackstatsextension/gpxtrkx:distance' => ['distance', 'floatval'],
+  '/gpx/trk/extensions/gpxtrkx:trackstatsextension/gpxtrkx:maxspeed' => ['max_speed', 'floatval'],
+  '/gpx/trk/extensions/gpxtrkx:trackstatsextension/gpxtrkx:timertime' => ['total_time', 'intval'],
+  '/gpx/trk/extensions/gpxtrkx:trackstatsextension/gpxtrkx:movingtime' => ['moving_time', 'intval'],
+]);
 
 $rootLogger = Log\ConsoleLogger::for('RootLogger');
 $httpLogger = Log\ConsoleLogger::for('HttpLogger');

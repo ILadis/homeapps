@@ -52,10 +52,11 @@ class LogfileDataset implements Dataset {
 }
 
 class GpxDataset implements Dataset {
-  private $folder;
+  private $folder, $fields;
 
-  public function __construct($folder) {
+  public function __construct($folder, $fields) {
     $this->folder = $folder;
+    $this->fields = $fields;
   }
 
   public function load() {
@@ -63,41 +64,51 @@ class GpxDataset implements Dataset {
 
     foreach ($iterator as $file) {
       if ($file->getExtension() == 'gpx') {
-        yield $this->read($file);
+        yield $this->parse($file);
       }
     }
   }
 
-  private function read($file) {
-    $file = $file->openFile();
-    $data = $file->fread($file->getSize());
+  private function parse($file) {
+    $parser = xml_parser_create();
+    xml_set_element_handler($parser, $this->push($path), $this->pop($path));
+    xml_set_character_data_handler($parser, $this->handler($path, $result));
 
-    $document = new SimpleXMLElement($data, LIBXML_NONET);
-    $document->registerXPathNamespace('x', 'http://www.topografix.com/GPX/1/1');
+    $handle = fopen($file->getRealPath(), 'r');
+    while ($line = fgets($handle)) {
+      if (xml_parse($parser, $line) == 0) break;
+      if (count($result) == count($this->fields)) break;
+    }
 
-    $name = $this->xpath($document, '/x:gpx/x:trk/x:name');
-    $type = $this->xpath($document, '/x:gpx/x:trk/x:type');
-    $timestamp = $this->xpath($document, '/x:gpx/x:trk/x:trkseg[1]/x:trkpt[1]/x:time');
-
-    $distance   = $this->xpath($document, '//gpxtrkx:Distance', 'floatval');
-    $maxSpeed   = $this->xpath($document, '//gpxtrkx:MaxSpeed', 'floatval');
-    $totalTime  = $this->xpath($document, '//gpxtrkx:TimerTime', 'intval');
-    $movingTime = $this->xpath($document, '//gpxtrkx:MovingTime', 'intval');
-
-    return [
-      'name' => $name,
-      'type' => $type,
-      'timestamp' => $timestamp,
-      'distance'    => $distance,
-      'max_speed'   => $maxSpeed,
-      'total_time'  => $totalTime,
-      'moving_time' => $movingTime,
-    ];
+    return $result;
   }
 
-  private function xpath($document, $query, $type = 'strval') {
-    $result = $document->xpath($query);
-    return is_array($result) && count($result) > 0 ? $type("{$result[0]}") : '';
+  private function handler(&$path, &$result) {
+    $result = array();
+    $fields = $this->fields;
+
+    return function($parser, $data) use (&$path, &$result, &$fields) {
+      $xpath = strtolower('/'.implode('/', $path));
+      $field = $fields[$xpath] ?? false;
+
+      if ($field) {
+        list($name, $type) = $field;
+        $result[$name] = $type($data);
+      }
+    };
+  }
+
+  private function push(&$path) {
+    $path = array();
+    return function($parser, $name, $attrs) use (&$path) {
+      array_push($path, $name);
+    };
+  }
+
+  private function pop(&$path) {
+    return function($parser, $name) use (&$path) {
+      array_pop($path);
+    };
   }
 }
 
