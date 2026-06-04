@@ -32,7 +32,7 @@ class ScanImage implements Http\Handler {
     Image\pipe(
       Image\read($image),
       Image\crop(183188194, 20),
-      Image\scale(0.3),
+      Image\scale(0.8),
       Image\dimensions($width, $height),
       Image\write($image, true)
     )();
