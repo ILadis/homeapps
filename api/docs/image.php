@@ -30,7 +30,6 @@ function scale($value = 1) {
     $width = round(imagesx($image) * $value);
     $height = round(imagesy($image) * $value);
     $scaled = imagescale($image, $width, $height, IMG_NEAREST_NEIGHBOUR);
-    imagedestroy($image);
     return $scaled;
   };
 }
@@ -45,8 +44,7 @@ function dimensions(&$width, &$height) {
 
 function crop($color = 255255255, $threshold = 1) {
   return function($image) use ($color, $threshold) {
-    $croped = imagecropauto($image , IMG_CROP_THRESHOLD, $threshold, $color);
-    imagedestroy($image);
+    $croped = imagecropauto($image, IMG_CROP_THRESHOLD, $threshold, $color);
     return $croped;
   };
 }
