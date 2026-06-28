@@ -27,20 +27,20 @@
     chart2.addDataset('Temperatur', Datasets.TemperatureTrend, './api/metrics/2');
 
     const chart3 = new Gaugechart();
-    chart3.addDataset('Temperatur: Bad', Datasets.TemperatureValue, './api/metrics/1');
+    chart3.setDataset('Temperatur: Bad', Datasets.TemperatureValue, './api/metrics/1');
 
     const chart4 = new Gaugechart();
-    chart4.addDataset('Temperatur: Zimmer', Datasets.TemperatureValue, './api/metrics/2');
+    chart4.setDataset('Temperatur: Zimmer', Datasets.TemperatureValue, './api/metrics/2');
 
     const chart5 = new Gaugechart();
-    chart5.addDataset('rel. Luftfeuchtigkeit: Bad', Datasets.HumidityValue, './api/metrics/3');
+    chart5.setDataset('rel. Luftfeuchtigkeit: Bad', Datasets.HumidityValue, './api/metrics/3');
 
     const chart6 = new Gaugechart();
-    chart6.addDataset('rel. Luftfeuchtigkeit: Zimmer', Datasets.HumidityValue, './api/metrics/4');
+    chart6.setDataset('rel. Luftfeuchtigkeit: Zimmer', Datasets.HumidityValue, './api/metrics/4');
 
     const chart7 = new Barchart();
     chart7.setTitle('HTTP Status-Codes');
-    chart7.setDataset(Datasets.HttpStatusCodes, './api/metrics/5');
+    chart7.addDataset(Datasets.HttpStatusCodes, './api/metrics/5');
 
     const chart8 = new Piechart();
     chart8.setTitle('HTTP User-Agents');
@@ -48,9 +48,11 @@
     chart8.setDataset(Datasets.HttpUserAgents, './api/metrics/5', 7);
 
     const chart9 = new Barchart();
-    chart9.setTitle('Fahrradtouren (km)');
+    chart9.setTitle('Fahrradtouren');
     chart9.showLegends(false);
-    chart9.setDataset(Datasets.BikingDistance, './api/metrics/6');
+    chart9.comboScales();
+    chart9.addDataset(Datasets.BikingDistance, './api/metrics/6');
+    chart9.addDataset(Datasets.BikingTours, './api/metrics/6');
 
     document.body.appendChild(chart3);
     document.body.appendChild(chart5);

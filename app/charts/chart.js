@@ -210,14 +210,26 @@ Barchart.prototype.showLegends = function(show, alignment = 'top') {
   this.options.plugins.legend = { display: show, position: alignment };
 };
 
-Barchart.prototype.setDataset = async function(dataset, ...options) {
+Barchart.prototype.comboScales = function() {
+  this.options.scales.combo = {
+    display: false,
+    stacked: false,
+  };
+};
+
+Barchart.prototype.addDataset = async function(dataset, ...options) {
   let [labels, values] = await dataset(...options);
-
-  while (this.data.datasets.pop());
-
+  
   for (let label in values) {
+    let index = this.data.datasets.length;
+    let combo = index > 0 && !!this.options.scales.combo;
+
+    let type = combo ? 'line'  : 'bar';
+    let axis = combo ? 'combo' : 'y';
+
     this.data.labels = labels;
     this.data.datasets.push({
+      type, yAxisID: axis, order: -index,
       label, data: values[label],
       backgroundColor: Colors.primary(this.data.datasets.length),
       borderColor: Colors.primary(this.data.datasets.length),
@@ -291,8 +303,10 @@ export const Gaugechart = element('chart-gauge', 'div', html`
   this.destroy = () => chart.destroy();
 });
 
-Gaugechart.prototype.addDataset = async function(label, dataset, ...options) {
+Gaugechart.prototype.setDataset = async function(label, dataset, ...options) {
   let data = new Array();
+
+  while (this.data.datasets.pop());
 
   this.data.labels = [];
   this.data.datasets.push({

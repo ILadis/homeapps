@@ -100,11 +100,50 @@ export async function BikingDistance(url) {
 
     let label = labels[date.getMonth()];
     if (label in data == false) {
-      data[label] = 0;
+      let index = labels.indexOf(label);
+
+      for (let label of labels) {
+        data[label] = data[label] || 0;
+        if (--index < 0) break;
+      }
     }
 
     data[label] += distance;
   }
 
   return [labels, { 'km': data }];
+}
+
+export async function BikingTours(url) {
+  let result = await fetch(url);
+  let values = await result.json();
+
+  let labels = new Array(
+    'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli',
+    'August', 'September', 'Oktober', 'November', 'Dezember');
+
+  let data = new Object();
+
+  for (let value of values) {
+    let type = value['type'];
+    let date = new Date(value['timestamp']);
+    let now = new Date();
+
+    if (type != 'biking') continue;
+    if (date.getYear() != now.getYear()) continue;
+
+    let label = labels[date.getMonth()];
+    if (label in data == false) {
+      let index = labels.indexOf(label);
+
+      for (let label of labels) {
+        data[label] = data[label] || 0;
+        if (--index < 0) break;
+      }
+    }
+
+    data[label]++;
+  }
+
+  return [labels, { 'Touren': data }];
 }
