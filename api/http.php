@@ -216,6 +216,10 @@ class Uri {
   public function getQueryParam($name, $default = null) {
     return $this->query[$name] ?? $default;
   }
+
+  public function hasQueryParam($name) {
+    return array_key_exists($name, $this->query);
+  }
 }
 
 class Router {
