@@ -212,6 +212,8 @@ Barchart.prototype.showLegends = function(show, alignment = 'top') {
 
 Barchart.prototype.comboScales = function() {
   this.options.scales.combo = {
+    axis: 'y',
+    type: 'linear',
     display: false,
     stacked: false,
   };
